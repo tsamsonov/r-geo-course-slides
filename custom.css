@@ -62,7 +62,10 @@ h1, h2, h3 {
   font-family: 'Cuprum';
   font-weight: bold;
 }
-table { font-size: 18pt; }
+table { 
+  font-size: 18pt; 
+  float: left;
+}
 img {
   margin-bottom: 0;
   padding-bottom: 0;

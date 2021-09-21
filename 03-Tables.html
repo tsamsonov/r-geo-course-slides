@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Таблицы</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Тимофей Самсонов" />
+    <meta name="date" content="2021-09-21" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Таблицы
+## Визуализация и анализ географических данных на языке R
+### Тимофей Самсонов
+### МГУ имени Ломоносова, Географический факультет
+### 2021-09-21
+
+---
+
+
+
+
+## Tidyverse
+
+Пакет       | Назначение
+------------|-----------
+__ggplot2__ | Построение графиков на основе правил грамматики
+__tibble__  | Усовершенствованный вариант фрейма данных
+__dplyr__   | Грамматика манипуляций над табличными данными
+__tidyr__   | Приведение таблиц в аккуратный вид, удобный для обработки
+__readr__   | Чтение табличных данных из текстовых файлов
+__readxl__  | Чтение табличных данных из файлов Microsoft Excel
+__purrr__   | Функциональное программирование
+__rlang__   | Расширение возможностей языка
+__stringr__ | Работа со строками
+__forcats__ | Автоматизация работы с факторами
+
+---
+
+## Тибблы
+
+__Тиббл__ представляет собой фрейм данных с более строгим поведением
+
+
+```r
+library(tibble)
+```
+
+.pull-left[
+
+```r
+tibble(
+  a = 1:3, 
+  b = 1, 
+  c = -1:1
+)
+## # A tibble: 3 x 3
+##       a     b     c
+##   &lt;int&gt; &lt;dbl&gt; &lt;int&gt;
+## 1     1     1    -1
+## 2     2     1     0
+## 3     3     1     1
+```
+]
+
+.pull-right[
+
+```r
+tribble(
+  ~a, ~b, ~c,
+   1,  1, -1,
+   2,  1,  0,
+   3,  1,  1
+)
+## # A tibble: 3 x 3
+##       a     b     c
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     1     1    -1
+## 2     2     1     0
+## 3     3     1     1
+```
+]
+
+
+
+---
+
+## Встроенные данные
+
+
+```r
+data(package = 'dplyr')
+```
+
+&lt;img src="img/data_dplyr.png" width="100%" /&gt;
+
+---
+
+## Встроенные данные
+
+
+```r
+data(starwars, package = 'dplyr')
+starwars
+## # A tibble: 87 x 14
+##    name    height  mass hair_color  skin_color eye_color birth_year sex   gender
+##    &lt;chr&gt;    &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; 
+##  1 Luke S…    172    77 blond       fair       blue            19   male  mascu…
+##  2 C-3PO      167    75 &lt;NA&gt;        gold       yellow         112   none  mascu…
+##  3 R2-D2       96    32 &lt;NA&gt;        white, bl… red             33   none  mascu…
+##  4 Darth …    202   136 none        white      yellow          41.9 male  mascu…
+##  5 Leia O…    150    49 brown       light      brown           19   fema… femin…
+##  6 Owen L…    178   120 brown, grey light      blue            52   male  mascu…
+##  7 Beru W…    165    75 brown       light      blue            47   fema… femin…
+##  8 R5-D4       97    32 &lt;NA&gt;        white, red red             NA   none  mascu…
+##  9 Biggs …    183    84 black       light      brown           24   male  mascu…
+## 10 Obi-Wa…    182    77 auburn, wh… fair       blue-gray       57   male  mascu…
+## # … with 77 more rows, and 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;,
+## #   films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;
+```
+
+---
+
+## Файлы с разделителем
+
+
+```r
+library(readr)
+(okruga = read_csv('../r-geo-course/data/okruga.csv'))
+## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   `№` = col_double(),
+##   Регион = col_character(),
+##   `2005` = col_double(),
+##   `2010` = col_double(),
+##   `2011` = col_double(),
+##   `2012` = col_double(),
+##   `2013` = col_double()
+## )
+## # A tibble: 8 x 7
+##     `№` Регион            `2005` `2010` `2011` `2012` `2013`
+##   &lt;dbl&gt; &lt;chr&gt;              &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1     1 Центральный         4341   3761   3613   3651   3570
+## 2     2 Северо-Западный     3192   3088   2866   2877   2796
+## 3     3 Южный федеральный   1409   1446   1436   1394   1321
+## 4     4 Северо-Кавказский    496    390    397    395    374
+## 5     5 Приволжский         3162   2883   2857   2854   2849
+## 6     6 Уральский           1681   1860   1834   1665   1624
+## 7     7 Сибирский           2575   2218   2142   2077   1941
+## 8     8 Дальневосточный      871    870    821    765    713
+```
+
+---
+
+# Файлы с фиксированной шириной столбца
+
+
+```r
+(wenergy = read_table('../r-geo-course/data/wind_energy.txt', 
+                      col_names = c('id', 'lat', 'lon', 'energy50', 'energy110')))
+## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   id = col_double(),
+##   lat = col_double(),
+##   lon = col_double(),
+##   energy50 = col_double(),
+##   energy110 = col_double()
+## )
+## # A tibble: 92 x 5
+##       id   lat   lon energy50 energy110
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+##  1     1  43.5  28       111.      178.
+##  2     2  43.5  28.5     187.      301.
+##  3     3  44    28.5     169.      271.
+##  4     4  44.5  28.5     157.      253.
+##  5     5  44.5  29       189.      304.
+##  6     6  45    29       170.      274.
+##  7     7  45    29.5     199.      320.
+##  8     8  45.5  29.5     189.      303.
+##  9     9  46    30       180.      289.
+## 10    10  46    30.5     208.      334.
+## # … with 82 more rows
+```
+
+---
+
+## Таблицы Microsoft Excel
+
+
+```r
+library(readxl)
+(reforest = read_excel('../r-geo-course/data/reforest.xlsx', 
+                       col_types = c('text', rep('numeric', 8))))
+## # A tibble: 89 x 9
+##    Region                `2005` `2010` `2011` `2012` `2013` `2014` `2015` `2016`
+##    &lt;chr&gt;                  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Российская Федерация   812.   812.   860    842.   872.   863    803.   840. 
+##  2 Центральный федераль…   52.6   62.7   60.9   60.3   70.9   71.2   72.6   77  
+##  3 Белгородская область     0.4    0.1    0.3    0.3    0.4    0.4    0.2    0.2
+##  4 Брянская область         2.9    2.8    3      3.2    3.5    3.3    3.1    3  
+##  5 Владимирская область     4.4    5.3    5.7    6      7.1    5.9    6      4.9
+##  6 Воронежская область      1.1    1.1    1.8    3      2.7    2.7    2.6    2.3
+##  7 Ивановская область       2.1    1.6    2.2    3.1    4      4.8    4.6    4.2
+##  8 Калужская область        2.2    2.3    2.3    2.5    2.4    3.1    3.2    3.2
+##  9 Костромская область     10     25.2   11     11.8   15.3   13.6   15.1   16.4
+## 10 Курская область          0.5    0.3    0.4    0.6    0.6    0.6    0.5    0.4
+## # … with 79 more rows
+```
+
+---
+
+# Просмотр
+
+
+```r
+head(reforest) # по умолчанию 6
+## # A tibble: 6 x 9
+##   Region                 `2005` `2010` `2011` `2012` `2013` `2014` `2015` `2016`
+##   &lt;chr&gt;                   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Российская Федерация    812.   812.   860    842.   872.   863    803.   840. 
+## 2 Центральный федеральн…   52.6   62.7   60.9   60.3   70.9   71.2   72.6   77  
+## 3 Белгородская область      0.4    0.1    0.3    0.3    0.4    0.4    0.2    0.2
+## 4 Брянская область          2.9    2.8    3      3.2    3.5    3.3    3.1    3  
+## 5 Владимирская область      4.4    5.3    5.7    6      7.1    5.9    6      4.9
+## 6 Воронежская область       1.1    1.1    1.8    3      2.7    2.7    2.6    2.3
+tail(reforest, 3)
+## # A tibble: 3 x 9
+##   Region                 `2005` `2010` `2011` `2012` `2013` `2014` `2015` `2016`
+##   &lt;chr&gt;                   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Сахалинская область      13.1   12.7   12.5    4.6    4.7    4.9    4.7    4.1
+## 2 Еврейская автономная …    2.9   NA      2.6    2.5    2.3   NA     NA      2.4
+## 3 Чукотский автономный …    0.3   NA     NA     NA     NA     NA     NA     NA
+```
+
+---
+
+## Функция View()
+
+.pull-left[
+__RStudio__ предоставляет графический интерфейс для просмотра таблиц, в котором таблицу можно сортировать и фильтровать:
+
+```r
+View(wenergy)
+```
+
+&gt; .red[__Внимание:__ не следует оставлять вызовы функции `View()` в тексте законченной программы. Используйте ее только для отладочных целей.]
+]
+
+.pull-right[
+&lt;img src="img/View.png" width="1133" /&gt;
+]
+
+---
+
+## Грамматика манипуляций dplyr
+
+Функция       | Назначение
+--------------|-----------------
+`select()`    | Выбор переменных
+`filter()`    | Выбор строк (фильтрация)
+`arrange()`   | Упорядочение строк
+`mutate()`    | Мутирование — добавление и изменение переменных
+`transmute()` | Трансмутирование — мутирование с отбрасыванием переменных
+`relocate()`  | Изменение порядка столбцов
+`pull()`      | Извлечение столбца как вектора
+`group_by()`  | Группировка строк (для последующего агрегирования)
+`rowwise()`   | Группировка построчная
+`summarise()` | Агрегирование значений переменных
+
+---
+
+# Грамматика манипуляций
+
+Для начала переименуем столбцы с годами, чтобы их названия начинались с буквы `y`:
+
+```r
+old_names = colnames(reforest)
+colnames(reforest) = c(old_names[1], 
+                       paste('y', old_names[-1], sep = ''))
+head(reforest)
+## # A tibble: 6 x 9
+##   Region                        y2005 y2010 y2011 y2012 y2013 y2014 y2015 y2016
+##   &lt;chr&gt;                         &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 Российская Федерация          812.  812.  860   842.  872.  863   803.  840. 
+## 2 Центральный федеральный округ  52.6  62.7  60.9  60.3  70.9  71.2  72.6  77  
+## 3 Белгородская область            0.4   0.1   0.3   0.3   0.4   0.4   0.2   0.2
+## 4 Брянская область                2.9   2.8   3     3.2   3.5   3.3   3.1   3  
+## 5 Владимирская область            4.4   5.3   5.7   6     7.1   5.9   6     4.9
+## 6 Воронежская область             1.1   1.1   1.8   3     2.7   2.7   2.6   2.3
+```
+
+---
+
+## Выбор переменных
+
+
+```r
+library(dplyr)
+## 
+## Присоединяю пакет: 'dplyr'
+## Следующие объекты скрыты от 'package:stats':
+## 
+##     filter, lag
+## Следующие объекты скрыты от 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+(rdf = select(reforest, Region, y2010, y2015))
+## # A tibble: 89 x 3
+##    Region                        y2010 y2015
+##    &lt;chr&gt;                         &lt;dbl&gt; &lt;dbl&gt;
+##  1 Российская Федерация          812.  803. 
+##  2 Центральный федеральный округ  62.7  72.6
+##  3 Белгородская область            0.1   0.2
+##  4 Брянская область                2.8   3.1
+##  5 Владимирская область            5.3   6  
+##  6 Воронежская область             1.1   2.6
+##  7 Ивановская область              1.6   4.6
+##  8 Калужская область               2.3   3.2
+##  9 Костромская область            25.2  15.1
+## 10 Курская область                 0.3   0.5
+## # … with 79 more rows
+```
+
+---
+
+## Выбор переменных
+
+Можно исключать (`-`) столбцы и указывать диапазоны (`:`) названий:
+
+
+```r
+(rdf = select(reforest, -y2005, -y2011:-y2014, -y2016))
+## # A tibble: 89 x 3
+##    Region                        y2010 y2015
+##    &lt;chr&gt;                         &lt;dbl&gt; &lt;dbl&gt;
+##  1 Российская Федерация          812.  803. 
+##  2 Центральный федеральный округ  62.7  72.6
+##  3 Белгородская область            0.1   0.2
+##  4 Брянская область                2.8   3.1
+##  5 Владимирская область            5.3   6  
+##  6 Воронежская область             1.1   2.6
+##  7 Ивановская область              1.6   4.6
+##  8 Калужская область               2.3   3.2
+##  9 Костромская область            25.2  15.1
+## 10 Курская область                 0.3   0.5
+## # … with 79 more rows
+```
+
+---
+
+## Выбор строк (фильтрация)
+
+
+```r
+filter(rdf, y2015 &gt; 50)
+## # A tibble: 11 x 3
+##    Region                            y2010 y2015
+##    &lt;chr&gt;                             &lt;dbl&gt; &lt;dbl&gt;
+##  1 Российская Федерация              812.  803. 
+##  2 Центральный федеральный округ      62.7  72.6
+##  3 Северо-Западный федеральный округ 163.  194. 
+##  4 Архангельская область              39.4  57.6
+##  5 Приволжский федеральный округ      89.2 110. 
+##  6 Уральский федеральный округ        63.8  52.9
+##  7 Сибирский федеральный округ       225.  259. 
+##  8 Красноярский край                  49    50.4
+##  9 Иркутская область                  80.4 117. 
+## 10 Дальневосточный федеральный округ 199.  110. 
+## 11 Хабаровский край                   70.2  59.6
+```
+
+---
+
+## Выбор строк (фильтрация)
+
+
+```r
+flt = stringr::str_detect(rdf$Region, 'Федерация|федеральный округ')
+flt
+##  [1]  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE
+## [25] FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+## [37] FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE
+## [49] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [61] FALSE  TRUE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+## [73] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE
+## [85] FALSE FALSE FALSE FALSE FALSE
+regdf = filter(rdf, !flt) # применяем фильтр
+head(regdf)
+## # A tibble: 6 x 3
+##   Region               y2010 y2015
+##   &lt;chr&gt;                &lt;dbl&gt; &lt;dbl&gt;
+## 1 Белгородская область   0.1   0.2
+## 2 Брянская область       2.8   3.1
+## 3 Владимирская область   5.3   6  
+## 4 Воронежская область    1.1   2.6
+## 5 Ивановская область     1.6   4.6
+## 6 Калужская область      2.3   3.2
+```
+
+
+
+---
+
+## Сортировка
+
+
+```r
+arrange(regdf, y2015) # по возрастанию
+## # A tibble: 80 x 3
+##    Region                              y2010 y2015
+##    &lt;chr&gt;                               &lt;dbl&gt; &lt;dbl&gt;
+##  1 Орловская область                     0     0.1
+##  2 Астраханская область                  0.1   0.1
+##  3 Кабардино-Балкарская Республика       0.1   0.1
+##  4 Карачаево-Черкесская Республика       0.2   0.1
+##  5 Республика Северная Осетия – Алания  NA     0.1
+##  6 Ставропольский край                   0.4   0.1
+##  7 Белгородская область                  0.1   0.2
+##  8 Тульская область                      0.1   0.2
+##  9 Магаданская область                   2.6   0.4
+## 10 Курская область                       0.3   0.5
+## # … with 70 more rows
+```
+
+---
+
+## Добавление или изменение переменных
+
+
+```r
+regdf = mutate(regdf, delta = y2015 - y2010)
+regdf
+## # A tibble: 80 x 4
+##    Region               y2010 y2015   delta
+##    &lt;chr&gt;                &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Белгородская область   0.1   0.2   0.1  
+##  2 Брянская область       2.8   3.1   0.300
+##  3 Владимирская область   5.3   6     0.7  
+##  4 Воронежская область    1.1   2.6   1.5  
+##  5 Ивановская область     1.6   4.6   3    
+##  6 Калужская область      2.3   3.2   0.9  
+##  7 Костромская область   25.2  15.1 -10.1  
+##  8 Курская область        0.3   0.5   0.2  
+##  9 Липецкая область       0.4   1.1   0.7  
+## 10 Московская область     2.7   8.9   6.2  
+## # … with 70 more rows
+```
+
+---
+
+## Трансмутирование
+
+`transmute()` сохраняет только столбцы, указанные в параметрах
+
+```r
+transmute(regdf, Region, delta = y2015 - y2010) # сохраняем только Region и delta
+## # A tibble: 80 x 2
+##    Region                 delta
+##    &lt;chr&gt;                  &lt;dbl&gt;
+##  1 Белгородская область   0.1  
+##  2 Брянская область       0.300
+##  3 Владимирская область   0.7  
+##  4 Воронежская область    1.5  
+##  5 Ивановская область     3    
+##  6 Калужская область      0.9  
+##  7 Костромская область  -10.1  
+##  8 Курская область        0.2  
+##  9 Липецкая область       0.7  
+## 10 Московская область     6.2  
+## # … with 70 more rows
+```
+
+---
+
+## Агрегирование
+
+
+```r
+summarise(regdf, 
+          sumforest = sum(y2015, na.rm = TRUE),
+          minforest = min(y2015, na.rm = TRUE),
+          maxforest = max(y2015, na.rm = TRUE))
+## # A tibble: 1 x 3
+##   sumforest minforest maxforest
+##       &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1      801.       0.1      117.
+```
+
+---
+
+## Агрегирующие функции
+
+В пакете __dplyr__ также имеются полезные агрегирующие функции:
+
+- `n()` вычисляет количество элементов.
+
+- `n_distinct()` вычисляет количество уникальных элементов.
+
+- `first(x)`, `last(x)` и `nth(x, n)` извлекают, первый, последний и n-ный элемент. 
+
+---
+
+## Группировка
+
+Исходные данные:
+
+```
+## # A tibble: 80 x 4
+##    Region               y2010 y2015 okrug                        
+##    &lt;chr&gt;                &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                        
+##  1 Белгородская область   0.1   0.2 Центральный федеральный округ
+##  2 Брянская область       2.8   3.1 Центральный федеральный округ
+##  3 Владимирская область   5.3   6   Центральный федеральный округ
+##  4 Воронежская область    1.1   2.6 Центральный федеральный округ
+##  5 Ивановская область     1.6   4.6 Центральный федеральный округ
+##  6 Калужская область      2.3   3.2 Центральный федеральный округ
+##  7 Костромская область   25.2  15.1 Центральный федеральный округ
+##  8 Курская область        0.3   0.5 Центральный федеральный округ
+##  9 Липецкая область       0.4   1.1 Центральный федеральный округ
+## 10 Московская область     2.7   8.9 Центральный федеральный округ
+## # … with 70 more rows
+```
+
+---
+
+## Группировка
+
+`group_by()` + `row_number()`: регион с максимальной величиной показателя в каждом округе:
+
+```r
+regdf_gr = group_by(regdf, okrug)
+regdf_arr = arrange(regdf_gr, desc(y2015))
+(regdf_res = filter(regdf_arr, row_number() == 1))
+## # A tibble: 8 x 4
+## # Groups:   okrug [8]
+##   Region                y2010 y2015 okrug                              
+##   &lt;chr&gt;                 &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                              
+## 1 Иркутская область      80.4 117.  Сибирский федеральный округ        
+## 2 Хабаровский край       70.2  59.6 Дальневосточный федеральный округ  
+## 3 Архангельская область  39.4  57.6 Северо-Западный федеральный округ  
+## 4 Пермский край          22.9  32.5 Приволжский федеральный округ      
+## 5 Свердловская область   25.6  24.4 Уральский федеральный округ        
+## 6 Костромская область    25.2  15.1 Центральный федеральный округ      
+## 7 Волгоградская область   1.8   0.9 Южный федеральный округ            
+## 8 Чеченская Республика    0.9   0.7 Северо-Кавказский федеральный округ
+```
+
+---
+
+## Группировка
+
+`group_by()` + `summarise()`: суммарный объем лесовосстановительных работ по округам:
+
+```r
+regdf_gr = group_by(regdf, okrug)
+summarise(regdf_gr, total = sum(y2015, na.rm = TRUE))
+## # A tibble: 8 x 2
+##   okrug                               total
+##   &lt;chr&gt;                               &lt;dbl&gt;
+## 1 Дальневосточный федеральный округ   108. 
+## 2 Приволжский федеральный округ       110. 
+## 3 Северо-Западный федеральный округ   194. 
+## 4 Северо-Кавказский федеральный округ   1.1
+## 5 Сибирский федеральный округ         259. 
+## 6 Уральский федеральный округ          52.9
+## 7 Центральный федеральный округ        72.7
+## 8 Южный федеральный округ               3.3
+```
+
+---
+
+## Конвейер манипуляций
+
+ __Пайп-оператор `|&gt;`__ предназначен для компактной и наглядной записи _последовательностей_ обработки данных. Работает он следующим образом:
+
+ - `x |&gt; f` эквивалентно `f(x)`
+ 
+ - `x |&gt; f(y)` эквивалентно `f(x, y)`
+ 
+ - `x |&gt; f |&gt; g |&gt; h` эквивалентно `h(g(f(x)))`
+
+&gt; Пайп-оператор можно быстро набрать в RStudio, нажав клавиатурное сочетание &lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;Shift&lt;/kbd&gt; + &lt;kbd&gt;M&lt;/kbd&gt; (&lt;kbd&gt;Cmd&lt;/kbd&gt; + &lt;kbd&gt;Shift&lt;/kbd&gt; + &lt;kbd&gt;M&lt;/kbd&gt; на помпьютерах Mac)
+
+---
+
+## Конвейер манипуляций
+
+С помощью пайп-оператора код по нахождению региона-лидера можно записать так:
+
+
+```r
+leaders = regdf |&gt;
+  group_by(okrug) |&gt;
+  arrange(desc(y2015)) |&gt;
+  filter(row_number() == 1)
+
+head(leaders)
+## # A tibble: 6 x 4
+## # Groups:   okrug [6]
+##   Region                            y2010 y2015 okrug                           
+##   &lt;chr&gt;                             &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                           
+## 1 Российская Федерация              812.  803.  &lt;NA&gt;                            
+## 2 Сибирский федеральный округ       225.  259.  Сибирский федеральный округ     
+## 3 Северо-Западный федеральный округ 163.  194.  Северо-Западный федеральный окр…
+## 4 Дальневосточный федеральный округ 199.  110.  Дальневосточный федеральный окр…
+## 5 Приволжский федеральный округ      89.2 110.  Приволжский федеральный округ   
+## 6 Центральный федеральный округ      62.7  72.6 Центральный федеральный округ
+```
+
+---
+
+## Сравнение
+
+.pull-left[
+Традиционно:
+
+```r
+leaders = filter(
+            arrange(
+              group_by(
+                regdf, 
+                okrug
+              ),
+              desc(y2015)
+            ),
+            row_number() == 1
+          )
+```
+]
+
+.pull-right[
+С помощью конвейера:
+
+```r
+leaders = regdf |&gt;
+  group_by(okrug) |&gt; 
+  arrange(desc(y2015)) |&gt; 
+  filter(row_number() == 1)
+```
+]
+
+---
+
+## Преобразование структуры
+
+Функции пакета __tidyr__
+
+- `pivot_longer()`: широкие таблицы в длинные.
+
+- `pivot_wider()`: длинные таблицы в широкие.
+
+&gt; В tidyr более ранних чем 1.0.0 версий для этих целей использовались функции `gather()` и `spread()`
+
+Вспомогательные:
+
+- `separate()`: разделить столбец.
+
+- `unite()`: соединить несколько столбцов.
+
+---
+
+## Преобразование структуры
+
+`pivot_longer()`: широкая форма в длинную форму
+
+```r
+library(tidyr)
+(reforest_tidy = reforest |&gt;
+    pivot_longer(cols = y2005:y2016,
+                 names_to = 'year', 
+                 values_to = 'value')
+)
+## # A tibble: 712 x 3
+##    Region                        year  value
+##    &lt;chr&gt;                         &lt;chr&gt; &lt;dbl&gt;
+##  1 Российская Федерация          y2005 812. 
+##  2 Российская Федерация          y2010 812. 
+##  3 Российская Федерация          y2011 860  
+##  4 Российская Федерация          y2012 842. 
+##  5 Российская Федерация          y2013 872. 
+##  6 Российская Федерация          y2014 863  
+##  7 Российская Федерация          y2015 803. 
+##  8 Российская Федерация          y2016 840. 
+##  9 Центральный федеральный округ y2005  52.6
+## 10 Центральный федеральный округ y2010  62.7
+## # … with 702 more rows
+```
+
+---
+
+## Преобразование структуры
+
+`separate()` + `select()` + `mutate()`: разделить столбец `year`
+
+```r
+(reforest_tidy = reforest_tidy |&gt; 
+  separate(year, c('y', 'year'), 1) |&gt;
+  select(-y) |&gt;
+  mutate(year = as.integer(year)))
+## # A tibble: 712 x 3
+##    Region                         year value
+##    &lt;chr&gt;                         &lt;int&gt; &lt;dbl&gt;
+##  1 Российская Федерация           2005 812. 
+##  2 Российская Федерация           2010 812. 
+##  3 Российская Федерация           2011 860  
+##  4 Российская Федерация           2012 842. 
+##  5 Российская Федерация           2013 872. 
+##  6 Российская Федерация           2014 863  
+##  7 Российская Федерация           2015 803. 
+##  8 Российская Федерация           2016 840. 
+##  9 Центральный федеральный округ  2005  52.6
+## 10 Центральный федеральный округ  2010  62.7
+## # … with 702 more rows
+```
+
+---
+
+## Преобразование структуры
+
+`filter()`
+
+```r
+reforest_tidy |&gt;
+  filter(year &gt; 2011 &amp; year &lt; 2016 &amp; value == 0)
+## # A tibble: 2 x 3
+##   Region             year value
+##   &lt;chr&gt;             &lt;int&gt; &lt;dbl&gt;
+## 1 Орловская область  2013     0
+## 2 Республика Адыгея  2014     0
+```
+
+---
+
+## Преобразование структуры
+
+`pivot_wider()`: длинная форма в широкую форму
+
+```r
+(reforest = reforest_tidy |&gt;
+   pivot_wider(names_from = year, 
+               values_from = value)
+ )
+## # A tibble: 89 x 9
+##    Region                `2005` `2010` `2011` `2012` `2013` `2014` `2015` `2016`
+##    &lt;chr&gt;                  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Российская Федерация   812.   812.   860    842.   872.   863    803.   840. 
+##  2 Центральный федераль…   52.6   62.7   60.9   60.3   70.9   71.2   72.6   77  
+##  3 Белгородская область     0.4    0.1    0.3    0.3    0.4    0.4    0.2    0.2
+##  4 Брянская область         2.9    2.8    3      3.2    3.5    3.3    3.1    3  
+##  5 Владимирская область     4.4    5.3    5.7    6      7.1    5.9    6      4.9
+##  6 Воронежская область      1.1    1.1    1.8    3      2.7    2.7    2.6    2.3
+##  7 Ивановская область       2.1    1.6    2.2    3.1    4      4.8    4.6    4.2
+##  8 Калужская область        2.2    2.3    2.3    2.5    2.4    3.1    3.2    3.2
+##  9 Костромская область     10     25.2   11     11.8   15.3   13.6   15.1   16.4
+## 10 Курская область          0.5    0.3    0.4    0.6    0.6    0.6    0.5    0.4
+## # … with 79 more rows
+```
+
+---
+
+## Соединение (мутирующее)
+
+- `inner_join(x, y, by = )` возвращает все строки из `x`, для которых имеются соответствующие строки в `y`, а также все столбцы из `x` и `y`.
+&lt;br&gt;&lt;br&gt;
+- `left_join(x, y, by = )` возвращает все строки из `x`, а также все столбцы из `x` и `y`. Строки в `x`, для которых не найдены соответствия в `y`, будут иметь значения `NA` в присоединенных столбцах
+&lt;br&gt;&lt;br&gt;
+- `right_join(x, y, by = )` возвращает все строки из `y`, а также все столбцы из `x` и `y`. Строки в `y`, для которых не найдены соответствия в `x`, будут иметь значения `NA` в присоединенных столбцах
+&lt;br&gt;&lt;br&gt;
+- `full_join(x, y, by = )` возвращает все строки и колонки из `x` и `y`. В строках, для которых не найдено соответствие ячейки присоединяемых столбцов будут заполнены значениями `NA`
+
+---
+
+## Соединение (фильтрующее)
+
+- `semi_join(x, y, by = )` возвращает все строки из `x`, для которых имеются соответствующие строки в `y`, а также все столбцы из `x`
+&lt;br&gt;&lt;br&gt;
+- `anti_join(x, y, by = )` возвращает все строки из `x`, для которых _не_ найдены соответствующие строки в `y`, а также все столбцы из `x`
+
+---
+
+## Соединение
+
+Таблица по лесозаготовкам:
+
+```r
+(timber = read_excel('../r-geo-course/data/timber.xlsx', 
+                    col_types = c('text', rep('numeric', 8))) |&gt;
+  filter(!stringr::str_detect(Регион, 'Федерация|федеральный округ')))
+## # A tibble: 75 x 9
+##    Регион               `2010` `2011` `2012` `2013` `2014` `2015` `2016` Место
+##    &lt;chr&gt;                 &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+##  1 Белгородская область   30.4   39.6   27.7   37.4   34.1   45.6   30.4    60
+##  2 Брянская область      614.   616.   824.   850.   793.   739.   750.     27
+##  3 Владимирская область 1078   1335   1236   1142   1165   1272   1252      20
+##  4 Воронежская область    73.6   69.5   68.6   47.9   81.1   86.6   53.5    58
+##  5 Ивановская область    130.   140.   200.   199.   231.   326.   421.     38
+##  6 Калужская область     274.   244.   192.   198.   183    145.   204      44
+##  7 Костромская область  3000   3332   2797   2692   2564   2186   2515      14
+##  8 Курская область        22.8   55.4   49.7   50.1   65.9   74.6   80.7    55
+##  9 Липецкая область      163.   139     49.7   42.6   50.1   73.1   87.8    53
+## 10 Московская область    126.   265.   299.   108.    15.6   NA     NA      74
+## # … with 65 more rows
+```
+
+---
+
+## Соединение
+
+Приводим в аккуратный вид:
+
+```r
+(timber_tidy = timber |&gt;
+  pivot_longer(`2010`:`2016`, names_to = 'year', values_to = 'harvest') |&gt;
+  transmute(Region = Регион,
+            year = as.numeric(year),
+            harvest = harvest))
+## # A tibble: 525 x 3
+##    Region                year harvest
+##    &lt;chr&gt;                &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Белгородская область  2010    30.4
+##  2 Белгородская область  2011    39.6
+##  3 Белгородская область  2012    27.7
+##  4 Белгородская область  2013    37.4
+##  5 Белгородская область  2014    34.1
+##  6 Белгородская область  2015    45.6
+##  7 Белгородская область  2016    30.4
+##  8 Брянская область      2010   614. 
+##  9 Брянская область      2011   616. 
+## 10 Брянская область      2012   824. 
+## # … with 515 more rows
+```
+
+---
+
+## Соединение
+
+`inner_join()`: соединяем лесозаготовки и лесовосстановление по региону и году
+
+```r
+(compare = reforest_tidy %&gt;% 
+  inner_join(timber_tidy, 
+             by = c("Region" = "Region", 
+                    "year" = "year"))
+)
+## # A tibble: 511 x 4
+##    Region                year value harvest
+##    &lt;chr&gt;                &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Белгородская область  2010   0.1    30.4
+##  2 Белгородская область  2011   0.3    39.6
+##  3 Белгородская область  2012   0.3    27.7
+##  4 Белгородская область  2013   0.4    37.4
+##  5 Белгородская область  2014   0.4    34.1
+##  6 Белгородская область  2015   0.2    45.6
+##  7 Белгородская область  2016   0.2    30.4
+##  8 Брянская область      2010   2.8   614. 
+##  9 Брянская область      2011   3     616. 
+## 10 Брянская область      2012   3.2   824. 
+## # … with 501 more rows
+```
+
+---
+
+## Соединение
+
+Вычисляем соотношение:
+
+```r
+(compare = compare %&gt;% 
+   mutate(ratio = 1000 * value / harvest) %&gt;% 
+   select(Region, year, ratio, value, harvest) %&gt;% 
+   arrange(year, desc(ratio)))
+## # A tibble: 511 x 5
+##    Region                    year ratio value harvest
+##    &lt;chr&gt;                    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Ставропольский край       2010 182.    0.4     2.2
+##  2 Ростовская область        2010 149.    1.5    10.1
+##  3 Магаданская область       2010 118.    2.6    22  
+##  4 Сахалинская область       2010  63.8  12.7   199. 
+##  5 Республика Саха (Якутия)  2010  63.3  58     917. 
+##  6 Республика Тыва           2010  61.8   4.4    71.2
+##  7 Мурманская область        2010  52.2   3      57.5
+##  8 Волгоградская область     2010  48.4   1.8    37.2
+##  9 Камчатский  край          2010  38.9   5.2   134. 
+## 10 Амурская область          2010  38.5  29.8   773. 
+## # … with 501 more rows
+```
+
+---
+
+## Экспорт в файл
+
+
+Файлы с разделителем
+
+```r
+write_csv(compare, "../r-geo-course/data/output/timber_compare.csv")
+```
+
+файлы Excel:
+
+```r
+library(writexl)
+write_xlsx(compare, "../r-geo-course/data/output/timber_compare.xlsx")
+```
+
+---
+
+## Рекомендации по подготовке таблиц для чтения в R
+
+- В первой строке таблицы должны располагаться названия столбцов.
+
+- Во второй строке таблицы должны начинаться данные. Не допускайте многострочных заголовков.
+
+- В названиях столбцов недопустимы объединенные ячейки, покрывающие несколько столбцов. Это может привести к неверному подсчету количества столбцов и, как следствие, некорректному чтению таблицы в целом.
+
+- Названия столбцов должны состоять из латинских букв и цифр, начинаться с буквы и не содержать пробелов. Плохое название столбца: `Валовый внутренний продукт за 2015 г.`. Хорошее название столбца: `GDP2015`.
+
+- Некоторые ошибки данных в таблицах (такие как неверные десятичные разделители), проще найти и исправить в табличном/текстовом редакторе, нежели после загрузки в __R__.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

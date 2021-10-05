@@ -615,18 +615,16 @@ barplot(
 
 ---
 
-# Цвет
+# Цветовые палитры
 
-Наконец, вещь, которой совершенно необходимо уметь пользоваться при работе с цветом в __R__ --- это цветовые палитры. Палитры чрезвычайно удобны, когда необходимо сгенерировать множество цветов, зная лишь основные оттенки. Для этого нужно создать палитру, используя функцию `colorRampPalette()`:
 
 ```r
-# задаем 2 опорных цвета: черный  белый
-palet=colorRampPalette(c("black","white")) 
+*palet = colorRampPalette(c("steelblue","white","purple4"))
+```
 
-# и автоматически генерируем 8 цветов между ними:
-colors=palet(8)
+.pull-left[
 
-# используем их для отображения:
+```r
 barplot(okr$ХимЭкспорт, 
         names.arg = names, 
         main = "Экспорт продукции химической промышленности", 
@@ -634,29 +632,21 @@ barplot(okr$ХимЭкспорт,
         horiz = TRUE, 
         las = 1, 
         xlim = c(0, 12000), 
-        col= colors)
+*       col = palet(nrow(okr)))
 ```
+`colorRampPalette()` является __функциональной фабрикой__, т.е. функцией, создающей другую функцию. 
+]
 
-![](05_Graphics_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+.pull-right[
+&lt;img src="05_Graphics_files/figure-html/pal-out-1.png" width="90%" /&gt;
+]
 
-```r
+---
 
-# вы можете включить в палитру произвольное количество цветов:
-palet=colorRampPalette(c("steelblue","white","purple4")) 
-colors=palet(8)
-barplot(okr$ХимЭкспорт, 
-        names.arg = names, 
-        main = "Экспорт продукции химической промышленности", 
-        xlab = "млн долл. США", 
-        horiz=TRUE, 
-        las = 1, 
-        xlim = c(0, 12000), 
-        col= colors)
-```
+# Цветовые палитры
 
-![](05_Graphics_files/figure-html/unnamed-chunk-16-2.png)&lt;!-- --&gt;
-
-В __R__ cуществует множество стандартных палитр, их список можно найти в справке и документации. Наиболее полезные из них:
+.pull-left[
+В __R__ cуществует множество стандартных цветовых палитр:
 
 * `colors()`
 * `gray()`
@@ -665,52 +655,113 @@ barplot(okr$ХимЭкспорт,
 * `topo.colors()`
 * `terrain.colors()`
 
-Напрмер, вы можете изменить цвета диаграммы, взяв их из одной из палитр или выбрав случайным образом из полной палитры цветов, используя функцию `sample()`:
 
 ```r
-pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=rainbow(length(names2)))
+pie(
+  okr$ХимЭкспорт, names2, 
+  main = "Доля федеральных округов в экспорте \n продукции химической промышленности", 
+* col = rainbow(nrow(okr))
+)
+```
+]
+
+.pull-right[
+![](05_Graphics_files/figure-html/piepal-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Цветовые палитры
+
+.pull-left[
+В __R__ cуществует множество стандартных цветовых палитр:
+
+* `colors()`
+* `gray()`
+* `rainbow()`
+* `heat.colors()`
+* `topo.colors()`
+* `terrain.colors()`
+
+
+```r
+pie(
+  okr$ХимЭкспорт, names2, 
+  main = "Доля федеральных округов в экспорте \n продукции химической промышленности", 
+*col = sample(colors(), nrow(okr))
+)
+```
+]
+
+.pull-right[
+![](05_Graphics_files/figure-html/piepal2-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Color Brewer
+
+Широко используемый ресурс для построения цветовых палитр
+
+&lt;iframe src="https://colorbrewer2.org/" width="100%" height="400px"&gt;&lt;/iframe&gt;
+https://colorbrewer2.org/
+
+---
+
+# Color Brewer
+
+.pull-left[
+Палитры ColorBrewer доступны через пакет `RColorBrewer`
+
+
+```r
+library(RColorBrewer)
+par(mar = c(0, 2.5, 0, 2.5))
+*display.brewer.all()
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+К каждой палитре можно обратиться по имени:
 
 ```r
-pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=sample(colors(),5))
+colors = brewer.pal(nrow(okr), 
+                    "Set1")
+```
+]
+
+.pull-right[
+![](05_Graphics_files/figure-html/brew-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+
+# Color Brewer
+
+
+
+.pull-left[
+.code-small[
+
+```r
+pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", 
+*   col = brewer.pal(nrow(okr), "Set1"))
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-17-2.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+]
+]
 
-Более богатый набор палитр можно найти в библиотеке `RColorBrewer`, которая представляет собой интерпретацию палитр, доступных на сайте [colorbrewer2.org](http://colorbrewer2.org/)
-
-
-```r
-library(RColorBrewer) # Откроем библиотеку RColorBrewer:
-display.brewer.all() # Посмотрим, какие в ней имеются палитры
-```
-
-![](05_Graphics_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
-
-
-К каждой из этих палитр можно обратиться по названию с помощью функции `brewer.pal()`. Поскольку нам необходимы цвета для категориальных данных, следует использовать палитры из средней части (_Set3 - Accent_)
-
+.pull-right[
+.code-small[
 
 ```r
-# выберем цвета из палитры Set2 по количеству секторов в круге:
-colors = brewer.pal(length(names2),"Set1")
-
-# И используем их при визуализации
-par(mar = c(5, 5, 5, 5)) # установим поля
-pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=colors)
+pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", 
+*   col = brewer.pal(nrow(okr), "Set2"))
 ```
 
 ![](05_Graphics_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
-
-```r
-
-# Попробуем палитру Accent:
-pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=brewer.pal(length(names2),"Accent"))
-```
-
-![](05_Graphics_files/figure-html/unnamed-chunk-21-2.png)&lt;!-- --&gt;
+]
+]
 
 ---
 

@@ -569,17 +569,14 @@ barplot(
 
 ---
 
-# Цвет
+# Цветовые палитры
 
-Наконец, вещь, которой совершенно необходимо уметь пользоваться при работе с цветом в __R__ --- это цветовые палитры. Палитры чрезвычайно удобны, когда необходимо сгенерировать множество цветов, зная лишь основные оттенки. Для этого нужно создать палитру, используя функцию `colorRampPalette()`:
-```{r, collapse=TRUE}
-# задаем 2 опорных цвета: черный  белый
-palet=colorRampPalette(c("black","white")) 
+```{r}
+palet = colorRampPalette(c("steelblue","white","purple4")) #<<
+```
 
-# и автоматически генерируем 8 цветов между ними:
-colors=palet(8)
-
-# используем их для отображения:
+.pull-left[
+```{r pal, eval=F}
 barplot(okr$ХимЭкспорт, 
         names.arg = names, 
         main = "Экспорт продукции химической промышленности", 
@@ -587,22 +584,22 @@ barplot(okr$ХимЭкспорт,
         horiz = TRUE, 
         las = 1, 
         xlim = c(0, 12000), 
-        col= colors)
-
-# вы можете включить в палитру произвольное количество цветов:
-palet=colorRampPalette(c("steelblue","white","purple4")) 
-colors=palet(8)
-barplot(okr$ХимЭкспорт, 
-        names.arg = names, 
-        main = "Экспорт продукции химической промышленности", 
-        xlab = "млн долл. США", 
-        horiz=TRUE, 
-        las = 1, 
-        xlim = c(0, 12000), 
-        col= colors)
+        col = palet(nrow(okr))) #<<
 ```
+`colorRampPalette()` является __функциональной фабрикой__, т.е. функцией, создающей другую функцию. 
+]
 
-В __R__ cуществует множество стандартных палитр, их список можно найти в справке и документации. Наиболее полезные из них:
+.pull-right[
+```{r pal-out, echo = F, ref.label='pal', out.width='90%'}
+```
+]
+
+---
+
+# Цветовые палитры
+
+.pull-left[
+В __R__ cуществует множество стандартных цветовых палитр:
 
 * `colors()`
 * `gray()`
@@ -611,37 +608,110 @@ barplot(okr$ХимЭкспорт,
 * `topo.colors()`
 * `terrain.colors()`
 
-Напрмер, вы можете изменить цвета диаграммы, взяв их из одной из палитр или выбрав случайным образом из полной палитры цветов, используя функцию `sample()`:
-```{r, collapse=TRUE}
-pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=rainbow(length(names2)))
-pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=sample(colors(),5))
+```{r piepal, eval=F}
+pie(
+  okr$ХимЭкспорт, names2, 
+  main = "Доля федеральных округов в экспорте \n продукции химической промышленности", 
+  col = rainbow(nrow(okr)) #<<
+)
+```
+]
+
+.pull-right[
+```{r piepal-out, ref.label='piepal', echo=FALSE}
+```
+]
+
+---
+
+# Цветовые палитры
+
+.pull-left[
+В __R__ cуществует множество стандартных цветовых палитр:
+
+* `colors()`
+* `gray()`
+* `rainbow()`
+* `heat.colors()`
+* `topo.colors()`
+* `terrain.colors()`
+
+```{r piepal2, eval=F}
+pie(
+  okr$ХимЭкспорт, names2, 
+  main = "Доля федеральных округов в экспорте \n продукции химической промышленности", 
+col = sample(colors(), nrow(okr)) #<<
+)
+```
+]
+
+.pull-right[
+```{r piepal2-out, ref.label='piepal2', echo=FALSE}
+```
+]
+
+---
+
+# Color Brewer
+
+Широко используемый ресурс для построения цветовых палитр
+
+```{r, echo = F}
+knitr::include_url("https://colorbrewer2.org/")
+```
+https://colorbrewer2.org/
+
+---
+
+# Color Brewer
+
+.pull-left[
+Палитры ColorBrewer доступны через пакет `RColorBrewer`
+
+```{r brew, eval=F}
+library(RColorBrewer)
+par(mar = c(0, 2.5, 0, 2.5))
+display.brewer.all() #<<
 ```
 
-Более богатый набор палитр можно найти в библиотеке `RColorBrewer`, которая представляет собой интерпретацию палитр, доступных на сайте [colorbrewer2.org](http://colorbrewer2.org/)
-```{r, echo = FALSE, purl = FALSE}
-par(mar = c(0,5,0,0))
+К каждой палитре можно обратиться по имени:
+```{r}
+colors = brewer.pal(nrow(okr), 
+                    "Set1")
 ```
-```{r, collapse=TRUE}
-library(RColorBrewer) # Откроем библиотеку RColorBrewer:
-display.brewer.all() # Посмотрим, какие в ней имеются палитры
+]
+
+.pull-right[
+```{r brew-out, ref.label='brew', echo=F}
 ```
-```{r, echo = FALSE, purl = FALSE}
-par(mar = c(5,5,5,5))
-```
+]
 
-К каждой из этих палитр можно обратиться по названию с помощью функции `brewer.pal()`. Поскольку нам необходимы цвета для категориальных данных, следует использовать палитры из средней части (_Set3 - Accent_)
+---
 
-```{r, collapse=TRUE}
-# выберем цвета из палитры Set2 по количеству секторов в круге:
-colors = brewer.pal(length(names2),"Set1")
 
-# И используем их при визуализации
+# Color Brewer
+
+```{r, echo = F}
 par(mar = c(5, 5, 5, 5)) # установим поля
-pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=colors)
-
-# Попробуем палитру Accent:
-pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=brewer.pal(length(names2),"Accent"))
 ```
+
+.pull-left[
+.code-small[
+```{r}
+pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", 
+    col = brewer.pal(nrow(okr), "Set1")) #<<
+```
+]
+]
+
+.pull-right[
+.code-small[
+```{r}
+pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", 
+    col = brewer.pal(nrow(okr), "Set2")) #<<
+```
+]
+]
 
 ---
 

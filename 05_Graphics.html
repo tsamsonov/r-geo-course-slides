@@ -464,19 +464,33 @@ pie(okr$ХимЭкспорт,
 
 # Цвет и прозрачность
 
-Цвет --- одно из основных графических средств, используемых на графиках и диаграммах, поэтому данная тема рассмотрена более подробно в отдельном разделе. Определить цвет можно различными способами. Во-первых, в __R__ есть палитра предопределенных цветов, которые можно выбирать по их [названию](http://research.stowers-institute.org/efg/R/Color/Chart/ColorChart.pdf)).
-
+.pull-left[
 Список называний цветов можно посмотреть, вызвав функцию `colors()`:
 
 ```r
-head(colors())
-## [1] "white"         "aliceblue"     "antiquewhite"  "antiquewhite1" "antiquewhite2" "antiquewhite3"
+colors()[1:20]
 ```
 
-Основной цвет любого графика или диграмма задается параметром `col = `. Это цвет (или цвета) с помощью которых будут отображаться данные. Попробуем изменить цвет графика с серого на пастельно-синий:
+ [1] "white"         "aliceblue"     "antiquewhite"  "antiquewhite1" "antiquewhite2" "antiquewhite3" "antiquewhite4" "aquamarine"   
+ [9] "aquamarine1"   "aquamarine2"   "aquamarine3"   "aquamarine4"   "azure"         "azure1"        "azure2"        "azure3"       
+[17] "azure4"        "beige"         "bisque"        "bisque1"      
+]
+
+.pull-right[
+[Палитра](http://research.stowers-institute.org/efg/R/Color/Chart/ColorChart.pdf) предопределенных цветов:
+&lt;iframe src="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf" width="100%" height="400px"&gt;&lt;/iframe&gt;
+.small[http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf]
+]
+
+---
+
+# Цвет
+
+.pull-left[
+Основной цвет задается параметром `col`:
 
 ```r
-par(mar = c(5, 10, 4, 2)) # увеличим поле left до 10 условных единиц
+par(mar = c(5, 10, 4, 2))
 barplot(okr$ХимЭкспорт, 
         names.arg = names, 
         main = "Экспорт продукции химической промышленности", 
@@ -484,14 +498,22 @@ barplot(okr$ХимЭкспорт,
         horiz = TRUE, 
         las = 1, 
         xlim = c(0,12000), 
-        col = "steelblue")
+*       col = "orangered")
 ```
+]
 
-![](05_Graphics_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
-Помимо этого вы можете задать цвет с помощью цветовых компонент в различных пространствах. Для этого вы должны быть знакомы с основами теории цвета (посмотрите презентацию [UsingColorInR.pdf](http://research.stowers-institute.org/efg/Report/UsingColorInR.pdf). Например, фиолетовый цвет в пространстве [RGB](https://ru.wikipedia.org/wiki/RGB) можно задать с помощью функции `rgb()`, смешав синюю и красную компоненты:
+.pull-right[
+![](05_Graphics_files/figure-html/col1-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Цвет
+
+.pull-left[
+Также можно цвет задать в заданном цветовом пространстве:
 
 ```r
-violet = rgb(0.4, 0, 0.6)
 barplot(okr$ХимЭкспорт, 
         names.arg = names, 
         main = "Экспорт продукции химической промышленности", 
@@ -499,20 +521,28 @@ barplot(okr$ХимЭкспорт,
         horiz = TRUE, 
         las = 1, 
         xlim = c(0,12000), 
-        col = violet)
+*       col = rgb(0.4, 0, 0.6))
 ```
+]
 
-![](05_Graphics_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+.pull-right[
+![](05_Graphics_files/figure-html/col2-out-1.png)&lt;!-- --&gt;
+]
 
-Чтобы сделать цвет __полупрозрачным__, есть две возможности: 
+---
 
-* При создании нового цвета --- передать в функцию `rgb()` дополнительный параметр `alpha = `, который задает долю прозрачности в диапазоне от 0 до 1.
-* При модификации существующего цвета --- вызвать функцию `adjustcolor()` с параметром `alpha = `
+# Цвет
 
-Например:
+.pull-left[
+Каждому столбику можно задать свой цвет:
 
 ```r
-violet.transp = adjustcolor(violet, alpha = 0.5)
+colors = c(
+  "red", "green", "blue", 
+  "orange", "yellow", 
+  "pink", "white","black"
+)
+
 barplot(okr$ХимЭкспорт, 
         names.arg = names, 
         main = "Экспорт продукции химической промышленности", 
@@ -520,32 +550,26 @@ barplot(okr$ХимЭкспорт,
         horiz = TRUE, 
         las = 1, 
         xlim = c(0,12000), 
-        col = violet.transp)
+        col = colors)
 ```
+]
 
-![](05_Graphics_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+.pull-right[
+![](05_Graphics_files/figure-html/col3-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Цвет
+
+.pull-left[
+Или выделить особым цветом нужные. Например, 2 лидера:
 
 ```r
-
-green.transp = rgb(0, 1, 0, 0.5) # появился четвертый параметр
-barplot(okr$ХимЭкспорт, 
-        names.arg = names, 
-        main = "Экспорт продукции химической промышленности", 
-        xlab = "млн долл. США", 
-        horiz = TRUE, 
-        las = 1, 
-        xlim = c(0,12000), 
-        col = green.transp)
-```
-
-![](05_Graphics_files/figure-html/unnamed-chunk-17-2.png)&lt;!-- --&gt;
-
-&gt; Функция `adjustcolor()` позволяет модифицировать все компоненты цвета, не только прозрачность. 
-
-На графике типа _barplot_ вы имеете фактически несколько переменных, которые представлены столбиками. А это означает что для них можно использовать различные цвета. Вы можете передать в параметр `col = ` вектор из цветов, соответствующих столбикам:
-
-```r
-colors = c("red", "green", "blue", "orange", "yellow", "pink", "white","black")
+colors = rep("gray", 8) 
+ord = order(okr$ХимЭкспорт,
+            decreasing = T)
+colors[ord[1:2]] = "orangered"
 
 barplot(okr$ХимЭкспорт, 
         names.arg = names, 
@@ -556,42 +580,42 @@ barplot(okr$ХимЭкспорт,
         xlim = c(0,12000), 
         col = colors)
 ```
+]
 
-![](05_Graphics_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+.pull-right[
+![](05_Graphics_files/figure-html/col4-out-1.png)&lt;!-- --&gt;
+]
 
-На самом деле, такой винегрет из цветов на столбчатых диаграммах использовать не принято. Но вы должны понимать, что при необходимости можно поменять цвет отдельно выбранных столбиков. Например, мы можем показать красным цветом Wентральный и Приволжский округа, которые являются лидерами по экспорту продукции химической промышленности:
+---
 
-```r
-colors = rep("gray", 8) # сделаем 8 серых цветов
-colors[2] = "red"
-colors[7] = "red"
-barplot(okr$ХимЭкспорт, 
-        names.arg = names, 
-        main = "Экспорт продукции химической промышленности", 
-        xlab = "млн долл. США", 
-        horiz = TRUE, 
-        las = 1, 
-        xlim = c(0,12000), 
-        col = colors)
-```
+# Прозрачность
 
-![](05_Graphics_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
-
-Еще одна интересная особенность использования цвета заключается в том, что количество указанных цветом может не совпадать с количеством рядов данных. Вы можете указать 2 или 3 цвета, и они будут циклически повторяться при визуализации данных:
+.pull-left[
+Полупрозрачность можно создать путем модификации существующего цвета через `adjustcolor` или определения компоненты `alpha` при создании:
 
 ```r
-colors=c("gray","steelblue")
-barplot(okr$ХимЭкспорт, 
-        names.arg = names, 
-        main = "Экспорт продукции химической промышленности", 
-        xlab = "млн долл. США", 
-        horiz =TRUE, 
-        las = 1, 
-        xlim = c(0, 12000), 
-        col = colors)
+barplot(
+  okr$ХимЭкспорт, 
+  names.arg = names, 
+  main = "Экспорт продукции химической промышленности", 
+  xlab = "млн долл. США", 
+  horiz = TRUE, 
+  las = 1, 
+  xlim = c(0,12000), 
+* col = adjustcolor('violet',
+*                   alpha = 0.5),
+* border = rgb(0, 1, 0, 0.5)
+)
 ```
+]
 
-![](05_Graphics_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+.pull-right[
+![](05_Graphics_files/figure-html/transp-out-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Цвет
 
 Наконец, вещь, которой совершенно необходимо уметь пользоваться при работе с цветом в __R__ --- это цветовые палитры. Палитры чрезвычайно удобны, когда необходимо сгенерировать множество цветов, зная лишь основные оттенки. Для этого нужно создать палитру, используя функцию `colorRampPalette()`:
 
@@ -613,7 +637,7 @@ barplot(okr$ХимЭкспорт,
         col= colors)
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
 
 ```r
 
@@ -630,7 +654,7 @@ barplot(okr$ХимЭкспорт,
         col= colors)
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-21-2.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-16-2.png)&lt;!-- --&gt;
 
 В __R__ cуществует множество стандартных палитр, их список можно найти в справке и документации. Наиболее полезные из них:
 
@@ -647,13 +671,13 @@ barplot(okr$ХимЭкспорт,
 pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=rainbow(length(names2)))
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
 
 ```r
 pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=sample(colors(),5))
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-22-2.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-17-2.png)&lt;!-- --&gt;
 
 Более богатый набор палитр можно найти в библиотеке `RColorBrewer`, которая представляет собой интерпретацию палитр, доступных на сайте [colorbrewer2.org](http://colorbrewer2.org/)
 
@@ -663,7 +687,7 @@ library(RColorBrewer) # Откроем библиотеку RColorBrewer:
 display.brewer.all() # Посмотрим, какие в ней имеются палитры
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
 
 
 К каждой из этих палитр можно обратиться по названию с помощью функции `brewer.pal()`. Поскольку нам необходимы цвета для категориальных данных, следует использовать палитры из средней части (_Set3 - Accent_)
@@ -678,7 +702,7 @@ par(mar = c(5, 5, 5, 5)) # установим поля
 pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=colors)
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
 
 ```r
 
@@ -686,7 +710,7 @@ pie(okr$ХимЭкспорт, names2, main = "Доля федеральных о
 pie(okr$ХимЭкспорт, names2, main = "Доля федеральных округов в экспорте \n продукции химической промышленности", col=brewer.pal(length(names2),"Accent"))
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-26-2.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-21-2.png)&lt;!-- --&gt;
 
 ---
 
@@ -725,7 +749,7 @@ points(tab$Год, tab$Азовское, pch=20, col="steelblue",cex = 0.8)
 lines(tab$Год, tab$Азовское, pch=20, col="steelblue")
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
 
 Аналогично происходит тонкая настройка __цвета__:
 
@@ -822,7 +846,7 @@ plot(tab$Год,
 grid()
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
 
 Вы, разумеется, можете поменять их количество, однако __R__ не будет за вас согласовывать шаг сетки и шаг меток осей, поскольку метки генерируются на стадии рисования `plot()` или `axis()` и не запоминаются.
 
@@ -834,7 +858,7 @@ plot(tab$Год,
 grid(10, 5)
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
 
 Функция `grid()` на самом деле является оберткой функции `abline()`, которая позволяет рисовать произвольные линии на графике. Данна функция предоставляет следующие возможности построения линий и серий линий:
 
@@ -890,7 +914,7 @@ text(tab$Год,
      cex = 0.75,
      pos = 3)
 ```
-![](05_Graphics_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
 
 &gt; К сожалению, стандартный механизм размещения аннотаций пакета `graphics` не обладает возможностью устранения конфликтов подписей. Однако это возможно для графиков, построенных с помощью библиотек [lattice](https://cran.r-project.org/web/packages/lattice/index.html) и [ggplot2](https://cran.r-project.org/web/packages/ggplot2/index.html). Для этого можно воспользоваться пакетом [directlabels](https://cran.r-project.org/web/packages/directlabels/index.html) или  [ggrepel](https://cran.r-project.org/web/packages/ggrepel/index.html).
 
@@ -958,7 +982,7 @@ lns = c(1, 1, 1) # каждый элемент показывается лини
 legend(location, labels, title = main, col = colors, pch = pts, lwd = lns)
 ```
 
-![](05_Graphics_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
+![](05_Graphics_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
 
 Более подробно с разнообразными опциями размещения легенды на графике вы можете познакомиться, набрав в консоли команду `?legend`.
     </textarea>

@@ -33,14 +33,6 @@ class: center, middle, inverse, title-slide
 
 ```r
 library(dplyr)
-## 
-## Присоединяю пакет: 'dplyr'
-## Следующие объекты скрыты от 'package:stats':
-## 
-##     filter, lag
-## Следующие объекты скрыты от 'package:base':
-## 
-##     intersect, setdiff, setequal, union
 library(tidyr)
 library(ggplot2)
 library(eurostat)
@@ -60,14 +52,13 @@ library(soilDB)
 
 ---
 
-## Загрузка данных Евростата {#advgraphics_eurostat}
+## Загрузка данных Евростата
 
+.code-small[
 
 ```r
-tables = c('tet00034', 'tet00033', 'tet00032', 
-           'tet00031','tet00030', 'tet00029')
-
-trades = lapply(tables, function(X) { # прочтем несколько таблиц в список
+tables = c('tet00034', 'tet00033', 'tet00032', 'tet00031','tet00030', 'tet00029')
+trades = lapply(tables, function(X) {
 * get_eurostat(X) |&gt;  label_eurostat()
 }) |&gt; 
   bind_rows() |&gt;  # объединим прочитанные таблицы в одну
@@ -77,13 +68,6 @@ trades = lapply(tables, function(X) { # прочтем несколько таб
   rename(export = `Exports in million of ECU/EURO`,
          import = `Imports in million of ECU/EURO`) |&gt; 
   mutate(partner = as.factor(partner))
-## Table tet00034 cached at /var/folders/5s/rkxr4m8j24569d_p6nj9ld200000gn/T//RtmpTual81/eurostat/tet00034_date_code_FF.rds
-## Table tet00033 cached at /var/folders/5s/rkxr4m8j24569d_p6nj9ld200000gn/T//RtmpTual81/eurostat/tet00033_date_code_FF.rds
-## Table tet00032 cached at /var/folders/5s/rkxr4m8j24569d_p6nj9ld200000gn/T//RtmpTual81/eurostat/tet00032_date_code_FF.rds
-## Table tet00031 cached at /var/folders/5s/rkxr4m8j24569d_p6nj9ld200000gn/T//RtmpTual81/eurostat/tet00031_date_code_FF.rds
-## Table tet00030 cached at /var/folders/5s/rkxr4m8j24569d_p6nj9ld200000gn/T//RtmpTual81/eurostat/tet00030_date_code_FF.rds
-## Table tet00029 cached at /var/folders/5s/rkxr4m8j24569d_p6nj9ld200000gn/T//RtmpTual81/eurostat/tet00029_date_code_FF.rds
-
 trades
 ## # A tibble: 720 × 5
 ##    sitc06                   partner                time        export import
@@ -100,6 +84,7 @@ trades
 ## 10 Food, drinks and tobacco United States          2008-01-01 10021.   6030.
 ## # … with 710 more rows
 ```
+]
 
 ---
 
@@ -317,7 +302,8 @@ str(series)
 
 ## Быстрый график ggplot
 
-Суммарный экспорт по годам с использованием `qplot()`:
+.pull-left[
+Суммарный экспорт через `qplot()`:
 
 ```r
 trades_total = trades |&gt; 
@@ -329,14 +315,18 @@ qplot(time, export,
       data = trades_total, 
       geom = c('point', 'line'))
 ```
+]
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+.pull-right[
+![](06_AdvGraphics_files/figure-html/qplot-out-1.png)&lt;!-- --&gt;
+]
+
 
 ---
 
 ## Базовый шаблон ggplot
 
-Базовый (минимально необходимый) шаблон построения графика через __ggplot__ выглядит следующим образом:
+Базовый шаблон __ggplot__:
 
 ```r
 ggplot(data = &lt;DATA&gt;) + 
@@ -344,9 +334,9 @@ ggplot(data = &lt;DATA&gt;) +
 ```
 где:
 
-- `DATA` --- источник данных (фрейм, тиббл)
-- `GEOM_FUNCTION` --- функция, отвечающая за геометрический тип графика (точки, линии, гистограммы и т.д.)
-- `MAPPINGS` --- перечень соответствий между переменными данных (содержащихся в `DATA`) и графическими переменными (координатами, размерами, цветами и т.д.)
+- `DATA` — источник данных (фрейм, тиббл)
+- `GEOM_FUNCTION` — функция, отвечающая за геометрический тип графика (точки, линии, гистограммы и т.д.)
+- `MAPPINGS` — перечень соответствий между переменными данных (содержащихся в `DATA`) и графическими переменными (координатами, размерами, цветами и т.д.)
 
 ---
 
@@ -354,24 +344,30 @@ ggplot(data = &lt;DATA&gt;) +
 
 .pull-left[
 Точки `geom_point()`:
+.code-small[
 
 ```r
 ggplot(data = trades_total) +
-  geom_line(mapping = aes(x = time, y = export))
+  geom_point(mapping = aes(x = time, 
+                          y = export))
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+]
 ]
 
 .pull-right[
 Линии `geom_line()`:
+.code-small[
 
 ```r
 ggplot(data = trades_total) +
-  geom_line(mapping = aes(x = time, y = export))
+  geom_line(mapping = aes(x = time, 
+                          y = export))
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+]
 ]
 
 
@@ -381,17 +377,21 @@ ggplot(data = trades_total) +
 
 .pull-left[
 Ступенчатые кривые`geom_step()`:
+.code-small[
 
 ```r
 ggplot(data = trades_total) +
-  geom_step(mapping = aes(x = time, y = export))
+  geom_step(mapping = aes(x = time, 
+                          y = export))
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+]
 ]
 
 .pull-right[
 Совмещение геометрий:
+.code-small[
 
 ```r
 ggplot(data = trades_total) +
@@ -399,7 +399,8 @@ ggplot(data = trades_total) +
   geom_point(mapping = aes(x = time, y = export))
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+]
 ]
 
 ---
@@ -408,27 +409,33 @@ ggplot(data = trades_total) +
 
 .pull-left[
 Вынос общих данных:
+.code-small[
 
 ```r
-ggplot(data = trades_total, mapping = aes(x = time, y = export)) +
+ggplot(data = trades_total, 
+       mapping = aes(x = time, y = export)) +
+  geom_line() +
+  geom_point()
+```
+
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+]
+]
+
+.pull-right[
+Заливка `geom_area()`:
+.code-small[
+
+```r
+ggplot(data = trades_total, 
+       mapping = aes(x = time, y = export)) +
+  geom_area(alpha = 0.5) + # полигон с прозрачностью 0,5
   geom_line() +
   geom_point()
 ```
 
 ![](06_AdvGraphics_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
 ]
-
-.pull-right[
-Заливка `geom_area()`:
-
-```r
-ggplot(data = trades_total, mapping = aes(x = time, y = export)) +
-  geom_area(alpha = 0.5) + # полигон с прозрачностью 0,5
-  geom_line() +
-  geom_point()
-```
-
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -468,7 +475,9 @@ ggplot(
 Перестановка осей через `coord_flip()`:
 
 ```r
-ggplot(df, mapping = aes(x = partner, y = export)) +
+ggplot(df, 
+       mapping = aes(x = partner, 
+                     y = export)) +
   geom_col() +
   coord_flip()
 ```
@@ -482,7 +491,7 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 
 ## Графические переменные
 
-Функция `aes(...)` управляет отображением переменных данных на графические переменные 
+Функция `aes(...)` отображает переменные данных на графические переменные 
 
 ```r
 # один цвет для графика (параметр за пределами aes)
@@ -490,7 +499,7 @@ ggplot(trades_total) +
     geom_line(mapping = aes(x = time, y = export), color = 'blue')
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
 
 
 ---
@@ -500,11 +509,11 @@ ggplot(trades_total) +
 
 ```r
 trade_russia = trades |&gt; dplyr::filter(partner == 'Russia')
-ggplot(trade_russia) + # у каждой группы данных свой цвет (параметр внутри aes)
+ggplot(trade_russia) + # у каждой группы данных свой цвет
   geom_line(mapping = aes(x = time, y = export, color = sitc06))
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -512,12 +521,13 @@ ggplot(trade_russia) + # у каждой группы данных свой цв
 
 
 ```r
-ggplot(trade_russia, mapping = aes(x = time, y = export, color = sitc06)) + # а теперь и с точками
+ggplot(trade_russia,  # а теперь и с точками
+       mapping = aes(x = time, y = export, color = sitc06)) +
   geom_line() +
   geom_point()
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -531,7 +541,7 @@ ggplot(trades_total) +
     geom_point(mapping = aes(x = time, y = export), shape = 15)
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -544,7 +554,7 @@ ggplot(trade_russia) +
     geom_point(mapping = aes(x = time, y = export, shape = sitc06))
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -558,7 +568,7 @@ ggplot(trades_total, mapping = aes(x = time, y = export)) +
     geom_line(size = 2)
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -572,7 +582,7 @@ ggplot(trade_russia, aes(x = time, y = export)) +
     geom_line(aes(group = sitc06))
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -586,54 +596,57 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
   coord_flip()
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
 
 ---
 
 ## Графические переменные
 
 Управление цветом:
+.code-small[
 
 ```r
-trades |&gt; 
-  dplyr::filter(time == as.Date('2017-01-01')) |&gt; 
+filter(trades, time == as.Date('2017-01-01')) |&gt; 
   ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
-  geom_col(color = 'black', size = 0.2) +
-  coord_flip()
+    geom_col(color = 'black', size = 0.2) + coord_flip()
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+]
+
 
 ---
 
 ## Графические переменные
 
 Процентное соотношение величин:
+.code-small[
 
 ```r
-trades |&gt; 
-  dplyr::filter(time == as.Date('2017-01-01')) |&gt; 
+filter(trades, time == as.Date('2017-01-01')) |&gt; 
   ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
     geom_col(color = 'black', size = 0.2, position = 'fill') +
     coord_flip()
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+]
 
 ---
 
 ## Графические переменные
 
 Группировка по соседству:
+.code-small[
 
 ```r
-trade_russia |&gt; 
-  dplyr::filter(time &gt;= as.Date('2013-01-01')) |&gt; 
+filter(trade_russia, time &gt;= as.Date('2013-01-01')) |&gt; 
   ggplot(mapping = aes(x = time, y = export, fill = sitc06)) +
     geom_col(color = 'black', size = 0.2, position = 'dodge')
 ```
 
-![](06_AdvGraphics_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+]
 
 ---
 
@@ -649,28 +662,26 @@ trades_type = trades |&gt;
             import = sum(import))
 
 ggplot(trades_type) + 
-    geom_point(mapping = aes(x = export, y = import, color = sitc06, size = time), alpha = 0.5)
-
-ggplot(trades_type) + 
-    geom_point(mapping = aes(x = export, y = import, color = sitc06, size = time), alpha = 0.5) +
+    geom_point(mapping = aes(
+        x = export, y = import, 
+        color = sitc06, 
+        size = time
+      ), 
+      alpha = 0.5
+    ) +
     coord_flip()
 ```
 ]
 
 .pull-right[
-
-```
-## `summarise()` has grouped output by 'sitc06'. You can override using the `.groups` argument.
-```
-
-![](06_AdvGraphics_files/figure-html/flip2-out-1.png)&lt;!-- --&gt;![](06_AdvGraphics_files/figure-html/flip2-out-2.png)&lt;!-- --&gt;
+![](06_AdvGraphics_files/figure-html/flip2-out-1.png)&lt;!-- --&gt;
 ]
 
 ---
 
 ## Системы координат
 
-.pull-left[
+.left-40[
 Логарифмирование:
 
 ```r
@@ -689,7 +700,7 @@ ggplot(
 ```
 ]
 
-.pull-right[
+.right-60[
 ![](06_AdvGraphics_files/figure-html/log-out-1.png)&lt;!-- --&gt;
 ]
 
@@ -697,7 +708,7 @@ ggplot(
 
 ## Системы координат
 
-.pull-left[
+.left-40[
 Полярная система координат:
 
 ```r
@@ -714,7 +725,7 @@ ggplot(
 ```
 ]
 
-.pull-right[
+.right-60[
 ![](06_AdvGraphics_files/figure-html/log2-out-1.png)&lt;!-- --&gt;
 ]
 
@@ -722,7 +733,7 @@ ggplot(
 
 ## Системы координат
 
-.pull-left[
+.left-40[
 Преобразование квадратного корня:
 
 ```r
@@ -740,7 +751,7 @@ ggplot(
 ```
 ]
 
-.pull-right[
+.right-60[
 ![](06_AdvGraphics_files/figure-html/log3-out-1.png)&lt;!-- --&gt;
 ]
 
@@ -776,6 +787,7 @@ ggplot(
 ## Названия осей и легенды
 
 .pull-left[
+.code-small[
 
 ```r
 options(scipen = 999)
@@ -789,12 +801,14 @@ ggplot(trades_type) +
     ),
     alpha = 0.5
   ) +
-  labs(color = "Вид продукции", size = 'Год') +
+  labs(color = "Вид продукции", 
+       size = 'Год') +
   ggtitle('Соотношение импорта и экспорта в странах Евросоюза (млн долл. США)',
           subtitle = 'Данные по ключевым партнерам') +
   xlab('Экспорт') +
   ylab('Импорт')
 ```
+]
 ]
 
 .pull-right[
@@ -805,7 +819,8 @@ ggplot(trades_type) +
 
 ## Разметка осей
 
-.pull-left[
+.left-40[
+.code-small[
 
 ```r
 brks = seq(0, 500000, 100000)
@@ -829,8 +844,9 @@ ggplot(
   )
 ```
 ]
+]
 
-.pull-right[
+.right-60[
 ![](06_AdvGraphics_files/figure-html/axes2-out-1.png)&lt;!-- --&gt;
 ]
 
@@ -838,7 +854,7 @@ ggplot(
 
 ## Разметка осей
 
-.pull-left[
+.left-40[
 Диапазоны по осям и выделение
 
 ```r
@@ -858,7 +874,7 @@ ggplot(
 ```
 ]
 
-.pull-right[
+.right-60[
 ![](06_AdvGraphics_files/figure-html/ranges-out-1.png)&lt;!-- --&gt;
 ]
 
@@ -872,7 +888,8 @@ ggplot(
 ```r
 ggplot(
   data = trades_total, 
-  mapping = aes(x = time, y = export)) +
+  mapping = aes(x = time, 
+                y = export)) +
   geom_area(alpha = 0.5) + # полигон с прозрачностью 0,5
   geom_line() +
   geom_point() +
@@ -891,7 +908,7 @@ ggplot(
 
 ## Подписи и аннотации
 
-.pull-left[
+.left-40[
 Подписи с фоновой плашкой:
 
 ```r
@@ -902,7 +919,7 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 ```
 ]
 
-.pull-right[
+.right-60[
 ![](06_AdvGraphics_files/figure-html/labels2-out-1.png)&lt;!-- --&gt;
 ]
 
@@ -921,8 +938,10 @@ ggplot(trades_total,
   geom_point() +
   geom_text(aes(label = floor(export / 1000)), 
             vjust = 0, nudge_y = 40000) +
-  annotate("text", x = as.Date('2009-01-01'), 
-           y = 550000, label = "Это провал", 
+  annotate("text", 
+           x = as.Date('2009-01-01'), 
+           y = 550000, 
+           label = "Это провал", 
            color = 'red')
 ```
 ]
@@ -935,7 +954,7 @@ ggplot(trades_total,
 
 ## Подписи и аннотации
 
-.pull-left[
+.left-40[
 Аннотирование регионов:
 
 ```r
@@ -946,7 +965,7 @@ ggplot(trades_type, mapping = aes(x = export, y = import, color = sitc06, size =
 ```
 ]
 
-.pull-right[
+.right-60[
 ![](06_AdvGraphics_files/figure-html/anno2-out-1.png)&lt;!-- --&gt;
 ]
 
@@ -968,9 +987,11 @@ trades |&gt;
   facet_wrap(~time)
 ```
 
-.pull-right[
+---
+
+## Фасеты
+
 ![](06_AdvGraphics_files/figure-html/facets-out-1.png)&lt;!-- --&gt;
-]
 
 ---
 

@@ -17,7 +17,7 @@ output:
 ```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
 library(datasets)
 knitr::opts_knit$set(global.par = TRUE)
-knitr::opts_chunk$set(warning=FALSE, collapse=TRUE,dpi=300)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
 ```
 
 ## Источники данных
@@ -49,13 +49,12 @@ knitr::include_graphics('img/eurostat.png')
 
 ---
 
-## Загрузка данных Евростата {#advgraphics_eurostat}
+## Загрузка данных Евростата
 
+.code-small[
 ```{r, cache = TRUE}
-tables = c('tet00034', 'tet00033', 'tet00032', 
-           'tet00031','tet00030', 'tet00029')
-
-trades = lapply(tables, function(X) { # прочтем несколько таблиц в список
+tables = c('tet00034', 'tet00033', 'tet00032', 'tet00031','tet00030', 'tet00029')
+trades = lapply(tables, function(X) {
   get_eurostat(X) |>  label_eurostat() #<<
 }) |> 
   bind_rows() |>  # объединим прочитанные таблицы в одну
@@ -65,9 +64,9 @@ trades = lapply(tables, function(X) { # прочтем несколько таб
   rename(export = `Exports in million of ECU/EURO`,
          import = `Imports in million of ECU/EURO`) |> 
   mutate(partner = as.factor(partner))
-
 trades
 ```
+]
 
 ---
 
@@ -116,8 +115,9 @@ str(series)
 
 ## Быстрый график ggplot
 
-Суммарный экспорт по годам с использованием `qplot()`:
-```{r}
+.pull-left[
+Суммарный экспорт через `qplot()`:
+```{r qplot, eval = FALSE}
 trades_total = trades |> 
   group_by(time) |> 
   summarise(export = sum(export),
@@ -127,21 +127,28 @@ qplot(time, export,
       data = trades_total, 
       geom = c('point', 'line'))
 ```
+]
+
+.pull-right[
+```{r qplot-out, ref.label='qplot', echo = FALSE}
+```
+]
+
 
 ---
 
 ## Базовый шаблон ggplot
 
-Базовый (минимально необходимый) шаблон построения графика через __ggplot__ выглядит следующим образом:
+Базовый шаблон __ggplot__:
 ```{r, eval = FALSE}
 ggplot(data = <DATA>) + 
   <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
 ```
 где:
 
-- `DATA` --- источник данных (фрейм, тиббл)
-- `GEOM_FUNCTION` --- функция, отвечающая за геометрический тип графика (точки, линии, гистограммы и т.д.)
-- `MAPPINGS` --- перечень соответствий между переменными данных (содержащихся в `DATA`) и графическими переменными (координатами, размерами, цветами и т.д.)
+- `DATA` — источник данных (фрейм, тиббл)
+- `GEOM_FUNCTION` — функция, отвечающая за геометрический тип графика (точки, линии, гистограммы и т.д.)
+- `MAPPINGS` — перечень соответствий между переменными данных (содержащихся в `DATA`) и графическими переменными (координатами, размерами, цветами и т.д.)
 
 ---
 
@@ -149,18 +156,24 @@ ggplot(data = <DATA>) +
 
 .pull-left[
 Точки `geom_point()`:
-```{r}
+.code-small[
+```{r, fig.height=5}
 ggplot(data = trades_total) +
-  geom_line(mapping = aes(x = time, y = export))
+  geom_point(mapping = aes(x = time, 
+                          y = export))
 ```
+]
 ]
 
 .pull-right[
 Линии `geom_line()`:
-```{r}
+.code-small[
+```{r, fig.height=5}
 ggplot(data = trades_total) +
-  geom_line(mapping = aes(x = time, y = export))
+  geom_line(mapping = aes(x = time, 
+                          y = export))
 ```
+]
 ]
 
 
@@ -170,19 +183,24 @@ ggplot(data = trades_total) +
 
 .pull-left[
 Ступенчатые кривые`geom_step()`:
-```{r}
+.code-small[
+```{r, fig.height=5}
 ggplot(data = trades_total) +
-  geom_step(mapping = aes(x = time, y = export))
+  geom_step(mapping = aes(x = time, 
+                          y = export))
 ```
+]
 ]
 
 .pull-right[
 Совмещение геометрий:
-```{r}
+.code-small[
+```{r, fig.height=5}
 ggplot(data = trades_total) +
   geom_line(mapping = aes(x = time, y = export)) +
   geom_point(mapping = aes(x = time, y = export))
 ```
+]
 ]
 
 ---
@@ -191,21 +209,27 @@ ggplot(data = trades_total) +
 
 .pull-left[
 Вынос общих данных:
-```{r}
-ggplot(data = trades_total, mapping = aes(x = time, y = export)) +
+.code-small[
+```{r, fig.height=4}
+ggplot(data = trades_total, 
+       mapping = aes(x = time, y = export)) +
   geom_line() +
   geom_point()
 ```
 ]
+]
 
 .pull-right[
 Заливка `geom_area()`:
-```{r}
-ggplot(data = trades_total, mapping = aes(x = time, y = export)) +
+.code-small[
+```{r, fig.height=3.5}
+ggplot(data = trades_total, 
+       mapping = aes(x = time, y = export)) +
   geom_area(alpha = 0.5) + # полигон с прозрачностью 0,5
   geom_line() +
   geom_point()
 ```
+]
 ]
 
 ---
@@ -232,7 +256,7 @@ ggplot(
 ]
 
 .pull-right[
-```{r barplot-out, ref.label='barplot', echo=FALSE}
+```{r barplot-out, ref.label='barplot', echo=FALSE, fig.height=5.5}
 ```
 ]
 
@@ -243,7 +267,9 @@ ggplot(
 .pull-left[
 Перестановка осей через `coord_flip()`:
 ```{r flip, eval = FALSE}
-ggplot(df, mapping = aes(x = partner, y = export)) +
+ggplot(df, 
+       mapping = aes(x = partner, 
+                     y = export)) +
   geom_col() +
   coord_flip()
 ```
@@ -258,8 +284,8 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 
 ## Графические переменные
 
-Функция `aes(...)` управляет отображением переменных данных на графические переменные 
-```{r}
+Функция `aes(...)` отображает переменные данных на графические переменные 
+```{r, fig.height=2}
 # один цвет для графика (параметр за пределами aes)
 ggplot(trades_total) + 
     geom_line(mapping = aes(x = time, y = export), color = 'blue')
@@ -270,9 +296,9 @@ ggplot(trades_total) +
 
 ## Графические переменные
 
-```{r}
+```{r, fig.height=2.5}
 trade_russia = trades |> dplyr::filter(partner == 'Russia')
-ggplot(trade_russia) + # у каждой группы данных свой цвет (параметр внутри aes)
+ggplot(trade_russia) + # у каждой группы данных свой цвет
   geom_line(mapping = aes(x = time, y = export, color = sitc06))
 ```
 
@@ -280,8 +306,9 @@ ggplot(trade_russia) + # у каждой группы данных свой цв
 
 ## Графические переменные
 
-```{r}
-ggplot(trade_russia, mapping = aes(x = time, y = export, color = sitc06)) + # а теперь и с точками
+```{r, fig.height=2.5}
+ggplot(trade_russia,  # а теперь и с точками
+       mapping = aes(x = time, y = export, color = sitc06)) +
   geom_line() +
   geom_point()
 ```
@@ -291,7 +318,7 @@ ggplot(trade_russia, mapping = aes(x = time, y = export, color = sitc06)) + # а
 ## Графические переменные
 
 Аналогичным образом работает параметр формы значка:
-```{r}
+```{r, fig.height=2.5}
 # один значок для графика
 ggplot(trades_total) + 
     geom_point(mapping = aes(x = time, y = export), shape = 15)
@@ -302,7 +329,7 @@ ggplot(trades_total) +
 ## Графические переменные
 
 У каждой группы данных свой значок
-```{r}
+```{r, fig.height=2.5}
 ggplot(trade_russia) + 
     geom_point(mapping = aes(x = time, y = export, shape = sitc06))
 ```
@@ -312,7 +339,7 @@ ggplot(trade_russia) +
 ## Графические переменные
 
 Управление размером через `size`:
-```{r}
+```{r, fig.height=2.5}
 ggplot(trades_total, mapping = aes(x = time, y = export)) + 
     geom_point(size = 5) +
     geom_line(size = 2)
@@ -323,7 +350,7 @@ ggplot(trades_total, mapping = aes(x = time, y = export)) +
 ## Графические переменные
 
 Группировка данных:
-```{r}
+```{r, fig.height=2.5}
 ggplot(trade_russia, aes(x = time, y = export)) + 
     geom_point(aes(shape = sitc06)) +
     geom_line(aes(group = sitc06))
@@ -334,7 +361,7 @@ ggplot(trade_russia, aes(x = time, y = export)) +
 ## Графические переменные
 
 Управление цветом:
-```{r}
+```{r, fig.height=2.5}
 ggplot(df, mapping = aes(x = partner, y = export)) +
   geom_col(fill = 'plum4', color = 'black', size = 0.2) +
   coord_flip()
@@ -345,38 +372,41 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 ## Графические переменные
 
 Управление цветом:
-```{r}
-trades |> 
-  dplyr::filter(time == as.Date('2017-01-01')) |> 
+.code-small[
+```{r, fig.height=2.5}
+filter(trades, time == as.Date('2017-01-01')) |> 
   ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
-  geom_col(color = 'black', size = 0.2) +
-  coord_flip()
+    geom_col(color = 'black', size = 0.2) + coord_flip()
 ```
+]
+
 
 ---
 
 ## Графические переменные
 
 Процентное соотношение величин:
-```{r}
-trades |> 
-  dplyr::filter(time == as.Date('2017-01-01')) |> 
+.code-small[
+```{r, fig.height=2.5}
+filter(trades, time == as.Date('2017-01-01')) |> 
   ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
     geom_col(color = 'black', size = 0.2, position = 'fill') +
     coord_flip()
 ```
+]
 
 ---
 
 ## Графические переменные
 
 Группировка по соседству:
-```{r}
-trade_russia |> 
-  dplyr::filter(time >= as.Date('2013-01-01')) |> 
+.code-small[
+```{r, fig.height=2}
+filter(trade_russia, time >= as.Date('2013-01-01')) |> 
   ggplot(mapping = aes(x = time, y = export, fill = sitc06)) +
     geom_col(color = 'black', size = 0.2, position = 'dodge')
 ```
+]
 
 ---
 
@@ -391,10 +421,13 @@ trades_type = trades |>
             import = sum(import))
 
 ggplot(trades_type) + 
-    geom_point(mapping = aes(x = export, y = import, color = sitc06, size = time), alpha = 0.5)
-
-ggplot(trades_type) + 
-    geom_point(mapping = aes(x = export, y = import, color = sitc06, size = time), alpha = 0.5) +
+    geom_point(mapping = aes(
+        x = export, y = import, 
+        color = sitc06, 
+        size = time
+      ), 
+      alpha = 0.5
+    ) +
     coord_flip()
 ```
 ]
@@ -408,7 +441,7 @@ ggplot(trades_type) +
 
 ## Системы координат
 
-.pull-left[
+.left-40[
 Логарифмирование:
 ```{r log, eval=F}
 ggplot(
@@ -426,8 +459,8 @@ ggplot(
 ```
 ]
 
-.pull-right[
-```{r log-out, ref.label='log', echo=FALSE}
+.right-60[
+```{r log-out, ref.label='log', echo=FALSE, fig.height = 5.5}
 ```
 ]
 
@@ -435,7 +468,7 @@ ggplot(
 
 ## Системы координат
 
-.pull-left[
+.left-40[
 Полярная система координат:
 ```{r log2, eval=F}
 ggplot(
@@ -451,7 +484,7 @@ ggplot(
 ```
 ]
 
-.pull-right[
+.right-60[
 ```{r log2-out, ref.label='log2', echo=FALSE}
 ```
 ]
@@ -460,7 +493,7 @@ ggplot(
 
 ## Системы координат
 
-.pull-left[
+.left-40[
 Преобразование квадратного корня:
 ```{r log3, eval=F}
 ggplot(
@@ -477,7 +510,7 @@ ggplot(
 ```
 ]
 
-.pull-right[
+.right-60[
 ```{r log3-out, ref.label='log3', echo=FALSE}
 ```
 ]
@@ -514,6 +547,7 @@ ggplot(
 ## Названия осей и легенды
 
 .pull-left[
+.code-small[
 ```{r axes, eval=F}
 options(scipen = 999)
 ggplot(trades_type) + 
@@ -526,12 +560,14 @@ ggplot(trades_type) +
     ),
     alpha = 0.5
   ) +
-  labs(color = "Вид продукции", size = 'Год') +
+  labs(color = "Вид продукции", 
+       size = 'Год') +
   ggtitle('Соотношение импорта и экспорта в странах Евросоюза (млн долл. США)',
           subtitle = 'Данные по ключевым партнерам') +
   xlab('Экспорт') +
   ylab('Импорт')
 ```
+]
 ]
 
 .pull-right[
@@ -543,7 +579,8 @@ ggplot(trades_type) +
 
 ## Разметка осей
 
-.pull-left[
+.left-40[
+.code-small[
 ```{r axes2, eval=F}
 brks = seq(0, 500000, 100000)
 ggplot(
@@ -566,9 +603,10 @@ ggplot(
   )
 ```
 ]
+]
 
-.pull-right[
-```{r axes2-out, ref.label='axes2', echo=FALSE}
+.right-60[
+```{r axes2-out, ref.label='axes2', echo=FALSE, fig.height=5.5}
 ```
 ]
 
@@ -576,7 +614,7 @@ ggplot(
 
 ## Разметка осей
 
-.pull-left[
+.left-40[
 Диапазоны по осям и выделение
 ```{r ranges, eval=F}
 ggplot(
@@ -595,8 +633,8 @@ ggplot(
 ```
 ]
 
-.pull-right[
-```{r ranges-out, ref.label='ranges', echo=FALSE}
+.right-60[
+```{r ranges-out, ref.label='ranges', echo=FALSE, fig.height=5.5}
 ```
 ]
 
@@ -609,7 +647,8 @@ ggplot(
 ```{r labels, eval=F}
 ggplot(
   data = trades_total, 
-  mapping = aes(x = time, y = export)) +
+  mapping = aes(x = time, 
+                y = export)) +
   geom_area(alpha = 0.5) + # полигон с прозрачностью 0,5
   geom_line() +
   geom_point() +
@@ -629,7 +668,7 @@ ggplot(
 
 ## Подписи и аннотации
 
-.pull-left[
+.left-40[
 Подписи с фоновой плашкой:
 ```{r labels2, eval=F}
 ggplot(df, mapping = aes(x = partner, y = export)) +
@@ -639,8 +678,8 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 ```
 ]
 
-.pull-right[
-```{r labels2-out, ref.label='labels2', echo=FALSE}
+.right-60[
+```{r labels2-out, ref.label='labels2', echo=FALSE, fig.height=5.5}
 ```
 ]
 
@@ -658,8 +697,10 @@ ggplot(trades_total,
   geom_point() +
   geom_text(aes(label = floor(export / 1000)), 
             vjust = 0, nudge_y = 40000) +
-  annotate("text", x = as.Date('2009-01-01'), 
-           y = 550000, label = "Это провал", 
+  annotate("text", 
+           x = as.Date('2009-01-01'), 
+           y = 550000, 
+           label = "Это провал", 
            color = 'red')
 ```
 ]
@@ -673,7 +714,7 @@ ggplot(trades_total,
 
 ## Подписи и аннотации
 
-.pull-left[
+.left-40[
 Аннотирование регионов:
 ```{r anno2, eval=F}
 ggplot(trades_type, mapping = aes(x = export, y = import, color = sitc06, size = time)) + 
@@ -683,8 +724,8 @@ ggplot(trades_type, mapping = aes(x = export, y = import, color = sitc06, size =
 ```
 ]
 
-.pull-right[
-```{r anno2-out, ref.label='anno2', echo=FALSE}
+.right-60[
+```{r anno2-out, ref.label='anno2', echo=FALSE, fig.height=5.5}
 ```
 ]
 
@@ -705,10 +746,12 @@ trades |>
   facet_wrap(~time)
 ```
 
-.pull-right[
-```{r facets-out, ref.label='facets', echo=FALSE}
+---
+
+## Фасеты
+
+```{r facets-out, ref.label='facets', echo=FALSE, fig.height=3.5}
 ```
-]
 
 ---
 

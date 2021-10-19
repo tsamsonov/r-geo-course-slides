@@ -44,142 +44,119 @@ library(readxl)
 
 ## База данных Gapminder
 
-В данной лекции мы будем работать с базой данных [__Gapminder__](https://www.gapminder.org/tools/), которая содержит уникальный набор показателей по странам мира, агрегированный из различных источников (многие показатели имеют ряды на несколько столетий!):
+[__gapminder.org__](gapminder.org)
 
-&lt;div class="figure"&gt;
-&lt;img src="../r-geo-course/images/gapminder1.png" alt="База данных Gapminder" width="847" /&gt;
-&lt;p class="caption"&gt;База данных Gapminder&lt;/p&gt;
-&lt;/div&gt;
-
-__Gapminder__ отлично подходит для знакомства со основами статистического  анализа в R, поскольку эта база данных содержит показатели с разным видом распределения, которые сгруппированы по макрорегионам и континентам, и, разумеется, имеют между собой ряд взаимосвязей, совместное поведение которых можно изучать посредством корреляционного и регрессионного анализа.
-
-Данные __Gapminder__ можно загружать в текстовом формате и формате _Microsoft Excel_, но также можно и через программный интерфейс Google Sheets. Для этого требуется выбрать показатель в каталоге данных, расположенном по адресу [__https://www.gapminder.org/data/__](https://www.gapminder.org/data/), открыть описание источника и перейти к онлайн-таблице:
-&lt;div class="figure"&gt;
-&lt;img src="../r-geo-course/images/gapminder_full.png" alt="Последовательность действия для открытия данных Gapminder в формате Google Sheets" width="386" /&gt;
-&lt;p class="caption"&gt;Последовательность действия для открытия данных Gapminder в формате Google Sheets&lt;/p&gt;
-&lt;/div&gt;
-
-Ключ открывшейся таблицы расположен в адресной строке между компонентами `/d/` и `/edit#`:
-
-&lt;div class="figure"&gt;
-&lt;img src="../r-geo-course/images/gapminder_key.png" alt="Ключ таблицы Google Sheets из базы данных Gapminder" width="743" /&gt;
-&lt;p class="caption"&gt;Ключ таблицы Google Sheets из базы данных Gapminder&lt;/p&gt;
-&lt;/div&gt;
+&lt;img src="img/gapminder1.png" width="60%" /&gt;
 
 ---
 
-## Пакет googlesheets4
+## Ключ таблицы Google Sheets
 
-Доступ к облачным таблицам — удобный способ работы с табличными данными, который позволяет избавиться от манипуляций с локальными файлами. Свои данные вы тоже можете хранить в таблицах Google. Если таблицы регулярно обновляются держателем данных, загрузка их из облачного хранилища будет гарантировать вам актуальность анализируемой информации. Ограниченем такого режима работы является то, что для доступа к данным вам нужен Интернет.
+Ключ таблицы расположен в адресной строке между `/d/` и `/edit#`:
 
-Пакет [__googlesheets4__](https://googlesheets4.tidyverse.org/) открывает доступ к таблицам Google. С кратким руководством по использованию пакета вы можете ознакомиться [тут](https://googlesheets4.tidyverse.org/articles/articles/drive-and-sheets.html). Данный пакет использует версию _4.x Google Sheets API_ (отсюда цифра 4 в навании) и рекомендуется к использованию вместо устаревшего пакета [__googlesheets__](https://cran.r-project.org/web/packages/googlesheets/). 
+&lt;img src="img/gapminder_key.png" width="60%" /&gt;
 
-Пакет __googlesheets4__ работает в связке с пакетом __googledrive__, обеспечивающим общие методы доступа к Google Drive. Для загрузки достаточно вызвать функцию `read_sheet()`, передав ей в качестве аргумента ключ таблицы Google (см. предыдущий раздел):
+---
+
+## Загрузка данных Gapminder через googlesheets4
 
 В качестве примера возьмем данные по [__ВВП на душу населения__](https://www.gapminder.org/data/documentation/gd001/):
 
 
 ```r
 gdpdf = read_sheet('1cxtzRRN6ldjSGoDzFHkB8vqPavq1iOTMElGewQnmHgg')
-gdpdf
-## # A tibble: 260 × 256
-##    `GDP per capita PPP,… `1764` `1765` `1766` `1767` `1768` `1769` `1770` `1771`
-##    &lt;chr&gt;                  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-##  1 Abkhazia                  NA     NA     NA     NA     NA     NA     NA     NA
-##  2 Afghanistan               NA     NA     NA     NA     NA     NA     NA     NA
-##  3 Akrotiri and Dhekelia     NA     NA     NA     NA     NA     NA     NA     NA
-##  4 Albania                   NA     NA     NA     NA     NA     NA     NA     NA
-##  5 Algeria                   NA     NA     NA     NA     NA     NA     NA     NA
-##  6 American Samoa            NA     NA     NA     NA     NA     NA     NA     NA
-##  7 Andorra                   NA     NA     NA     NA     NA     NA     NA     NA
-##  8 Angola                    NA     NA     NA     NA     NA     NA     NA     NA
-##  9 Anguilla                  NA     NA     NA     NA     NA     NA     NA     NA
-## 10 Antigua and Barbuda       NA     NA     NA     NA     NA     NA     NA     NA
-## # … with 250 more rows, and 247 more variables: 1772 &lt;dbl&gt;, 1773 &lt;dbl&gt;,
-## #   1774 &lt;dbl&gt;, 1775 &lt;dbl&gt;, 1776 &lt;dbl&gt;, 1777 &lt;dbl&gt;, 1778 &lt;dbl&gt;, 1779 &lt;dbl&gt;,
-## #   1780 &lt;dbl&gt;, 1781 &lt;dbl&gt;, 1782 &lt;dbl&gt;, 1783 &lt;dbl&gt;, 1784 &lt;dbl&gt;, 1785 &lt;dbl&gt;,
-## #   1786 &lt;dbl&gt;, 1787 &lt;dbl&gt;, 1788 &lt;dbl&gt;, 1789 &lt;dbl&gt;, 1790 &lt;dbl&gt;, 1791 &lt;dbl&gt;,
-## #   1792 &lt;dbl&gt;, 1793 &lt;dbl&gt;, 1794 &lt;dbl&gt;, 1795 &lt;dbl&gt;, 1796 &lt;dbl&gt;, 1797 &lt;dbl&gt;,
-## #   1798 &lt;dbl&gt;, 1799 &lt;dbl&gt;, 1800 &lt;dbl&gt;, 1801 &lt;dbl&gt;, 1802 &lt;dbl&gt;, 1803 &lt;dbl&gt;,
-## #   1804 &lt;dbl&gt;, 1805 &lt;dbl&gt;, 1806 &lt;dbl&gt;, 1807 &lt;dbl&gt;, 1808 &lt;dbl&gt;, 1809 &lt;dbl&gt;, …
+head(gdpdf)
+## # A tibble: 6 × 256
+##   `GDP per capita P… `1764` `1765` `1766` `1767` `1768` `1769` `1770` `1771` `1772` `1773` `1774` `1775` `1776` `1777` `1778` `1779`
+##   &lt;chr&gt;               &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Abkhazia               NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA
+## 2 Afghanistan            NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA
+## 3 Akrotiri and Dhek…     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA
+## 4 Albania                NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA
+## 5 Algeria                NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA
+## 6 American Samoa         NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA
+## # … with 239 more variables: 1780 &lt;dbl&gt;, 1781 &lt;dbl&gt;, 1782 &lt;dbl&gt;, 1783 &lt;dbl&gt;, 1784 &lt;dbl&gt;, 1785 &lt;dbl&gt;, 1786 &lt;dbl&gt;, 1787 &lt;dbl&gt;,
+## #   1788 &lt;dbl&gt;, 1789 &lt;dbl&gt;, 1790 &lt;dbl&gt;, 1791 &lt;dbl&gt;, 1792 &lt;dbl&gt;, 1793 &lt;dbl&gt;, 1794 &lt;dbl&gt;, 1795 &lt;dbl&gt;, 1796 &lt;dbl&gt;, 1797 &lt;dbl&gt;,
+## #   1798 &lt;dbl&gt;, 1799 &lt;dbl&gt;, 1800 &lt;dbl&gt;, 1801 &lt;dbl&gt;, 1802 &lt;dbl&gt;, 1803 &lt;dbl&gt;, 1804 &lt;dbl&gt;, 1805 &lt;dbl&gt;, 1806 &lt;dbl&gt;, 1807 &lt;dbl&gt;,
+## #   1808 &lt;dbl&gt;, 1809 &lt;dbl&gt;, 1810 &lt;dbl&gt;, 1811 &lt;dbl&gt;, 1812 &lt;dbl&gt;, 1813 &lt;dbl&gt;, 1814 &lt;dbl&gt;, 1815 &lt;dbl&gt;, 1816 &lt;dbl&gt;, 1817 &lt;dbl&gt;,
+## #   1818 &lt;dbl&gt;, 1819 &lt;dbl&gt;, 1820 &lt;dbl&gt;, 1821 &lt;dbl&gt;, 1822 &lt;dbl&gt;, 1823 &lt;dbl&gt;, 1824 &lt;dbl&gt;, 1825 &lt;dbl&gt;, 1826 &lt;dbl&gt;, 1827 &lt;dbl&gt;,
+## #   1828 &lt;dbl&gt;, 1829 &lt;dbl&gt;, 1830 &lt;dbl&gt;, 1831 &lt;dbl&gt;, 1832 &lt;dbl&gt;, 1833 &lt;dbl&gt;, 1834 &lt;dbl&gt;, 1835 &lt;dbl&gt;, 1836 &lt;dbl&gt;, 1837 &lt;dbl&gt;,
+## #   1838 &lt;dbl&gt;, 1839 &lt;dbl&gt;, 1840 &lt;dbl&gt;, 1841 &lt;dbl&gt;, 1842 &lt;dbl&gt;, 1843 &lt;dbl&gt;, 1844 &lt;dbl&gt;, 1845 &lt;dbl&gt;, 1846 &lt;dbl&gt;, 1847 &lt;dbl&gt;, …
 ```
+
+---
+
+## Загрузка данных Gapminder через googlesheets4
 
 Аналогично рассмотрим показатель [__ожидаемой продолжительности жизни__](https://www.gapminder.org/data/documentation/gd004/):
 
 ```r
 lifedf = read_sheet('1H3nzTwbn8z4lJ5gJ_WfDgCeGEXK3PVGcNjQ_U5og8eo')
-lifedf
-## # A tibble: 260 × 218
-##    `Life expectancy`     `1800` `1801` `1802` `1803` `1804` `1805` `1806` `1807`
-##    &lt;chr&gt;                  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-##  1 Abkhazia                NA     NA     NA     NA     NA     NA     NA     NA  
-##  2 Afghanistan             28.2   28.2   28.2   28.2   28.2   28.2   28.2   28.1
-##  3 Akrotiri and Dhekelia   NA     NA     NA     NA     NA     NA     NA     NA  
-##  4 Albania                 35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4
-##  5 Algeria                 28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8
-##  6 American Samoa          NA     NA     NA     NA     NA     NA     NA     NA  
-##  7 Andorra                 NA     NA     NA     NA     NA     NA     NA     NA  
-##  8 Angola                  27.0   27.0   27.0   27.0   27.0   27.0   27.0   27.0
-##  9 Anguilla                NA     NA     NA     NA     NA     NA     NA     NA  
-## 10 Antigua and Barbuda     33.5   33.5   33.5   33.5   33.5   33.5   33.5   33.5
-## # … with 250 more rows, and 209 more variables: 1808 &lt;dbl&gt;, 1809 &lt;dbl&gt;,
-## #   1810 &lt;dbl&gt;, 1811 &lt;dbl&gt;, 1812 &lt;dbl&gt;, 1813 &lt;dbl&gt;, 1814 &lt;dbl&gt;, 1815 &lt;dbl&gt;,
-## #   1816 &lt;dbl&gt;, 1817 &lt;dbl&gt;, 1818 &lt;dbl&gt;, 1819 &lt;dbl&gt;, 1820 &lt;dbl&gt;, 1821 &lt;dbl&gt;,
-## #   1822 &lt;dbl&gt;, 1823 &lt;dbl&gt;, 1824 &lt;dbl&gt;, 1825 &lt;dbl&gt;, 1826 &lt;dbl&gt;, 1827 &lt;dbl&gt;,
-## #   1828 &lt;dbl&gt;, 1829 &lt;dbl&gt;, 1830 &lt;dbl&gt;, 1831 &lt;dbl&gt;, 1832 &lt;dbl&gt;, 1833 &lt;dbl&gt;,
-## #   1834 &lt;dbl&gt;, 1835 &lt;dbl&gt;, 1836 &lt;dbl&gt;, 1837 &lt;dbl&gt;, 1838 &lt;dbl&gt;, 1839 &lt;dbl&gt;,
-## #   1840 &lt;dbl&gt;, 1841 &lt;dbl&gt;, 1842 &lt;dbl&gt;, 1843 &lt;dbl&gt;, 1844 &lt;dbl&gt;, 1845 &lt;dbl&gt;, …
+head(lifedf)
+## # A tibble: 6 × 218
+##   `Life expectancy`  `1800` `1801` `1802` `1803` `1804` `1805` `1806` `1807` `1808` `1809` `1810` `1811` `1812` `1813` `1814` `1815`
+##   &lt;chr&gt;               &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Abkhazia             NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA  
+## 2 Afghanistan          28.2   28.2   28.2   28.2   28.2   28.2   28.2   28.1   28.1   28.1   28.1   28.1   28.1   28.1   28.1   28.1
+## 3 Akrotiri and Dhek…   NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA  
+## 4 Albania              35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4   35.4
+## 5 Algeria              28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8   28.8
+## 6 American Samoa       NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA     NA  
+## # … with 201 more variables: 1816 &lt;dbl&gt;, 1817 &lt;dbl&gt;, 1818 &lt;dbl&gt;, 1819 &lt;dbl&gt;, 1820 &lt;dbl&gt;, 1821 &lt;dbl&gt;, 1822 &lt;dbl&gt;, 1823 &lt;dbl&gt;,
+## #   1824 &lt;dbl&gt;, 1825 &lt;dbl&gt;, 1826 &lt;dbl&gt;, 1827 &lt;dbl&gt;, 1828 &lt;dbl&gt;, 1829 &lt;dbl&gt;, 1830 &lt;dbl&gt;, 1831 &lt;dbl&gt;, 1832 &lt;dbl&gt;, 1833 &lt;dbl&gt;,
+## #   1834 &lt;dbl&gt;, 1835 &lt;dbl&gt;, 1836 &lt;dbl&gt;, 1837 &lt;dbl&gt;, 1838 &lt;dbl&gt;, 1839 &lt;dbl&gt;, 1840 &lt;dbl&gt;, 1841 &lt;dbl&gt;, 1842 &lt;dbl&gt;, 1843 &lt;dbl&gt;,
+## #   1844 &lt;dbl&gt;, 1845 &lt;dbl&gt;, 1846 &lt;dbl&gt;, 1847 &lt;dbl&gt;, 1848 &lt;dbl&gt;, 1849 &lt;dbl&gt;, 1850 &lt;dbl&gt;, 1851 &lt;dbl&gt;, 1852 &lt;dbl&gt;, 1853 &lt;dbl&gt;,
+## #   1854 &lt;dbl&gt;, 1855 &lt;dbl&gt;, 1856 &lt;dbl&gt;, 1857 &lt;dbl&gt;, 1858 &lt;dbl&gt;, 1859 &lt;dbl&gt;, 1860 &lt;dbl&gt;, 1861 &lt;dbl&gt;, 1862 &lt;dbl&gt;, 1863 &lt;dbl&gt;,
+## #   1864 &lt;dbl&gt;, 1865 &lt;dbl&gt;, 1866 &lt;dbl&gt;, 1867 &lt;dbl&gt;, 1868 &lt;dbl&gt;, 1869 &lt;dbl&gt;, 1870 &lt;dbl&gt;, 1871 &lt;dbl&gt;, 1872 &lt;dbl&gt;, 1873 &lt;dbl&gt;,
+## #   1874 &lt;dbl&gt;, 1875 &lt;dbl&gt;, 1876 &lt;dbl&gt;, 1877 &lt;dbl&gt;, 1878 &lt;dbl&gt;, 1879 &lt;dbl&gt;, 1880 &lt;dbl&gt;, 1881 &lt;dbl&gt;, 1882 &lt;dbl&gt;, 1883 &lt;dbl&gt;, …
 ```
+
+---
+
+## Загрузка данных Gapminder через googlesheets4
 
 Также нам понадобятся данные [__численности населения__]():
 
 ```r
 popdf = read_sheet('1IbDM8z5XicMIXgr93FPwjgwoTTKMuyLfzU6cQrGZzH8')
-popdf
-## # A tibble: 275 × 82
-##    `Total population`     `1800`  `1810`  `1820`  `1830`  `1840`  `1850`  `1860`
-##    &lt;chr&gt;                   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
-##  1 Abkhazia                   NA      NA      NA      NA      NA      NA      NA
-##  2 Afghanistan           3280000 3280000 3323519 3448982 3625022 3810047 3973968
-##  3 Akrotiri and Dhekelia      NA      NA      NA      NA      NA      NA      NA
-##  4 Albania                410445  423591  438671  457234  478227  506889  552800
-##  5 Algeria               2503218 2595056 2713079 2880355 3082721 3299305 3536468
-##  6 American Samoa           8170    8156    8142    8128    8114    7958    7564
-##  7 Andorra                  2654    2654    2700    2835    3026    3230    3436
-##  8 Angola                1567028 1567028 1597530 1686390 1813100 1949329 2110747
-##  9 Anguilla                 2025    2025    2064    2177    2338    2511    2693
-## 10 Antigua and Barbuda     37000   37000   37000   37000   37000   37000   36532
-## # … with 265 more rows, and 74 more variables: 1870 &lt;dbl&gt;, 1880 &lt;dbl&gt;,
-## #   1890 &lt;dbl&gt;, 1900 &lt;dbl&gt;, 1910 &lt;dbl&gt;, 1920 &lt;dbl&gt;, 1930 &lt;dbl&gt;, 1940 &lt;dbl&gt;,
-## #   1950 &lt;dbl&gt;, 1951 &lt;dbl&gt;, 1952 &lt;dbl&gt;, 1953 &lt;dbl&gt;, 1954 &lt;dbl&gt;, 1955 &lt;dbl&gt;,
-## #   1956 &lt;dbl&gt;, 1957 &lt;dbl&gt;, 1958 &lt;dbl&gt;, 1959 &lt;dbl&gt;, 1960 &lt;dbl&gt;, 1961 &lt;dbl&gt;,
-## #   1962 &lt;dbl&gt;, 1963 &lt;dbl&gt;, 1964 &lt;dbl&gt;, 1965 &lt;dbl&gt;, 1966 &lt;dbl&gt;, 1967 &lt;dbl&gt;,
-## #   1968 &lt;dbl&gt;, 1969 &lt;dbl&gt;, 1970 &lt;dbl&gt;, 1971 &lt;dbl&gt;, 1972 &lt;dbl&gt;, 1973 &lt;dbl&gt;,
-## #   1974 &lt;dbl&gt;, 1975 &lt;dbl&gt;, 1976 &lt;dbl&gt;, 1977 &lt;dbl&gt;, 1978 &lt;dbl&gt;, 1979 &lt;dbl&gt;, …
+head(popdf)
+## # A tibble: 6 × 82
+##   `Total population`  `1800`  `1810`  `1820`  `1830`  `1840`  `1850`  `1860`  `1870`  `1880`  `1890`  `1900`  `1910`  `1920`  `1930`
+##   &lt;chr&gt;                &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Abkhazia                NA      NA      NA      NA      NA      NA      NA      NA      NA      NA      NA      NA      NA      NA
+## 2 Afghanistan        3280000 3280000 3323519 3448982 3625022 3810047 3973968 4169690 4419695 4710171 5021241 5351413 5813814 6394908
+## 3 Akrotiri and Dhek…      NA      NA      NA      NA      NA      NA      NA      NA      NA      NA      NA      NA      NA      NA
+## 4 Albania             410445  423591  438671  457234  478227  506889  552800  610036  672544  741688  819950  901122  963956 1015991
+## 5 Algeria            2503218 2595056 2713079 2880355 3082721 3299305 3536468 3811028 4143163 4525691 4946166 5404045 6063800 6876190
+## 6 American Samoa        8170    8156    8142    8128    8114    7958    7564    7057    6582    6139    5949    7047    8173   10081
+## # … with 67 more variables: 1940 &lt;dbl&gt;, 1950 &lt;dbl&gt;, 1951 &lt;dbl&gt;, 1952 &lt;dbl&gt;, 1953 &lt;dbl&gt;, 1954 &lt;dbl&gt;, 1955 &lt;dbl&gt;, 1956 &lt;dbl&gt;,
+## #   1957 &lt;dbl&gt;, 1958 &lt;dbl&gt;, 1959 &lt;dbl&gt;, 1960 &lt;dbl&gt;, 1961 &lt;dbl&gt;, 1962 &lt;dbl&gt;, 1963 &lt;dbl&gt;, 1964 &lt;dbl&gt;, 1965 &lt;dbl&gt;, 1966 &lt;dbl&gt;,
+## #   1967 &lt;dbl&gt;, 1968 &lt;dbl&gt;, 1969 &lt;dbl&gt;, 1970 &lt;dbl&gt;, 1971 &lt;dbl&gt;, 1972 &lt;dbl&gt;, 1973 &lt;dbl&gt;, 1974 &lt;dbl&gt;, 1975 &lt;dbl&gt;, 1976 &lt;dbl&gt;,
+## #   1977 &lt;dbl&gt;, 1978 &lt;dbl&gt;, 1979 &lt;dbl&gt;, 1980 &lt;dbl&gt;, 1981 &lt;dbl&gt;, 1982 &lt;dbl&gt;, 1983 &lt;dbl&gt;, 1984 &lt;dbl&gt;, 1985 &lt;dbl&gt;, 1986 &lt;dbl&gt;,
+## #   1987 &lt;dbl&gt;, 1988 &lt;dbl&gt;, 1989 &lt;dbl&gt;, 1990 &lt;dbl&gt;, 1991 &lt;dbl&gt;, 1992 &lt;dbl&gt;, 1993 &lt;dbl&gt;, 1994 &lt;dbl&gt;, 1995 &lt;dbl&gt;, 1996 &lt;dbl&gt;,
+## #   1997 &lt;dbl&gt;, 1998 &lt;dbl&gt;, 1999 &lt;dbl&gt;, 2000 &lt;dbl&gt;, 2001 &lt;dbl&gt;, 2002 &lt;dbl&gt;, 2003 &lt;dbl&gt;, 2004 &lt;dbl&gt;, 2005 &lt;dbl&gt;, 2006 &lt;dbl&gt;,
+## #   2007 &lt;dbl&gt;, 2008 &lt;dbl&gt;, 2009 &lt;dbl&gt;, 2010 &lt;dbl&gt;, 2011 &lt;dbl&gt;, 2012 &lt;dbl&gt;, 2013 &lt;dbl&gt;, 2014 &lt;dbl&gt;, 2015 &lt;dbl&gt;
 ```
+
+---
+
+## Загрузка данных Gapminder через googlesheets4
 
 И географические данные по [__странам__](https://www.gapminder.org/data/geo/):
 
 ```r
 countdf = read_sheet('1qHalit8sXC0R8oVXibc2wa2gY7bkwGzOybEMTWp-08o', 2) 
-countdf
-## # A tibble: 197 × 13
-##    geo   name   four_regions eight_regions six_regions members_oecd_g77 Latitude
-##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;        &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;               &lt;dbl&gt;
-##  1 aus   Austr… asia         east_asia_pa… east_asia_… oecd               -25   
-##  2 brn   Brunei asia         east_asia_pa… east_asia_… g77                  4.5 
-##  3 khm   Cambo… asia         east_asia_pa… east_asia_… g77                 13   
-##  4 chn   China  asia         east_asia_pa… east_asia_… g77                 35   
-##  5 fji   Fiji   asia         east_asia_pa… east_asia_… g77                -18   
-##  6 hkg   Hong … asia         east_asia_pa… east_asia_… others              22.3 
-##  7 idn   Indon… asia         east_asia_pa… east_asia_… g77                 -5   
-##  8 jpn   Japan  asia         east_asia_pa… east_asia_… oecd                35.7 
-##  9 kir   Kirib… asia         east_asia_pa… east_asia_… others               1.42
-## 10 prk   North… asia         east_asia_pa… east_asia_… g77                 40   
-## # … with 187 more rows, and 6 more variables: Longitude &lt;dbl&gt;,
-## #   UN member since &lt;dttm&gt;, World bank region &lt;chr&gt;,
-## #   World bank, 4 income groups 2017 &lt;chr&gt;,
-## #   World bank, 3 income groups 2017 &lt;chr&gt;, UNHCR &lt;chr&gt;
+head(countdf)
+## # A tibble: 6 × 13
+##   geo   name             four_regions eight_regions six_regions members_oecd_g77 Latitude Longitude `UN member since`   `World bank reg…
+##   &lt;chr&gt; &lt;chr&gt;            &lt;chr&gt;        &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt; &lt;dttm&gt;              &lt;chr&gt;           
+## 1 aus   Australia        asia         east_asia_pa… east_asia_… oecd                -25        135  1945-11-01 00:00:00 East Asia &amp; Pac…
+## 2 brn   Brunei           asia         east_asia_pa… east_asia_… g77                   4.5      115. 1984-09-21 00:00:00 East Asia &amp; Pac…
+## 3 khm   Cambodia         asia         east_asia_pa… east_asia_… g77                  13        105  1955-12-14 00:00:00 East Asia &amp; Pac…
+## 4 chn   China            asia         east_asia_pa… east_asia_… g77                  35        105  1945-10-24 00:00:00 East Asia &amp; Pac…
+## 5 fji   Fiji             asia         east_asia_pa… east_asia_… g77                 -18        178  1970-10-13 00:00:00 East Asia &amp; Pac…
+## 6 hkg   Hong Kong, China asia         east_asia_pa… east_asia_… others               22.3      114. NA                  East Asia &amp; Pac…
+## # … with 3 more variables: World bank, 4 income groups 2017 &lt;chr&gt;, World bank, 3 income groups 2017 &lt;chr&gt;, UNHCR &lt;chr&gt;
 ```
 
 
@@ -189,21 +166,15 @@ countdf
 
 ## Оценка распределения
 
-Для оценки распределения случайной величины можно использовать графические и статистические способы. Выявление типа распределения важно, поскольку статистические методы не универсальны, и во многих случаях предполагают, что изучаемая переменная подчиняется определенному закону распределения (как правило, нормальному).
-
 Приведем выгруженные ранее данные ВВП к аккуратному виду, избавившись от множества столбцов с годом измерения. Сразу получим данные за 2015 год для анализа:
 
 ```r
 gdpdf_tidy = gdpdf |&gt; 
-   pivot_longer(cols = `1764`:`2018`, 
-                names_to = 'year', 
-                values_to = 'gdp',
+   pivot_longer(cols = `1764`:`2018`, names_to = 'year', values_to = 'gdp',
                 names_transform = list(year = as.integer)) |&gt; 
    rename(Country = 1)
 
-gdpdf15 = filter(gdpdf_tidy, year == 2015)
-
-gdpdf15
+(gdpdf15 = filter(gdpdf_tidy, year == 2015))
 ## # A tibble: 260 × 3
 ##    Country                year    gdp
 ##    &lt;chr&gt;                 &lt;int&gt;  &lt;dbl&gt;
@@ -222,70 +193,110 @@ gdpdf15
 
 ---
 
-Для визуальной проверки вида распределения можно использовать геометрию `geom_histogram()`:
+## Гистограмма распределения
+
+.pull-left[
+Строится через `geom_histogram()`:
 
 ```r
 ggplot(gdpdf15, aes(x = gdp)) + 
   geom_histogram()
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+]
 
-Изменить ширину кармана можно, используя параметр `binwidth`:
+.pull-right[
+Ширина кармана через `binwidth`:
+.code-small[
 
 ```r
 ggplot(gdpdf15, aes(x = gdp)) + 
-  geom_histogram(binwidth = 5000, color = 'black', fill = 'steelblue', size = 0.2)
+  geom_histogram(
+    binwidth = 5000, size = 0.2,
+    color = 'black', fill = 'steelblue'
+  )
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+]
+]
 
 ---
 
-Преобразуем в аккуратный вид и строим гистограмму распределения:
+## Гистограмма распределения
+
+.pull-left[
+Данные по продолжительности жизни:
 
 ```r
 lifedf_tidy = lifedf |&gt; 
-  pivot_longer(cols = `1800`:`2016`, 
-               names_to = 'year', 
-               values_to = 'lifexp',
-               names_transform = list(year = as.integer)) |&gt; 
+  pivot_longer(
+    cols = `1800`:`2016`, 
+    names_to = 'year', 
+    values_to = 'lifexp',
+    names_transform = list(
+      year = as.integer
+    )
+  ) |&gt; 
   rename(Country = 1)
 
-lifedf15 = dplyr::filter(lifedf_tidy, year == 2015)
+lifedf15 = filter(lifedf_tidy, 
+                  year == 2015)
+```
+]
 
+.pull-right[
+.code-small[
+
+```r
 ggplot(lifedf15, aes(x = lifexp)) + 
-  geom_histogram(binwidth = 2, color = 'black', fill = 'olivedrab', size = 0.2)
+  geom_histogram(
+    binwidth = 2, color = 'black', 
+    fill = 'olivedrab', size = 0.2
+  )
 ```
 
 ![](07_Stats_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+]
+]
 
 ---
 
-Для графической оценки распределения удобно использовать не только гистограмму, но также метод __ядерного сглаживания__ (_kernel density_), который позволяет строить аппроксимацию функции плотности вероятности. Условно говоря, ядро является функцией, которая позволяет распространить потенциал каждого элемента выборки на его ближайшую окрестность. Чем больше элементов выборки сконцентрировано вблизи данной точки, тем сильнее будет их совокупно наведенный потенциал в данной точке, и тем, соответственно, выше оценка плотности распределения, которая получается суперпозицией этих потенциалов. Математически операция ядерной оценки плотности в точке `\(x\)` определяется как:
-$$
-\hat f_h (x) = \frac{1}{nh}\sum_{i=1}^{n}K\Big(\frac{x - x_i}{h}\Big)
-$$
-где `\(K\)` — ядерная функция, `\(h &gt; 0\)` — сглаживающий параметр, `\(x_i\)` — элементы выборки, `\(n\)` — размер выборки. Ядерная функция должна удовлетворять двум критериям: `\(K(x) \geq 0\)`, `\(\int_{-\infty}^{+\infty} K(x) dx = 1\)`. Отсюда ясно, что любая модель функции плотности распределения может быть использована в качестве ядра: равномерное, нормальное и т.д. Как правило, ядерная функция носит бесконечно убывающий характер: чем дальше мы находимся от точки, тем меньше ее вклад в плотность распределения. 
+## Плотность распределения
 
-В __ggplot__ за аппроксимацию плотности распределения методом ядерного сглаживания отвечает геометрия `geom_density()`:
+Строится через `geom_density()`:
+
+.pull-left[
 
 ```r
 ggplot(gdpdf15, aes(x = gdp)) + 
-  geom_density(color = 'black', fill = 'steelblue', alpha = 0.5)
+  geom_density(color = 'black', 
+    fill = 'steelblue', alpha = 0.5)
 ```
 
 ![](07_Stats_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
 
 ```r
-
 ggplot(lifedf15, aes(x = lifexp)) + 
-  geom_density(color = 'black', fill = 'olivedrab', alpha = 0.5)
+  geom_density(color = 'black', 
+    fill = 'olivedrab', alpha = 0.5)
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-13-2.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+]
 
-Вы можете комбинировать гистограммы и оценку плотности распределения, но для этого гистограмма по оси _Y_ должна отражать не фактическое количество элементов в каждом классе, а _долю_ или плотность вероятности (`y = stat(density)`):
+---
+
+## Плотность распределения
+
+Для комбинации с гистограммой нужно `y = stat(density)`:
+
+.pull-left[
+.code-small[
 
 ```r
 ggplot(gdpdf15, aes(x = gdp)) + 
@@ -293,136 +304,159 @@ ggplot(gdpdf15, aes(x = gdp)) +
   geom_density(color = 'black', fill = 'steelblue', alpha = 0.5)
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+]
+]
+
+.pull-right[
+.code-small[
 
 ```r
-
 ggplot(lifedf15, aes(x = lifexp)) + 
   geom_histogram(aes(y = stat(density)), fill = 'grey', color = 'black', size = 0.1) +
   geom_density(color = 'black', fill = 'olivedrab', alpha = 0.5)
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-14-2.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+]
+]
 
 ---
 
-При построении гистограмм и оценке плотности распределения мы допустили ошибку: приняли, что все измерения являются равнозначными. Однако в данном случае это не так. Население Люксембурга и Пакистана отличается на два порядка --- это означает, что Пакистан должен иметь соответственно больший вес при построении гистограммы. Для учета этой характеристики подгрузим из __Gapminder__ данные по численности населения и присоединим их к нашим таблицам по ВВП и продолжительности жизни:
+## Взвешенные данные
+
+Присоединим данные по населению:
+
+.pull-left[
 
 ```r
 popdf_tidy = popdf |&gt; # численность населения
-  pivot_longer(cols = `1800`:`2015`, 
-               names_to = 'year', 
-               values_to = 'pop',
-               names_transform = list(year = as.integer)) |&gt; 
+  pivot_longer(
+    cols = `1800`:`2015`, 
+    names_to = 'year', 
+    values_to = 'pop',
+    names_transform = list(
+      year = as.integer
+    )
+  ) |&gt; 
   rename(Country = 1)
 
-(tab = gdpdf_tidy |&gt; 
+tab = gdpdf_tidy |&gt; 
     inner_join(lifedf_tidy) |&gt; 
-    inner_join(popdf_tidy))
-## # A tibble: 19,359 × 5
-##    Country   year   gdp lifexp   pop
-##    &lt;chr&gt;    &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
-##  1 Abkhazia  1800    NA     NA    NA
-##  2 Abkhazia  1810    NA     NA    NA
-##  3 Abkhazia  1820    NA     NA    NA
-##  4 Abkhazia  1830    NA     NA    NA
-##  5 Abkhazia  1840    NA     NA    NA
-##  6 Abkhazia  1850    NA     NA    NA
-##  7 Abkhazia  1860    NA     NA    NA
-##  8 Abkhazia  1870    NA     NA    NA
-##  9 Abkhazia  1880    NA     NA    NA
-## 10 Abkhazia  1890    NA     NA    NA
-## # … with 19,349 more rows
+    inner_join(popdf_tidy)
 ```
+]
+
+.pull-right[
+
+```r
+(tab15 = tab |&gt;  
+  filter(year == 2015) |&gt; 
+  drop_na())
+## # A tibble: 172 × 5
+##    Country              year    gdp lifexp      pop
+##    &lt;chr&gt;               &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+##  1 Afghanistan          2015  1418.   53.8 32526562
+##  2 Albania              2015  7343.   78    2896679
+##  3 Algeria              2015  6797.   76.4 39666519
+##  4 Angola               2015  6512.   59.6 25021974
+##  5 Antigua and Barbuda  2015 14884.   76.4    91818
+##  6 Argentina            2015 16640.   76.5 43416755
+##  7 Armenia              2015  5561.   74.7  3017712
+##  8 Australia            2015 38085.   82.3 23968973
+##  9 Austria              2015 37811.   81.3  8544586
+## 10 Azerbaijan           2015 10475.   72.9  9753968
+## # … with 162 more rows
+```
+]
 
 ---
 
+## Взвешенные данные
+
 Теперь мы можем произвести взвешенную оценку плотности распределения:
 
-```r
-tab15 = tab |&gt;  
-  filter(year == 2015) |&gt; 
-  drop_na() # все веса должны быть непустыми!
+.pull-left[
+.code-small[
 
-ggplot(tab15, aes(x = gdp, y = stat(density), weight = pop/sum(pop))) + 
+```r
+ggplot(tab15, 
+       aes(x = gdp, y = stat(density), weight = pop/sum(pop))) + 
   geom_histogram(binwidth = 5000, fill = 'grey', color = 'black', size = 0.1) +
   geom_density(color = 'black', fill = 'steelblue', alpha = 0.5)
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+]
+]
+
+.pull-right[
+.code-small[
 
 ```r
-
-ggplot(tab15, aes(x = lifexp, y = stat(density), weight = pop/sum(pop))) + 
+ggplot(tab15, 
+       aes(x = lifexp, y = stat(density), weight = pop/sum(pop))) + 
   geom_histogram(binwidth = 2.5, fill = 'grey', color = 'black', size = 0.1) +
   geom_density(color = 'black', fill = 'olivedrab', alpha = 0.5)
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-16-2.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+]
+]
+
 
 ---
 
-Графики плотности распределения удобны тем, что их, в отличие от гистограмм, удобно комбинировать на одном изображении, используя цвет для разделения по еще одной переменной.  Например, мы можем оценить, как изменились мировые диспропорции в продолжительности жизни и доходов населения за последние 50 лет (обратите внимание на параметр `fill = year` в эстетике:
+## Комбинация распределений
+
+Для комбинации по цвету можно задать `fill ` в эстетике:
+.code-small[
 
 ```r
-tab85 = tab |&gt; 
-  filter(year %in%  c(1965, 2015)) |&gt; 
-  drop_na()
+tab85 = tab |&gt; filter(year %in%  c(1965, 2015)) |&gt; drop_na()
+```
+]
 
-ggplot(tab85, aes(x = gdp, fill = factor(year), weight = pop/sum(pop))) + 
+.pull-left[
+.code-small[
+
+```r
+ggplot(tab85, aes(x = gdp, 
+           fill = factor(year), 
+           weight = pop/sum(pop))) + 
   geom_density(alpha = 0.5)
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+]
+]
+
+.pull-right[
+.code-small[
 
 ```r
-
-ggplot(tab85, aes(x = lifexp, fill = factor(year), weight = pop/sum(pop))) + 
+ggplot(tab85, aes(x = lifexp, 
+           fill = factor(year), 
+           weight = pop/sum(pop))) + 
   geom_density(alpha = 0.5)
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-17-2.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+]
+]
+
 
 ---
 
 ## Описательные статистики
 
-Описательные статистики --- это числовые характеристики, описывающие особенности статистического распределения изучаемой величины. К таким характеристикам относят выборочное среднее, медиану, минимум, максимум и ряд других величин. Можно вычислять эти характеристики для всей выборки, но для включения географического контекста мы стратифицируем ее по макрорегионам, которые используются в базе данных __Gapminder__:
+Присоединим данные по странам к исходной таблице:
 
 ```r
 countries = countdf |&gt;
   select(Country = name, Region = eight_regions) %&gt;%
   mutate(Country = factor(Country, levels = Country[order(.$Region)]))
-```
 
----
-
-Визуализируем:
-
-```r
-ggplot(countries, aes(x = Country, y = 1, fill = Region)) +
-  geom_col() +
-  geom_text(aes(y = 0.5, label = Country), size = 3) +
-  facet_wrap(~Region, scales = "free", ncol = 4) +
-  theme_bw()+
-  theme(panel.grid = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank()) +
-  guides(fill=FALSE) +
-  coord_flip()
-```
-
-![](07_Stats_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
-
----
-
-Присоединим эти данные к исходной таблице:
-
-```r
 (tabreg = tab |&gt; 
   left_join(countries) |&gt; 
   filter(year == 2015) |&gt; 
@@ -445,27 +479,35 @@ ggplot(countries, aes(x = Country, y = 1, fill = Region)) +
 
 ---
 
-Мы уже знакомы с функциями `min()`, `max()`, `median()`, `mean()`, `sd()`, которые дают значения соответствующих описательных статистик для векторов данных. Как представить их все одновременно? Для визуализации отличий в статистических параметрах исследуемой выборки удобно использовать тип графика, который называется [__boxplot__](https://ru.wikipedia.org/wiki/%D0%AF%D1%89%D0%B8%D0%BA_%D1%81_%D1%83%D1%81%D0%B0%D0%BC%D0%B8) (а по русски — диаграмма размаха, улей, или ящик с усами). В __ggplot__ за него отвечает геометрия `geom_boxplot()`:
+## Ящики с усами (boxplot)
 
+.pull-left[
 
 ```r
-ggplot(tabreg, aes(x = Region, y = gdp)) +
+ggplot(tabreg, 
+       aes(x = Region, y = gdp)) +
   geom_boxplot() + coord_flip()
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
 
 ```r
-
-ggplot(tabreg, aes(x = Region, y = lifexp)) +
+ggplot(tabreg, 
+       aes(x = Region, y = lifexp)) +
   geom_boxplot() + coord_flip()
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-21-2.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+]
+
 
 ---
 
-Данные графики наглядно показывают, что регионы отличаются по ряду статистических параметров исследуемой переменной: среднему значению, размаху вариации (разбросу значений), среднеквадратическому отклонению  Эти статистики можно получить и в табличном виде:
+## Агрегированные статистики
+
 
 ```r
 (tabreg |&gt; 
@@ -489,13 +531,10 @@ ggplot(tabreg, aes(x = Region, y = lifexp)) +
 
 ---
 
-## Статистические тесты
+## Тест Стьюдента
 
-Прежде чем манипулировать вычисленными статистиками (говорить, что в Западной Европе ВВП на душу населения в 10 раз выше, чем в Южной Африке), необходимо убедиться, что их отличия являются статистически значимыми. На статистическую значимость влияет не только абсолютная разность средних, но также характер распределения и объем выборки --- выборки малого объема не могут дать высокой статистической значимости.
-
-Для сравнения средних значений и дисперсий двух статистических выборок обычно используют [__тест Стьюдента__](https://ru.wikipedia.org/wiki/T-%D0%9A%D1%80%D0%B8%D1%82%D0%B5%D1%80%D0%B8%D0%B9_%D0%A1%D1%82%D1%8C%D1%8E%D0%B4%D0%B5%D0%BD%D1%82%D0%B0) и [__тест Фишера__](https://ru.wikipedia.org/wiki/F-%D1%82%D0%B5%D1%81%D1%82) соответственно. 
-
-Проведем тесты для сравнения средних по Европе и Южной Африке используя функцию `t.test()` (на самом деле это [тест Уэлча](https://en.wikipedia.org/wiki/Welch%27s_t-test), являющийся модификацией теста Стьюдента):
+Проверка на равенство средних
+.code-small[
 
 ```r
 t.test(tabreg |&gt; dplyr::filter(Region == 'africa_sub_saharan') |&gt; pull(gdp),
@@ -511,7 +550,17 @@ t.test(tabreg |&gt; dplyr::filter(Region == 'africa_sub_saharan') |&gt; pull(gdp
 ## sample estimates:
 ## mean of x mean of y 
 ##  3583.326 33571.214
+```
+]
 
+---
+
+## Тест Стьюдента
+
+Проверка на равенство средних
+.code-small[
+
+```r
 t.test(tabreg |&gt; dplyr::filter(Region == 'africa_sub_saharan') |&gt; pull(lifexp),
        tabreg |&gt; dplyr::filter(Region == 'europe_west') |&gt; pull(lifexp))
 ## 
@@ -526,12 +575,14 @@ t.test(tabreg |&gt; dplyr::filter(Region == 'africa_sub_saharan') |&gt; pull(lif
 ## mean of x mean of y 
 ##  62.25435  81.45789
 ```
-
-[__p-значения__](https://ru.wikipedia.org/wiki/P-%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5) для данных тестов очень малы, что позволяет нам принять (не отвергать) гипотезу о неравенстве средних для Западной Европы и Южной Африки.
+]
 
 ---
 
-Проверим, так ли значимы отличия в средних для Северной и Южной Америки:
+## Тест Стьюдента
+
+Проверка на равенство средних
+.code-small[
 
 ```r
 t.test(tabreg |&gt; dplyr::filter(Region == 'america_north') |&gt; pull(gdp),
@@ -547,7 +598,17 @@ t.test(tabreg |&gt; dplyr::filter(Region == 'america_north') |&gt; pull(gdp),
 ## sample estimates:
 ## mean of x mean of y 
 ##  13834.72  10349.69
+```
+]
 
+---
+
+## Тест Стьюдента
+
+Проверка на равенство средних
+.code-small[
+
+```r
 t.test(tabreg |&gt; dplyr::filter(Region == 'america_north') |&gt; pull(lifexp),
        tabreg |&gt; dplyr::filter(Region == 'america_south') |&gt; pull(lifexp))
 ## 
@@ -562,12 +623,14 @@ t.test(tabreg |&gt; dplyr::filter(Region == 'america_north') |&gt; pull(lifexp),
 ## mean of x mean of y 
 ##  74.86111  75.14167
 ```
+]
 
 ---
 
-В данном случае, несмотря на то, что вычисленные значения средних отличаются, тест показывает очень высокие __p-значения__ (0.25 и 0.84 соответственно), что не позволяет нам говорить о том, что эти отличия статистически значимы. Соответственно, делать на их основе какие-либо научные выводы нельзя.
+## Тест Фишера
 
-Аналогичным образом можно проверить статистическую значимость отличий в дисперсии (вариации значений) для разных регионов. Для этого используем функцию `var.test()` применительно к регионам Западной и Восточной Европы:
+Проверка на равенство дисперсий:
+.code-small[
 
 ```r
 var.test(tabreg |&gt; dplyr::filter(Region == 'europe_east') |&gt; pull(gdp),
@@ -583,7 +646,17 @@ var.test(tabreg |&gt; dplyr::filter(Region == 'europe_east') |&gt; pull(gdp),
 ## sample estimates:
 ## ratio of variances 
 ##          0.4008741
+```
+]
 
+---
+
+## Тест Фишера
+
+Проверка на равенство дисперсий:
+.code-small[
+
+```r
 var.test(tabreg |&gt; dplyr::filter(Region == 'europe_east') |&gt; pull(lifexp),
        tabreg |&gt; dplyr::filter(Region == 'europe_west') |&gt; pull(lifexp))
 ## 
@@ -598,111 +671,103 @@ var.test(tabreg |&gt; dplyr::filter(Region == 'europe_east') |&gt; pull(lifexp),
 ## ratio of variances 
 ##           5.324617
 ```
-
-Данный тест показывает, что отличия в вариации значений ВВП на душу населения для Западной и Восточной Европы носят пограничный характер (p = 0.04), и принимать их можно только если стоит относительно высокое пороговое значение p = 0.05. В то же время, вариация продолжительности жизни для Западной Европы существенной меньше, чем для Восточной и при данной выборке это отличие обладает высокой статистической значимостью (p = 0.0007). Соответственно, его можно принимать с уверенностью.
+]
 
 ---
 
 ## Диаграмма рассеяния
 
-Первичный анализ производится путем оценки совместного распределения переменных на плоскости (для двух переменных) путем построения диаграммы рассеяния. С этим графиком мы уже хорошо знакомы:
 
 ```r
 ggplot(tabreg, aes(gdp, lifexp)) +
   geom_point()
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
 
 ---
 
-Очевидно, что в данном случае мы имеем с нелинейной зависимостью. Чтобы упростить задачу по дальнейшему анализу, можно попробовать перейти к логарифмической шкале по оси _X_:
+## Диаграмма рассеяния
+
+.pull-left[
 
 ```r
 options(scipen = 999)
-ggplot(tabreg, aes(gdp, lifexp)) +
+ggplot(tabreg, 
+       aes(gdp, lifexp)) +
   geom_point() +
   scale_x_log10()
 ```
+]
 
-![](07_Stats_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+.pull-right[
+![](07_Stats_files/figure-html/scat-out-1.png)&lt;!-- --&gt;
+]
 
 ---
 
-На диаграмме рассеяния важно показать не только местоположение точек, но также их весовую значимость, которая в данном случае определяется численностью населения в стране. Введем соответствующую графическую переменную — размер точки:
+## Диаграмма рассеяния
+
+.pull-left[
 
 ```r
-ggplot(tabreg, aes(gdp, lifexp, size = pop)) +
-  geom_point(alpha = 0.5) +
-  scale_x_log10()
-```
-
-![](07_Stats_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
-
-Еще сильнее повысить информативность диаграммы рассеяния можно, используя цвет точек для обозначения региона принадлежности. Это позволит понять связь между введенной нами _географической стратификацией_ и распределением элементов выборки на диаграмме рассеяния:
-
-```r
-ggplot(tabreg, aes(gdp, lifexp, size = pop, color = Region)) +
+options(scipen = 999)
+ggplot(tabreg, 
+       aes(gdp, lifexp, 
+           size = pop, 
+           color = Region)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
   theme_bw()
 ```
+]
 
-![](07_Stats_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
-
-Использование цвета наглядно показывает, что африканские страны занимают нижнюю левую часть диаграммы рассеяния с малой величиной ВВП и низкой продолжительностью жизни.
+.pull-right[
+![](07_Stats_files/figure-html/scat2-out-1.png)&lt;!-- --&gt;
+]
 
 ---
 
-Целесообразно также добавить подписи крупнейших стран мира с населением более 100 млн чел, а также страны, занимающие экстремальные позиции по обеим осям, чтобы понять положение ключевых игроков на диаграмме:
+## Диаграмма рассеяния
+
+.pull-left[
+.code-small[
 
 ```r
-
 tablab = tabreg |&gt; # табличка для подписей
-  filter(
-    pop &gt; 1e8 | 
+  filter(pop &gt; 1e8 | 
     gdp == min(gdp) | 
     gdp == max(gdp) | 
     lifexp == min(lifexp) | 
-    lifexp == max(lifexp)
-  )
+    lifexp == max(lifexp))
 
-ggplot(tabreg, aes(gdp, lifexp, color = Region)) +
-  geom_point(aes(size = pop), alpha = 0.5) +
-  geom_text(data = tablab, 
-            aes(label = Country),
-            check_overlap = TRUE,
-            show.legend = FALSE) + # убрать текст из легенды
-  scale_x_log10() +
-  theme_bw()
-```
-
-![](07_Stats_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
-
----
-
-Устранение перекрытий подписей можно осуществить, используя геометрию `geom_text_repel()` из пакета __ggrepel__ вместо стандартной `geom_text()`
-
-```r
-ggplot(tabreg, aes(gdp, lifexp,  color = Region)) +
-  geom_point(aes(size = pop), alpha = 0.5) +
+ggplot(tabreg, aes(gdp, lifexp,  
+                   color = Region)) +
+  geom_point(aes(size = pop), 
+             alpha = 0.5) +
   geom_text_repel(data = tablab, 
                   aes(label = Country),
-                  box.padding = 0.7,  # зазор вокруг подписи
-                  segment.size = 0.2, # толщина линии выноски
-                  show.legend = FALSE) + # убрать текст из легенды
+                  box.padding = 0.7,
+                  segment.size = 0.2,
+                  show.legend = FALSE) +
   scale_x_log10() +
   labs(label = element_blank()) +
   theme_bw()
 ```
+]
+]
 
-![](07_Stats_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
+.pull-right[
+![](07_Stats_files/figure-html/scat3-out-1.png)&lt;!-- --&gt;
+]
 
 ---
 
-## Плотность распределения
+## Плотность распределения (изолинии)
 
-Плотность совместного распределения двух случайных величин представляет собой уже не кривую, а поверхность, которую можно построить с использованием геометрии `geom_density_2d()`. По умолчанию эта геометрия визуализируется в форме изолиний:
+.pull-left[
+Строится через `geom_density_2d()`:
+.code-small[
 
 ```r
 ggplot(tabreg, aes(gdp, lifexp)) +
@@ -711,30 +776,51 @@ ggplot(tabreg, aes(gdp, lifexp)) +
   scale_x_log10() +
   theme_bw()
 ```
+]
+]
 
-![](07_Stats_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+.pull-right[
+![](07_Stats_files/figure-html/den2d-out-1.png)&lt;!-- --&gt;
+]
 
 ---
 
-Усилить наглядность представления можно, добавив вспомогательную растровую поверхность плотности распределения (по которой, собственно, и строятся изолинии). Обратите внимание, что для растра используется функция `stat_density()`:
+## Плотность распределения (поверхность)
+
+.pull-left[
+Строится через `geom_density_2d()`:
+.code-small[
 
 ```r
 ggplot(tabreg, aes(gdp, lifexp)) +
-  stat_density_2d(geom = "raster", aes(fill = stat(density)), contour = FALSE) +
-  geom_density_2d(color = 'black', size = 0.2) +
+  stat_density_2d(
+    geom = "raster", 
+    aes(fill = stat(density)), 
+    contour = FALSE) +
+  geom_density_2d(
+    color = 'black', 
+    size = 0.2
+  ) +
   geom_point(alpha = 0.5) +
-  scale_fill_gradient(low = "white", high = "red") +
+  scale_fill_gradient(low = "white", 
+                      high = "red") +
   scale_x_log10() +
   theme_bw()
 ```
+]
+]
 
-![](07_Stats_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+.pull-right[
+![](07_Stats_files/figure-html/den2d2-out-1.png)&lt;!-- --&gt;
+]
 
-График двумерной плотности распределения показывает, что _мода_ распределения, т.е. наиболее часто встречающийся случай, примерно соответствует странам с продолжительностью жизни 75 лет и ВВП на душу населения \$10000.
 
 ---
 
-В некоторых случаях удобнее оказывается не аппроксимация непрерывной поверхности плотности распределения, а подсчет количества измерений по ячейкам регулярной сетки — квадратным или гексагональным. Такой подход бывает особенно полезен, когда точек измерений очень много и из-за их количества оказывается проблематично разглядеть области их концентрации. Агрегирование данных по ячейкам осуществляется путем применения геометрий `geom_bin2d()` и `geom_hex()`:
+## Биннинг (агрегирование по ячейкам)
+
+.pull-left[
+.code-small[
 
 ```r
 ggplot(tabreg, aes(gdp, lifexp)) +
@@ -745,10 +831,14 @@ ggplot(tabreg, aes(gdp, lifexp)) +
   theme_bw()
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
+]
+]
+
+.pull-right[
+.code-small[
 
 ```r
-
 ggplot(tabreg, aes(gdp, lifexp)) +
   geom_hex(bins = 10) +
   geom_point(alpha = 0.5) +
@@ -757,23 +847,16 @@ ggplot(tabreg, aes(gdp, lifexp)) +
   theme_bw()
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-34-2.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
+]
+]
+
 
 ---
 
 ## Корреляция
 
-[__Коэффициент корреляции__](https://bigenc.ru/mathematics/text/2099711) --- это числовая характеристика совместного распределения двух случайных величин, характеризующая их взаимосвязь. Наиболее часто в статистике употребляется выборочный коэффициент корреляции Пирсона, в котором перебираются все пары соответствующих друг другу значений из рядов `\(X = \{x_i\}\)` и `\(Y = \{y_i\}\)`: 
-$$
-r_{xy} = \frac{\sum_{i=1}^{n}(x_i - \bar x)(y_i - \bar y)}{\sqrt{\sum_{i=1}^{n}(x_i - \bar x)^2} \sqrt{\sum_{i=1}^{n}(y_i - \bar y)^2}},
-$$
-где `\(\bar x\)` и `\(\bar y\)` соответствуют выборочным средним для `\(X\)` и `\(Y\)`. 
-
-Важно помнить, что коэффициент корреляции Пирсона характеризует силу _линейной_ связи между двумя величинами. Поэтому, если наблюдаемая нами картина взаимосвязи носит нелинейный характер, необходимо предварительно линеаризовать ее, то есть выполнить преобразование над переменными, приводящее к получению линейной зависимости. В нашем в случае изучения ВВП на душу населения и продолжительности жизни мы видели, что линеаризация возможна путем логарифмирования показателя ВВП.
-
----
-
-Для вычисления коэффициента корреляции Пирсона в __R__ с оценкой уровня значимости используется функция `cor.test()`:
+Коэффициент корреляции Пирсона через `cor.test()`:
 
 ```r
 cor.test(tabreg$gdp, tabreg$lifexp)
@@ -789,9 +872,12 @@ cor.test(tabreg$gdp, tabreg$lifexp)
 ##       cor 
 ## 0.6574446
 ```
-Результат теста в данном случае показывает, что коэффициент корреляции с вероятностью 0,95 находится в интервале от 0,56 до 0,73, и его математическое ожидание равно 0,66. 
 
-Проверим, можно ли уточнить эту оценку, выполнив логарифмирование показателя ВВП:
+---
+
+## Корреляция
+
+Предварительное логарифмирование:
 
 ```r
 cor.test(log(tabreg$gdp), tabreg$lifexp)
@@ -807,50 +893,15 @@ cor.test(log(tabreg$gdp), tabreg$lifexp)
 ##       cor 
 ## 0.7990415
 ```
-Видим, что логарифмирование показателя позволяет повысить значение коэффициента корреляции до 0,8. При этом доверительный интервал, заключающий в себя эту величину с вероятностью 0,95 существенно сузился: с 0,17 до 0,11. Очевидно, мы получили более корректную оценку взаимосвязи.
 
 ---
 
 ## Регрессия
 
-Для построения статистической модели этой зависимости, позволяющей по значениям независимой переменной вычислять значения зависимой переменной, необходимо провести __регрессионный анализ__. В общем случае кривая регрессии обычно выражается линейной комбинацией набора функций:
-$$
-y(x) = β_0φ_0(x)+ β_1φ_1(x)+...+ β_mφ_m(x)
-$$
-Наиболее часто используется _полиномиальная регрессия_, при которой
-$$
-y(x) = β_0+β_1x+...+ β_mx^m.
-$$
-В этом случае основная задача регрессионного анализа сводится к поиску неизвестных коэффициентов `\(β_0,...,β_m\)`, который осуществляется [методом наименьших квадратов](https://bigenc.ru/mathematics/text/2245173). Результатом этого поиска являются выборочные коэффициенты регрессии `\(\hat β_0,...,\hat β_m\)`, которые дают оценку искомых параметров `\(β_0,...,β_m\)`. В итоге эмпирическая линия регрессии определяется многочленом
-$$
-\hat y(x)=\hat β_0+\hat β_1x+...+\hat β_mx_m,
-$$
-который и служит статистической оценкой неизвестной формы функциональной зависимости между исследуемыми величинами.
-
----
-
-Для представления моделей в R существует специальный объект, который называется __формула__. Формула имеет вид `f ~ x + y + ...`, что интерпретируется соответствующими функциями как `\(f = β_0 + β_1x + β_2y + \dots\)`
-
-&gt; __Обратите внимание__ на символ _тильды_ (`~`) --- он является отличительной особенностью формулы и интерпретируется как _«зависит от»_.
-
-Вместо переменных в формуле вы можете использовать функции от переменных. Например `log(f) ~ log(x) + sqrt(y)` означает модель `\(\log f = β_0 + β_1 \log x + β_2 \sqrt y\)`. Если необходимо выполнить алгебраические преобразования переменных или задать конкретное значение свободного члена, то их необходимо заключить в специальную функцию `I()`: `f ~ log(x) + I(y ^ 2) + I(0)` будет означать модель вида `\(f = β_1 \log x + β_2 y^2\)`. 
-
-Для краткой записи полиномиальной зависимости можно использовать вспомогательную функцию `poly()`, которая в качестве второго аргумента принимает степень многочлена. Т.е. `f ~ poly(x, 3)` означает модель вида `\(f = β_0 + β_1x + β_2x^2 + β_3x^3\)`.
-
-Оценка параметров линейных моделей осуществляется с помощью функции `lm()`. В нашем случае модель носит простой характер:
+Оценка параметров линейных моделей осуществляется с помощью функции `lm()`:
 
 ```r
 model = lm(lifexp ~ log(gdp), data = tabreg)
-coef(model)
-## (Intercept)    log(gdp) 
-##   25.129347    5.261476
-```
-
----
-
-Полученные данные говорят нам о том, что уравнение имеет вид `\(lifexp = 25.13 + 5.26 \log(gdp)\)`. Чтобы получить подробную сводку о качестве модели, мы можем вызвать `summary()`:
-
-```r
 summary(model)
 ## 
 ## Call:
@@ -872,11 +923,12 @@ summary(model)
 ## F-statistic: 300.2 on 1 and 170 DF,  p-value: &lt; 0.00000000000000022
 ```
 
-Результаты оценки говорят о том, что регрессия построена удовлетворительно. [Коэффициент детерминации](https://ru.wikipedia.org/wiki/%D0%9A%D0%BE%D1%8D%D1%84%D1%84%D0%B8%D1%86%D0%B8%D0%B5%D0%BD%D1%82_%D0%B4%D0%B5%D1%82%D0%B5%D1%80%D0%BC%D0%B8%D0%BD%D0%B0%D1%86%D0%B8%D0%B8) (квадрат коэффициента корреляции) равен 0,64.
-
 ---
 
-Для визуализации модели можно извлечь из нее значения используя функцию `fitted()`:
+## Регрессия
+
+Аппроксимированные значения извлекаются через `fitted()`:
+
 
 ```r
 df = tibble(lifexp = fitted(model),
@@ -888,22 +940,29 @@ ggplot(tabreg, aes(gdp, lifexp)) +
   theme_bw()
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
 
 ---
 
-Если вам нужно только построить линию регрессии, но не находить ее коэффициенты, то вы можете пропустить этап оценки параметров модели и вывести график линейной регрессии средствами __ggplot__, используя геометрию `geom_smooth()` с параметром `method = lm`:
+## Регрессия — визуализация
+
+.pull-left[
+__ggplot__ содержит геометрию `geom_smooth()`:
 
 ```r
 ggplot(tabreg, aes(gdp, lifexp)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = 'lm',
-              color = 'red', size = 1) +
+              color = 'red', 
+              size = 1) +
   scale_x_log10() +
   theme_bw()
 ```
+]
 
-![](07_Stats_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
+.pull-right[
+![](07_Stats_files/figure-html/smooth-out-1.png)&lt;!-- --&gt;
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

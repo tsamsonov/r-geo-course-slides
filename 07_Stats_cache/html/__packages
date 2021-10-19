@@ -1,0 +1,7 @@
+base
+dplyr
+tidyr
+ggplot2
+googlesheets4
+ggrepel
+readxl

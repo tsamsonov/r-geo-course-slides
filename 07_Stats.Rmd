@@ -443,17 +443,26 @@ var.test(tabreg |> dplyr::filter(Region == 'europe_east') |> pull(lifexp),
 
 ## Диаграмма рассеяния
 
-```{r}
-ggplot(tabreg, aes(gdp, lifexp)) +
+.pull-left[
+```{r scat, eval=F}
+ggplot(tabreg, 
+       aes(gdp, lifexp)) +
   geom_point()
 ```
+]
+
+.pull-left[
+```{r scat-out, ref.label = 'scat', echo=F}
+```
+]
+
 
 ---
 
 ## Диаграмма рассеяния
 
 .pull-left[
-```{r scat, eval=F}
+```{r scat1, eval=F}
 options(scipen = 999)
 ggplot(tabreg, 
        aes(gdp, lifexp)) +
@@ -463,7 +472,7 @@ ggplot(tabreg,
 ]
 
 .pull-right[
-```{r scat-out, ref.label='scat', echo=F}
+```{r scat1-out, ref.label='scat1', echo=F}
 ```
 ]
 
@@ -577,7 +586,6 @@ ggplot(tabreg, aes(gdp, lifexp)) +
 ```
 ]
 
-
 ---
 
 ## Биннинг (агрегирование по ячейкам)
@@ -643,15 +651,26 @@ summary(model)
 
 Аппроксимированные значения извлекаются через `fitted()`:
 
-```{r}
+.pull-left[
+```{r lmplot, eval = F}
 df = tibble(lifexp = fitted(model),
             gdp = tabreg$gdp)
               
 ggplot(tabreg, aes(gdp, lifexp)) +
   geom_point(alpha = 0.5) +
-  geom_line(data = df, aes(gdp, lifexp), color = 'red', size = 1) +
+  geom_line(data = df, 
+            aes(gdp, lifexp), 
+            color = 'red', 
+            size = 1) +
   theme_bw()
 ```
+]
+
+.pull-right[
+```{r lmplot-out, ref.label='lmplot', echo=F}
+```
+]
+
 
 ---
 

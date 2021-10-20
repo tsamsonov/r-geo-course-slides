@@ -677,13 +677,19 @@ var.test(tabreg |&gt; dplyr::filter(Region == 'europe_east') |&gt; pull(lifexp),
 
 ## Диаграмма рассеяния
 
+.pull-left[
 
 ```r
-ggplot(tabreg, aes(gdp, lifexp)) +
+ggplot(tabreg, 
+       aes(gdp, lifexp)) +
   geom_point()
 ```
+]
 
-![](07_Stats_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+.pull-left[
+![](07_Stats_files/figure-html/scat-out-1.png)&lt;!-- --&gt;
+]
+
 
 ---
 
@@ -701,7 +707,7 @@ ggplot(tabreg,
 ]
 
 .pull-right[
-![](07_Stats_files/figure-html/scat-out-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/scat1-out-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -814,7 +820,6 @@ ggplot(tabreg, aes(gdp, lifexp)) +
 ![](07_Stats_files/figure-html/den2d2-out-1.png)&lt;!-- --&gt;
 ]
 
-
 ---
 
 ## Биннинг (агрегирование по ячейкам)
@@ -831,7 +836,7 @@ ggplot(tabreg, aes(gdp, lifexp)) +
   theme_bw()
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -847,7 +852,7 @@ ggplot(tabreg, aes(gdp, lifexp)) +
   theme_bw()
 ```
 
-![](07_Stats_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
+![](07_Stats_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
 ]
 ]
 
@@ -929,6 +934,7 @@ summary(model)
 
 Аппроксимированные значения извлекаются через `fitted()`:
 
+.pull-left[
 
 ```r
 df = tibble(lifexp = fitted(model),
@@ -936,11 +942,18 @@ df = tibble(lifexp = fitted(model),
               
 ggplot(tabreg, aes(gdp, lifexp)) +
   geom_point(alpha = 0.5) +
-  geom_line(data = df, aes(gdp, lifexp), color = 'red', size = 1) +
+  geom_line(data = df, 
+            aes(gdp, lifexp), 
+            color = 'red', 
+            size = 1) +
   theme_bw()
 ```
+]
 
-![](07_Stats_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
+.pull-right[
+![](07_Stats_files/figure-html/lmplot-out-1.png)&lt;!-- --&gt;
+]
+
 
 ---
 

@@ -39,7 +39,6 @@ __Данные__
 library(tsibbledata)
 library(nasapower)
 ```
-
 ]
 
 .pull-right[

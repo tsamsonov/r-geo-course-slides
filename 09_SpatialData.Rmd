@@ -149,3 +149,31 @@ plot(mpol, lwd = 3, col = 'grey', main = 'MULTIPOLYGON', cex.main=3)
 # plot(gc, lwd = 3, col = 'grey', border = 'black', main = 'GEOMETRYCOLLECTION', cex.main=3)
 par(mfrow = c(1,1))
 ```
+
+---
+
+## Форматы представления
+
+.blue[__Well-Known Text (WKT)__] — текстовый формат (удобен для визуализации)
+
+```{r, echo=FALSE, collapse=T}
+cat(st_as_text(p))
+cat(st_as_text(ls))
+cat(st_as_text(pol))
+cat(st_as_text(mp))
+cat(st_as_text(mls))
+cat(st_as_text(mpol))
+cat(st_as_text(gc))
+```
+
+.red[__Well-Known Binary (WKB)__] — бинарный формат (предпочтителен для хранения)
+
+```{r, echo=FALSE}
+cat(st_as_binary(p))
+cat(st_as_binary(ls))
+cat(st_as_binary(pol))
+cat(st_as_binary(mp))
+cat(st_as_binary(mls))
+cat(st_as_binary(mpol))
+cat(st_as_binary(gc))
+```

@@ -177,3 +177,21 @@ cat(st_as_binary(mls))
 cat(st_as_binary(mpol))
 cat(st_as_binary(gc))
 ```
+
+---
+
+## Базовые библиотеки
+
+.left-40[
+В R существует высоко развитая инфраструктура для работы с векторными данными, которая обеспечивается пакетом [__sf__](https://cran.r-project.org/web/packages/sf/index.html).
+
+<br>
+__sf__ опирается на библиотеки [PROJ](https://proj.org), [GDAL](https://gdal.org), [GEOS](https://trac.osgeo.org/geos/) и [S2](https://s2geometry.io), которые устанавливаются вместе с ним.
+]
+
+.right-60[
+```{r, echo=FALSE}
+knitr::include_graphics('img/sf_architecture_new.svg')
+```
+]
+

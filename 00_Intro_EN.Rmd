@@ -309,15 +309,6 @@ https://www.tidyverse.org
 
 ---
 
-# Spatial data
-
-R has highly developed package ecosystem for working with spatial data. Some of the packages rely on external spatial libraries (GDAL, GEOS, PROJ, Leaflet) and GIS packages (QGIS, SAGA, GRASS, Whitebox).
-```{r, echo = F}
-knitr::include_graphics("img/spackages.png")
-```
-
----
-
 # Package 
 
 Many R packages are well documented and have dedicated web site
@@ -362,3 +353,21 @@ https://www.rstudio.com
 knitr::include_graphics("https://d33wubrfki0l68.cloudfront.net/eea112c862c6881ff251757e5197329030a7dfec/cc90d/2020/05/27/rstudio-1-3-release/rstudio-1-3-screenshot.png")
 ```
 ]
+
+---
+
+# Spatial data
+
+R has highly developed package ecosystem for working with spatial data. Some of the packages rely on external spatial libraries (GDAL, GEOS, PROJ, Leaflet) and GIS packages (QGIS, SAGA, GRASS, Whitebox).
+```{r, echo = F}
+knitr::include_graphics("img/spackages.png")
+```
+
+---
+
+# Spatial data models
+
+```{r}
+
+```
+

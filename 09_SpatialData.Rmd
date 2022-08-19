@@ -451,4 +451,22 @@ plot(continents['gdp'])
 ```
 ]
 
+---
 
+## Геометрические объекты 
+
+Для создания геометрических объектов в пакете __sf__ существует ряд функций:
+
+Функция                   | Тип пространственного объекта
+--------------------------|-----------------------------------
+`st_point()`              | _POINT_
+`st_linestring()`         | _LINESTRING_
+`st_polygon()`            | _POLYGON_
+`st_multipoint()`         | _MULTIPOINT_
+`st_multilinestring()`    | _MULTILINESTRING_
+`st_multipolygon()`       | _MULTIPOLYGON_
+`st_geometrycollection()` | _GEOMETRYCOLLECTION_
+
+<br><br><br><br><br><br><br><br><br><br><br>
+
+В зависимости от типа создаваемого объекта, данные функции принимают координаты в виде вектора, матрицы или списка.

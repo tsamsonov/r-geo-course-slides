@@ -550,7 +550,7 @@ print(pol)
 ]
 
 .pull-right[
-```{r, out.width='400px'}
+```{r, out.width='400px', crop = T}
 plot(pol, col = 'lightblue')
 ```
 ]
@@ -580,7 +580,7 @@ print(pol2)
 ]
 
 .pull-right[
-```{r, out.width='400px'}
+```{r, out.width='400px', crop = T}
 plot(pol2, col = 'lightblue')
 ```
 ]
@@ -629,7 +629,7 @@ print(mpol)
 
 ## Мультиполигоны
 
-```{r, out.width='500px'}
+```{r, out.width='500px', crop=T}
 plot(pol, col = 'grey') # Обычный полигон (серый)
 plot(mpol, col = 'pink', add = TRUE) # Мультиполигон (розовый)
 ```
@@ -660,7 +660,7 @@ print(mpol2)
 ]
 
 .pull-right[
-```{r}
+```{r, crop = T}
 plot(mpol2, col = 'olivedrab')
 ```
 ]
@@ -689,9 +689,33 @@ print(mline)
 ]
 
 .pull-right[
-```{r, out.height='350px'}
+```{r, out.height='250px', crop=T}
 plot(mline, lwd = 3, col = 'blue')
 plot(pol2, col = 'lightblue', add = TRUE)
 ```
+]
+
+---
+
+## Геометрические коллекции
+
+Геометрическая коллекция (`GEOMETRYCOLLECTION`) позволяет хранить вместе любые виды геометрий. Коллекции редко создаются напрямую, чаще они получаются в результате выполнения геометрических операций типа оверлея.
+
+```{r, message=T}
+col = st_geometrycollection(list(ls, mp, mline, pol2))
+print(col)
+```
+
+.pull-left[
+```{r geomcol, eval=F}
+plot(col)
+```
 
 ]
+
+.pull-right[
+```{r, ref.label='geomcol', echo=F, out.height='200px', crop=T}
+```
+
+]
+

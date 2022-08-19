@@ -443,6 +443,56 @@ mapview(countries, zcol = 'continent',
 
 ## Атрибутивные операции
 
+К объектам `sf` применимы стандартные преобразования фреймов данных.
+
+.pull-left[
+__Италия__:
+
+```r
+italy = countries |&gt; 
+  filter(sovereignt == 'Italy')
+plot(st_geometry(italy))
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-25-1.png" width="250px" /&gt;
+]
+
+.pull-right[
+__Cтраны более 100 млн. жителей__:
+
+```r
+largest = countries |&gt; 
+  select(pop_est) |&gt; 
+  filter(pop_est &gt; 100000000)
+plot(outlines, col = 'lightgrey')
+plot(largest, col = 'red', add = TRUE)
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-26-1.png" width="400px" /&gt;
+]
+
+---
+
+## Атрибутивные операции
+
+.pull-left[
+__Валовой региональный продукт по континентам:__
+
+
+```r
+continents = countries %&gt;%
+  filter(., st_is_valid(.)) |&gt;
+  group_by(continent) |&gt;  
+  summarise(gdp = sum(gdp_md_est))
+plot(continents['gdp'])
+```
+]
+
+.pull-right[
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-27-1.png" width="400px" /&gt;
+]
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

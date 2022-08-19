@@ -408,3 +408,47 @@ knitr::include_graphics('img/mapview3.png')
 
 ## Атрибутивные операции
 
+К объектам `sf` применимы стандартные преобразования фреймов данных.
+
+.pull-left[
+__Италия__:
+```{r, out.width = '250px', crop = T}
+italy = countries |> 
+  filter(sovereignt == 'Italy')
+plot(st_geometry(italy))
+```
+]
+
+.pull-right[
+__Cтраны более 100 млн. жителей__:
+```{r, out.width = '400px', crop = T}
+largest = countries |> 
+  select(pop_est) |> 
+  filter(pop_est > 100000000)
+plot(outlines, col = 'lightgrey')
+plot(largest, col = 'red', add = TRUE)
+```
+]
+
+---
+
+## Атрибутивные операции
+
+.pull-left[
+__Валовой региональный продукт по континентам:__
+
+```{r grp, eval = F}
+continents = countries %>%
+  filter(., st_is_valid(.)) |>
+  group_by(continent) |>  
+  summarise(gdp = sum(gdp_md_est))
+plot(continents['gdp'])
+```
+]
+
+.pull-right[
+```{r, ref.label='grp', out.width = '400px', crop = T, echo = F}
+```
+]
+
+

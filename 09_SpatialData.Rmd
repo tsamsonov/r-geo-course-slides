@@ -664,3 +664,34 @@ print(mpol2)
 plot(mpol2, col = 'olivedrab')
 ```
 ]
+
+---
+
+## Мультилинии
+
+Мультилиния, в отличие от мультиполигона, не требует дополнительного списка верхнего уровня, поскольку линии не могут содержать дыр. Например, можно собрать мультилинию из двух частей, соответствующих участкам реки до и после озера:
+
+.pull-left[
+```{r, message=T}
+coords1 = matrix(c(
+  -3, 0,
+  -1, 2,
+  0, 2
+), ncol = 2, byrow = TRUE)
+coords2 = matrix(c(
+  4, 2,
+  5, 3,
+  6, 5
+), ncol = 2, byrow = TRUE)
+mline = st_multilinestring(list(coords1, coords2))
+print(mline)
+```
+]
+
+.pull-right[
+```{r, out.height='350px'}
+plot(mline, lwd = 3, col = 'blue')
+plot(pol2, col = 'lightblue', add = TRUE)
+```
+
+]

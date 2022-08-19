@@ -734,6 +734,42 @@ plot(mpol2, col = 'olivedrab')
 
 ![](09_SpatialData_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
 ]
+
+---
+
+## Мультилинии
+
+Мультилиния, в отличие от мультиполигона, не требует дополнительного списка верхнего уровня, поскольку линии не могут содержать дыр. Например, можно собрать мультилинию из двух частей, соответствующих участкам реки до и после озера:
+
+.pull-left[
+
+```r
+coords1 = matrix(c(
+  -3, 0,
+  -1, 2,
+  0, 2
+), ncol = 2, byrow = TRUE)
+coords2 = matrix(c(
+  4, 2,
+  5, 3,
+  6, 5
+), ncol = 2, byrow = TRUE)
+mline = st_multilinestring(list(coords1, coords2))
+print(mline)
+## MULTILINESTRING ((-3 0, -1 2, 0 2), (4 2, 5 3, 6 5))
+```
+]
+
+.pull-right[
+
+```r
+plot(mline, lwd = 3, col = 'blue')
+plot(pol2, col = 'lightblue', add = TRUE)
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-41-1.png" height="350px" /&gt;
+
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

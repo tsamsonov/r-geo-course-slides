@@ -16,13 +16,13 @@ output:
 
 ```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
 library(datasets)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
 knitr::opts_knit$set(global.par = TRUE)
-knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, retina=TRUE, dpi=300)
 ```
 
 ## Используемые пакеты
 
-__tidyverse__
 ```{r}
 library(sf)
 library(stars)
@@ -35,7 +35,7 @@ library(readr)
 
 ## Модели пространственных данных
 
-__Пространственный объект__ (feature) — это цифровая модель материального или абстрактного объекта реального или виртуального мира с указанием его идентификатора, координатных и атрибутивных данных
+__Пространственный объект__ (feature) — это цифровая модель материального или абстрактного объекта реального или виртуального мира с указанием его идентификатора, координатных и атрибутивных данных.
 
 <br>
 __Пространственные данные__ (spatial data) — это данные о пространственных объектах и их наборах. 
@@ -282,5 +282,77 @@ class(obj)
 Чтобы добраться до координат, необходимо развернуть иерархию списков, из которых состоит `sfg`:
 ```{r}
 outlines[[8]][[1]]
+```
+]
+
+---
+
+## Визуализация (базовая графика)
+
+По умолчанию выполняется графический обзор атрибутов объектов
+```{r}
+plot(countries)
+```
+
+---
+
+## Визуализация (базовая графика)
+
+Если задача стоит нарисовать границы объектов, то нужно отображать объект __sfc__:
+```{r, fig.width=9, fig.height=3}
+plot(st_geometry(countries))
+```
+
+---
+
+## Визуализация (базовая графика)
+
+Для быстрого построения тематических карт по выбранному показателю необходимо при вызове функции `plot()` указать соответствующий атрибут фрейма данных:
+```{r, fig.width=9, fig.height=3}
+plot(countries['sovereignt'], key.pos = NULL) # Здесь легенда не нужна
+```
+
+---
+
+## Визуализация (базовая графика)
+
+Для отображения координатной сетки надо указать параметр `graticule = TRUE`, а подписей координат — `axes = TRUE`:
+```{r, fig.width=9, fig.height=3}
+plot(countries['gdp_md_est'], graticule = TRUE, axes = TRUE)
+```
+
+---
+
+## Визуализация (базовая графика)
+
+Для совмещения нескольких слоев на одной карте необходимо при втором и последующих вызовах функции `plot()` указать параметр `add = TRUE`. 
+
+.pull-left[
+.code-small[
+```{r complot, eval=F}
+cities_large = cities |> 
+  filter(scalerank == 0, 
+         ! name %in% c('Washington, D.C.', 'Paris', 'Riyadh', 'Rome', 'São Paulo', 'Kolkata'))
+plot(st_geometry(countries), lwd = 0.5, 
+     border = 'gray', xlim = c(-180,180))
+plot(oceans, col = 'steelblue1', 
+     border = 'steelblue', add = TRUE)
+plot(lakes, col = 'steelblue1', 
+     border = 'steelblue', add = TRUE)
+plot(rivers, col = 'steelblue', 
+     add = TRUE)
+plot(cities_large, col = 'black', 
+     pch = 19, cex = 0.25, add = TRUE)
+text(cities_large$longitude, 
+     cities_large$latitude, 
+     label = cities_large$name, 
+     cex = 0.5, pos = 2, offset = 0.25)
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='complot', echo=F, fig.width=5, fig.height=5, crop = TRUE}
+par(mar = rep(0,4))
 ```
 ]

@@ -4,7 +4,7 @@
     <title>Пространственные данные</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2022-08-07" />
+    <meta name="date" content="2022-08-19" />
     <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2022-08-07
+### 2022-08-19
 ]
 
 ---
@@ -36,7 +36,6 @@ class: center, middle, inverse, title-slide
 
 ## Используемые пакеты
 
-__tidyverse__
 
 ```r
 library(sf)
@@ -50,7 +49,7 @@ library(readr)
 
 ## Модели пространственных данных
 
-__Пространственный объект__ (feature) — это цифровая модель материального или абстрактного объекта реального или виртуального мира с указанием его идентификатора, координатных и атрибутивных данных
+__Пространственный объект__ (feature) — это цифровая модель материального или абстрактного объекта реального или виртуального мира с указанием его идентификатора, координатных и атрибутивных данных.
 
 &lt;br&gt;
 __Пространственные данные__ (spatial data) — это данные о пространственных объектах и их наборах. 
@@ -311,6 +310,89 @@ outlines[[8]][[1]]
 ##  [8,] 68.8675 -48.8300
 ##  [9,] 68.9350 -48.6250
 ```
+]
+
+---
+
+## Визуализация (базовая графика)
+
+По умолчанию выполняется графический обзор атрибутов объектов
+
+```r
+plot(countries)
+```
+
+![](09_SpatialData_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
+---
+
+## Визуализация (базовая графика)
+
+Если задача стоит нарисовать границы объектов, то нужно отображать объект __sfc__:
+
+```r
+plot(st_geometry(countries))
+```
+
+![](09_SpatialData_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
+---
+
+## Визуализация (базовая графика)
+
+Для быстрого построения тематических карт по выбранному показателю необходимо при вызове функции `plot()` указать соответствующий атрибут фрейма данных:
+
+```r
+plot(countries['sovereignt'], key.pos = NULL) # Здесь легенда не нужна
+```
+
+![](09_SpatialData_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+---
+
+## Визуализация (базовая графика)
+
+Для отображения координатной сетки надо указать параметр `graticule = TRUE`, а подписей координат — `axes = TRUE`:
+
+```r
+plot(countries['gdp_md_est'], graticule = TRUE, axes = TRUE)
+```
+
+![](09_SpatialData_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+
+---
+
+## Визуализация (базовая графика)
+
+Для совмещения нескольких слоев на одной карте необходимо при втором и последующих вызовах функции `plot()` указать параметр `add = TRUE`. 
+
+.pull-left[
+.code-small[
+
+```r
+cities_large = cities |&gt; 
+  filter(scalerank == 0, 
+         ! name %in% c('Washington, D.C.', 'Paris', 'Riyadh', 'Rome', 'São Paulo', 'Kolkata'))
+plot(st_geometry(countries), lwd = 0.5, 
+     border = 'gray', xlim = c(-180,180))
+plot(oceans, col = 'steelblue1', 
+     border = 'steelblue', add = TRUE)
+plot(lakes, col = 'steelblue1', 
+     border = 'steelblue', add = TRUE)
+plot(rivers, col = 'steelblue', 
+     add = TRUE)
+plot(cities_large, col = 'black', 
+     pch = 19, cex = 0.25, add = TRUE)
+text(cities_large$longitude, 
+     cities_large$latitude, 
+     label = cities_large$name, 
+     cex = 0.5, pos = 2, offset = 0.25)
+```
+]
+]
+
+.pull-right[
+![](09_SpatialData_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

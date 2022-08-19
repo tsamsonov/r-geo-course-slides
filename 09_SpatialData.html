@@ -511,6 +511,25 @@ plot(continents['gdp'])
 &lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
 
 В зависимости от типа создаваемого объекта, данные функции принимают координаты в виде вектора, матрицы или списка.
+
+---
+
+## Точки
+
+Проще всего создаются отдельные __точки__ (_POINT_):
+
+```r
+st_point(c(0, 2)) # XY POINT
+## POINT (0 2)
+st_point(c(0, 2, -1)) # XYZ POINT
+## POINT Z (0 2 -1)
+st_point(c(0, 2, 5), dim = 'XYM') # XYM POINT
+## POINT M (0 2 5)
+st_point(c(0, 2, -1, 5)) # XYZM POINT
+## POINT ZM (0 2 -1 5)
+```
+
+Дополнительный параметр `dim=` служит для уточнения типа геометрии точек и по сути нужен только тогда, когда необходимо создать редко используемые точки типа _XYM_. Во всех остальных случаях (_XY_, _XYZ_, _XYZM_) размерность геометрии распознается по умолчанию.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

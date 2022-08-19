@@ -18,7 +18,7 @@ output:
 library(datasets)
 knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
 knitr::opts_knit$set(global.par = TRUE)
-knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, retina=TRUE, dpi=300)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
 ```
 
 ## Используемые пакеты
@@ -356,3 +356,55 @@ text(cities_large$longitude,
 par(mar = rep(0,4))
 ```
 ]
+
+---
+
+## Визуализация (интерактивная)
+
+Для интерактивного исследования объектов можно использовать пакет `mapview`:
+```{r, eval = FALSE}
+mapview(countries)
+```
+```{r, echo = FALSE}
+knitr::include_graphics('img/mapview1.png')
+```
+
+---
+
+## Визуализация (интерактивная)
+
+Отображение показателей цветом осуществляется через параметр `col.regions`:
+
+```{r, eval = FALSE}
+nconts = length(unique(countries$continent))
+mapview(countries, zcol = 'continent', 
+        col.regions = RColorBrewer::brewer.pal(nconts, 'Set1'))
+```
+```{r, echo = FALSE}
+knitr::include_graphics('img/mapview2.png')
+```
+
+---
+
+## Визуализация (интерактивная)
+
+Несколько слоев складываются через `+` как в __ggplot2__:
+.code-small[
+```{r, eval=FALSE}
+mapview(countries, zcol = 'continent', 
+        col.regions = RColorBrewer::brewer.pal(nconts, 'Set1')) + #<<
+  mapview(cities_large, col.regions = 'black', label = 'name', cex = 3) } |> 
+  leafem::addStaticLabels(cities_large, label = cities_large$name,
+                          offset = c(0.1, 0),
+                          style = list("color" = "black", "font-weight" = "bold"))
+```
+]
+
+```{r, echo = FALSE}
+knitr::include_graphics('img/mapview3.png')
+```
+
+---
+
+## Атрибутивные операции
+

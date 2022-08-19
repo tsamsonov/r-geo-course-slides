@@ -394,6 +394,55 @@ text(cities_large$longitude,
 .pull-right[
 ![](09_SpatialData_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
 ]
+
+---
+
+## Визуализация (интерактивная)
+
+Для интерактивного исследования объектов можно использовать пакет `mapview`:
+
+```r
+mapview(countries)
+```
+&lt;img src="img/mapview1.png" width="481" /&gt;
+
+---
+
+## Визуализация (интерактивная)
+
+Отображение показателей цветом осуществляется через параметр `col.regions`:
+
+
+```r
+nconts = length(unique(countries$continent))
+mapview(countries, zcol = 'continent', 
+        col.regions = RColorBrewer::brewer.pal(nconts, 'Set1'))
+```
+&lt;img src="img/mapview2.png" width="481" /&gt;
+
+---
+
+## Визуализация (интерактивная)
+
+Несколько слоев складываются через `+` как в __ggplot2__:
+.code-small[
+
+```r
+mapview(countries, zcol = 'continent', 
+*       col.regions = RColorBrewer::brewer.pal(nconts, 'Set1')) +
+  mapview(cities_large, col.regions = 'black', label = 'name', cex = 3) } |&gt; 
+  leafem::addStaticLabels(cities_large, label = cities_large$name,
+                          offset = c(0.1, 0),
+                          style = list("color" = "black", "font-weight" = "bold"))
+```
+]
+
+&lt;img src="img/mapview3.png" width="481" /&gt;
+
+---
+
+## Атрибутивные операции
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

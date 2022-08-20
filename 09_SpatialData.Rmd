@@ -775,3 +775,52 @@ city.attr = data.frame(
 cites.sf = st_sf(city.attr, geometry = cities.sfc)
 print(cites.sf)
 ```
+
+---
+
+## Точки по координатам
+
+Для решения этой задачи можно воспользоваться функцией `st_as_sf()`. Рассмотрим задачу на примере файла координат станций из базы метеорологических данных [__ВНИИГМИ-МЦД__](http://meteo.ru/):
+
+```{r}
+stations = read_fwf(
+  '../r-geo-course/data/vniigmi/stations.txt', 
+  col_positions = fwf_widths(diff(c(1, 7, 42, 47, 53, 59, 67, 71)), 
+  col_names = c('id', 'name', 'lat', 't1', 'lon', 't2', 'z')),
+  locale = locale(encoding = 'CP1251')
+)
+
+print(stations)
+```
+
+---
+
+## Точки по координатам
+
+Теперь создадим пространственные точки на основе этой таблицы, взяв координаты из столбцов _lat_ и _lon_ соответственно и указав код системы координат:
+
+.pull-left[
+```{r vniigmi, eval=F}
+sf_stations = st_as_sf(
+  stations, 
+  coords = c("lon", "lat"), 
+  crs = 4326
+)
+plot(
+  st_geometry(sf_stations), 
+  pch = 19, col = 'red', 
+  cex = 0.25
+)
+plot(
+  st_geometry(countries), 
+  border = 'grey', add = TRUE
+)
+box()
+```
+]
+
+.pull-right[
+```{r, ref.label='vniigmi', crop=T, out.height='450px', echo=F}
+```
+
+]

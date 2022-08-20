@@ -880,6 +880,70 @@ print(cites.sf)
 ## 2                  Иркутск        1661        620 POINT (104.296 52.298)
 ## 3 Петропавловск-Камчатский        1740        180 POINT (158.651 53.044)
 ```
+
+---
+
+## Точки по координатам
+
+Для решения этой задачи можно воспользоваться функцией `st_as_sf()`. Рассмотрим задачу на примере файла координат станций из базы метеорологических данных [__ВНИИГМИ-МЦД__](http://meteo.ru/):
+
+
+```r
+stations = read_fwf(
+  '../r-geo-course/data/vniigmi/stations.txt', 
+  col_positions = fwf_widths(diff(c(1, 7, 42, 47, 53, 59, 67, 71)), 
+  col_names = c('id', 'name', 'lat', 't1', 'lon', 't2', 'z')),
+  locale = locale(encoding = 'CP1251')
+)
+
+print(stations)
+## # A tibble: 1,124 × 7
+##       id name                  lat t1      lon t2        z
+##    &lt;dbl&gt; &lt;chr&gt;               &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
+##  1 20046 Им.Э.Т.Кренкеля,ГМО  80.6 с.ш.   58   в.д.     21
+##  2 20069 Остров_Визе          79.5 с.ш.   77.0 в.д.     10
+##  3 20087 Голомянный           79.6 с.ш.   90.6 в.д.      7
+##  4 20107 Баренцбург           78.1 с.ш.   14.2 в.д.     73
+##  5 20289 Русский              77.2 с.ш.   96.4 в.д.      9
+##  6 20292 Им.Е.К.Федорова,ГМО  77.7 с.ш.  104.  в.д.     12
+##  7 20353 мыс_Желания          77.0 с.ш.   68.6 в.д.      9
+##  8 20476 Стерлегова           75.4 с.ш.   88.9 в.д.     10
+##  9 20667 Им.М.В.Попова        73.3 с.ш.   70.0 в.д.      4
+## 10 20674 Остров_Диксон        73.5 с.ш.   80.4 в.д.     42
+## # … with 1,114 more rows
+```
+
+---
+
+## Точки по координатам
+
+Теперь создадим пространственные точки на основе этой таблицы, взяв координаты из столбцов _lat_ и _lon_ соответственно и указав код системы координат:
+
+.pull-left[
+
+```r
+sf_stations = st_as_sf(
+  stations, 
+  coords = c("lon", "lat"), 
+  crs = 4326
+)
+plot(
+  st_geometry(sf_stations), 
+  pch = 19, col = 'red', 
+  cex = 0.25
+)
+plot(
+  st_geometry(countries), 
+  border = 'grey', add = TRUE
+)
+box()
+```
+]
+
+.pull-right[
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-49-1.png" height="450px" /&gt;
+
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

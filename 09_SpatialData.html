@@ -184,8 +184,7 @@ __sf__ опирается на библиотеки [PROJ](https://proj.org), [G
 ```r
 countries = st_read('../r-geo-course/data/ne/countries.gpkg')
 ## Reading layer `admin_0_map_units' from data source 
-##   `/Users/tsamsonov/GitHub/r-geo-course/data/ne/countries.gpkg' 
-##   using driver `GPKG'
+##   `/Users/tsamsonov/GitHub/r-geo-course/data/ne/countries.gpkg' using driver `GPKG'
 ## Simple feature collection with 183 features and 72 fields
 ## Geometry type: MULTIPOLYGON
 ## Dimension:     XY
@@ -856,6 +855,31 @@ countries |&gt;
 ```
 
 &lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-46-1.png" height="250px" /&gt;
+
+---
+
+## Пространственные объекты (`sf`)
+
+Пространственные объекты (класс `sf`) организуются в виде фрейма данных, один из столбцов которого имеет класс `sfc`.
+
+
+```r
+city.attr = data.frame(
+  name = c('Москва', 'Иркутск', 'Петропавловск-Камчатский'),
+  established = c(1147, 1661, 1740), population = c(12500, 620, 180)
+)
+cites.sf = st_sf(city.attr, geometry = cities.sfc)
+print(cites.sf)
+## Simple feature collection with 3 features and 3 fields
+## Geometry type: POINT
+## Dimension:     XY
+## Bounding box:  xmin: 37.615 ymin: 52.298 xmax: 158.651 ymax: 55.752
+## Geodetic CRS:  WGS 84
+##                       name established population               geometry
+## 1                   Москва        1147      12500  POINT (37.615 55.752)
+## 2                  Иркутск        1661        620 POINT (104.296 52.298)
+## 3 Петропавловск-Камчатский        1740        180 POINT (158.651 53.044)
+```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -760,3 +760,18 @@ countries |>
   st_geometry() |>
   plot(add = TRUE)
 ```
+
+---
+
+## Пространственные объекты (`sf`)
+
+Пространственные объекты (класс `sf`) организуются в виде фрейма данных, один из столбцов которого имеет класс `sfc`.
+
+```{r}
+city.attr = data.frame(
+  name = c('Москва', 'Иркутск', 'Петропавловск-Камчатский'),
+  established = c(1147, 1661, 1740), population = c(12500, 620, 180)
+)
+cites.sf = st_sf(city.attr, geometry = cities.sfc)
+print(cites.sf)
+```

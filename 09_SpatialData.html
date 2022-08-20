@@ -4,7 +4,7 @@
     <title>Пространственные данные</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2022-08-19" />
+    <meta name="date" content="2022-08-20" />
     <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2022-08-19
+### 2022-08-20
 ]
 
 ---
@@ -184,7 +184,8 @@ __sf__ опирается на библиотеки [PROJ](https://proj.org), [G
 ```r
 countries = st_read('../r-geo-course/data/ne/countries.gpkg')
 ## Reading layer `admin_0_map_units' from data source 
-##   `/Users/tsamsonov/GitHub/r-geo-course/data/ne/countries.gpkg' using driver `GPKG'
+##   `/Users/tsamsonov/GitHub/r-geo-course/data/ne/countries.gpkg' 
+##   using driver `GPKG'
 ## Simple feature collection with 183 features and 72 fields
 ## Geometry type: MULTIPOLYGON
 ## Dimension:     XY
@@ -796,6 +797,65 @@ plot(col)
 
 ]
 
+---
+
+## Списки геометрических объектов (sfc)
+
+Списки геометрических объектов (класс `sfc`) используются в таблицах пространственных объектов в качестве столбца, который хранит геометрию объектов.
+
+
+```r
+moscow.sfg = st_point(c(37.615, 55.752))
+irkutsk.sfg = st_point(c(104.296, 52.298))
+petro.sfg = st_point(c(158.651, 53.044))
+
+cities.sfc = st_sfc(moscow.sfg, irkutsk.sfg, petro.sfg)
+print(cities.sfc)
+## Geometry set for 3 features 
+## Geometry type: POINT
+## Dimension:     XY
+## Bounding box:  xmin: 37.615 ymin: 52.298 xmax: 158.651 ymax: 55.752
+## CRS:           NA
+## POINT (37.615 55.752)
+## POINT (104.296 52.298)
+## POINT (158.651 53.044)
+```
+
+---
+
+## Списки геометрических объектов (sfc)
+
+При создании списка геометрий для него может быть определена система координат:
+
+
+```r
+st_crs(cities.sfc) = st_crs(4326) # WGS84
+print(cities.sfc)
+## Geometry set for 3 features 
+## Geometry type: POINT
+## Dimension:     XY
+## Bounding box:  xmin: 37.615 ymin: 52.298 xmax: 158.651 ymax: 55.752
+## Geodetic CRS:  WGS 84
+```
+
+&gt; Для списка геометрий может быть определена только одна система координат
+
+---
+
+## Списки геометрических объектов (sfc)
+
+Куда легли созданные точки?
+
+
+```r
+plot(cities.sfc, pch = 19)
+countries |&gt; 
+  filter(sovereignt == 'Russia') |&gt; 
+  st_geometry() |&gt;
+  plot(add = TRUE)
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-46-1.png" height="250px" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

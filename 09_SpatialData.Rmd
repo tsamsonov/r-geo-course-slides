@@ -822,5 +822,47 @@ box()
 .pull-right[
 ```{r, ref.label='vniigmi', crop=T, out.height='450px', echo=F}
 ```
+]
+
+---
+
+## Преобразование типа геометрии
+
+Для преобразования типов геометрии существует функция `st_cast()`. Функция принимает объекты классов `sfg`, `sfc` или `sf`, а также название типа геометрии, к которому необходимо привести входные объекты.
+
+```{r}
+italy.borders = st_cast(italy, 'MULTILINESTRING')
+class(st_geometry(italy.borders))
+
+italy.regions = st_cast(italy.borders, 'MULTIPOLYGON')
+class(st_geometry(italy.regions))
+
+italy.points = st_cast(italy.borders, 'POINT')
+class(st_geometry(italy.points))
+```
+
+---
+
+## Преобразование типа геометрии
+
+Для преобразования типов геометрии существует функция `st_cast()`. Функция принимает объекты классов `sfg`, `sfc` или `sf`, а также название типа геометрии, к которому необходимо привести входные объекты.
+
+.pull-left[
+```{r stcast, eval=F}
+plot(
+  st_geometry(italy.regions), 
+  lwd = 0.5
+)
+plot(
+  italy.points, 
+  pch = 20, 
+  add = TRUE
+)
+```
+]
+
+.pull-right[
+```{r, ref.label='stcast', echo=F, crop = T, out.height='400px'}
+```
 
 ]

@@ -942,6 +942,52 @@ box()
 
 .pull-right[
 &lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-49-1.png" height="450px" /&gt;
+]
+
+---
+
+## Преобразование типа геометрии
+
+Для преобразования типов геометрии существует функция `st_cast()`. Функция принимает объекты классов `sfg`, `sfc` или `sf`, а также название типа геометрии, к которому необходимо привести входные объекты.
+
+
+```r
+italy.borders = st_cast(italy, 'MULTILINESTRING')
+class(st_geometry(italy.borders))
+## [1] "sfc_MULTILINESTRING" "sfc"
+
+italy.regions = st_cast(italy.borders, 'MULTIPOLYGON')
+class(st_geometry(italy.regions))
+## [1] "sfc_MULTIPOLYGON" "sfc"
+
+italy.points = st_cast(italy.borders, 'POINT')
+class(st_geometry(italy.points))
+## [1] "sfc_POINT" "sfc"
+```
+
+---
+
+## Преобразование типа геометрии
+
+Для преобразования типов геометрии существует функция `st_cast()`. Функция принимает объекты классов `sfg`, `sfc` или `sf`, а также название типа геометрии, к которому необходимо привести входные объекты.
+
+.pull-left[
+
+```r
+plot(
+  st_geometry(italy.regions), 
+  lwd = 0.5
+)
+plot(
+  italy.points, 
+  pch = 20, 
+  add = TRUE
+)
+```
+]
+
+.pull-right[
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-51-1.png" height="400px" /&gt;
 
 ]
     </textarea>

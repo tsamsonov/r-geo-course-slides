@@ -864,5 +864,67 @@ plot(
 .pull-right[
 ```{r, ref.label='stcast', echo=F, crop = T, out.height='400px'}
 ```
+]
+
+---
+
+## Полигонизация и разбиение линий
+
+__Полигонизация__ — это процесс преобразования линии или мультилинии в полигон(ы). Может быть полезной если необходимо восстановить площади объектов на основе их границ.  На вход нужна _одна_ мультилиния:
+
+.pull-left[
+```{r}
+# Создадим три линии
+coords1 = rbind(c(0, 0), c(0, 6))
+line1 = st_linestring(coords1)
+
+coords2 = rbind(c(-1,1), c(5,1))
+line2 = st_linestring(coords2)
+
+coords3 = rbind(c(-1,5), c(4,0))
+line3 = st_linestring(coords3)
+
+# Создадим мультилинию
+mls = st_multilinestring(
+  list(line1, line2, line3)
+)
+```
+]
+
+.pull-right[
+```{r, out.height='250px', crop=T}
+plot(mls) # мультилиния
+plot(st_cast(mls, 'MULTIPOINT'), 
+  pch = 20, cex = 2, add = TRUE)
+```
+]
+
+---
+
+## Полигонизация и разбиение линий
+
+.pull-left[
+Для того чтобы мультилинию превратить в полигоны, необходимо чтобы в местах пересечений и самопересечений стояли узла. Добавить узлы можно с помощью функции `st_node()`:
+```{r, message = T}
+# Неудачная попытка
+st_polygonize(mls)
+
+# Добавление пересечений
+mls2 = st_node(mls)
+poly2 = st_polygonize(mls2)
+
+print(poly2)
+```
+]
+
+.pull-right[
+```{r, out.height='300px', crop=T}
+plot(mls2)
+plot(poly2, 
+  col = 'grey', add = TRUE)
+plot(st_cast(mls2, 'MULTIPOINT'), 
+  pch = 20, cex = 2, add = TRUE)
+```
 
 ]
+

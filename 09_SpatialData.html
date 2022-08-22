@@ -4,7 +4,7 @@
     <title>Пространственные данные</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2022-08-20" />
+    <meta name="date" content="2022-08-22" />
     <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2022-08-20
+### 2022-08-22
 ]
 
 ---
@@ -1059,9 +1059,129 @@ plot(st_cast(mls2, 'MULTIPOINT'),
 ```
 
 &lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-55-1.png" height="300px" /&gt;
-
 ]
 
+---
+
+## Геометрические атрибуты
+
+К описательным характеристикам геометрии относятся ограничивающий прямоугольник, периметр (для линий и полигонов), площадь (для полигонов), центроид и список координат.
+
+
+```r
+st_bbox(italy)           # Органичивающий прямоугольник
+##      xmin      ymin      xmax      ymax 
+##  6.749955 36.619987 18.480247 47.115393
+st_area(italy)           # Площадь
+## 314577521836 [m^2]
+st_length(italy.borders) # Периметр
+## 5319369 [m]
+st_centroid(italy) |&gt;  # Центроид (может быть не внутри для невыпуклых фигур)
+  st_geometry()
+## Geometry set for 1 feature 
+## Geometry type: POINT
+## Dimension:     XY
+## Bounding box:  xmin: 12.2687 ymin: 42.67074 xmax: 12.2687 ymax: 42.67074
+## Geodetic CRS:  WGS 84
+```
+
+---
+
+## Геометрические атрибуты
+
+К описательным характеристикам геометрии относятся ограничивающий прямоугольник, периметр (для линий и полигонов), площадь (для полигонов), центроид и список координат.
+
+
+```r
+st_point_on_surface(italy) |&gt; # Точка гарантированно внутри
+  st_geometry() 
+## Geometry set for 1 feature 
+## Geometry type: POINT
+## Dimension:     XY
+## Bounding box:  xmin: 12.63118 ymin: 42.55822 xmax: 12.63118 ymax: 42.55822
+## Geodetic CRS:  WGS 84
+st_coordinates(italy) |&gt; head(4) # Список координат
+##             X        Y L1 L2 L3
+## [1,] 10.44270 46.89355  1  1  1
+## [2,] 11.04856 46.75136  1  1  1
+## [3,] 11.16483 46.94158  1  1  1
+## [4,] 12.15309 47.11539  1  1  1
+```
+
+---
+
+## Геометрические атрибуты
+
+Пример — ограничивающий прямоугольник и центроиды для Индонезии.
+
+.pull-left[
+.code-small[
+
+```r
+indonesia = countries |&gt; 
+  filter(sovereignt == 'Indonesia')
+
+box = st_as_sfc(st_bbox(indonesia))
+
+plot(indonesia |&gt; st_geometry(), 
+     col = 'lightgrey')
+plot(box, 
+     border = 'red', 
+     add = TRUE)
+plot(st_centroid(indonesia), 
+     col = 'darkgreen', 
+     pch = 19,
+     add = TRUE)
+plot(st_point_on_surface(indonesia), 
+     col = 'violetred', 
+     pch = 19,
+     add = TRUE)
+```
+]
+]
+
+.pull-left[
+&lt;br&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-58-1.png" width="600px" /&gt;
+]
+
+---
+
+## Экспорт
+
+Для экспорта векторных пространственных данных можно воспользоваться функцией `st_write()`, которая определит формат выходного файла по указанному вами расширению:
+
+```r
+st_write(cites.sf, 'data/mycities.shp') # Шейп-файл
+st_write(cites.sf, 'data/topo.gpkg', 'mycities') # Geopackage
+```
+
+---
+
+class: center, middle
+
+# Растровые данные
+
+---
+
+# Растр и его геометрия
+
+__Растр__ представляет из себя матрицу значений. Каждой ячейке матрицы соответствует прямоугольная пространственная область фиксированного размера, которая называется _пикселом_.
+&lt;br&gt;&lt;br&gt;
+__Геометрия растра__ определяет, где именно располагаются в пространстве пикселы растра и может быть описана путем указания следующих компонент
+&lt;br&gt;&lt;br&gt;
+
+Параметр | Назначение
+---------|---------
+`NCOLS` | Количество столбцов
+`NROWS` | Количество строк
+`XLLCENTER` | Координата `\(X\)` центра левой нижней ячейки растра
+`YLLCENTER` | Координата `\(Y\)` центра левой нижней ячейки растра
+`CELLSIZE` | Размер ячейки
+
+---
+
+# Пакеты для работы с растрами
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -1625,6 +1625,26 @@ plot(oceans, col = 'steelblue',
 &lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-80-1.png" height="400" /&gt;
 ]
 
+---
+
+## Манипуляции
+
+_Фильтрация_ происходит по измерениям, но применяется не к индексам ячеек, а к соответствующим величинам измерений:
+
+.pull-left[
+
+```r
+greenland = etopo |&gt; 
+  filter(x &gt; -80, x &lt; -10, 
+         y &gt; 58, y &lt; 85)
+
+plot(greenland)
+```
+]
+
+.pull-right[
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-81-1.png" height="400" /&gt;
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

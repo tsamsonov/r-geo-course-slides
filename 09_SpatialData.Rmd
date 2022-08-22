@@ -1304,19 +1304,28 @@ plot(oceans, col = 'steelblue',
 ```
 ]
 
----
-
-## Манипуляции
-
-_Фильтрация_ происходит по измерениям, но применяется не к индексам ячеек, а к соответствующим величинам измерений:
-```{r}
-greenland = etopo |> 
-  filter(x > -80, x < -10, y > 58, y < 85)
-plot(greenland)
-```
-
 .pull-right[
 ```{r, ref.label='mut', echo=F, out.height=400}
 ```
 ]
 
+---
+
+## Манипуляции
+
+_Фильтрация_ происходит по измерениям, но применяется не к индексам ячеек, а к соответствующим величинам измерений:
+
+.pull-left[
+```{r filt, eval=F}
+greenland = etopo |> 
+  filter(x > -80, x < -10, 
+         y > 58, y < 85)
+
+plot(greenland)
+```
+]
+
+.pull-right[
+```{r, ref.label='filt', echo=F, out.height=400}
+```
+]

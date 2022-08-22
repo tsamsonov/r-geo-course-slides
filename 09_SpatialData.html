@@ -1379,7 +1379,6 @@ plot(dem)
 
 ## Визуализация растров (статичная)
 
-
 .pull-left[
 Задав шкалу и соответствующие параметры, можно сделать визуализацию более информативной:
 .code-small[
@@ -1406,9 +1405,19 @@ plot(dem, breaks = brks, col = clrs)
 
 .pull-right[
 &lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-66-1.png" height="400px" /&gt;
-
 ]
 
+---
+
+## Визуализация растров (статичная)
+
+Для синтезирования цветного изображения на основе многоканального растра необходимо объект `stars` предварительно подать в функцию `st_rgb()`:
+
+```r
+plot(st_rgb(img))
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-67-1.png" height="300px" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

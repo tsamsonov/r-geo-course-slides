@@ -1499,6 +1499,79 @@ plot(dem_country)
 ```
 
 &lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-74-1.png" height="300px" /&gt;
+
+---
+
+## Индексирование
+
+Ортогональная структура объектов типа stars позволяет выполнять по ним различные срезы, отсекая ненужные данные. Для этого используется оператор квадратной скобки `[`, который работает следующим образом:
+
+- первый аргумент выбирает атрибут
+- второй и последующий аргументы выбирают измерения.
+
+Таким образом, при работе с растрами, которые содержат один атрибут, вам необходимо указать 4 индекса: `[var, x, y, band]`, где `var` - это название или порядковый номер атрибута, а `x, y, band` — порядковые номера двух координатных и одного семантического измерения.
+
+---
+
+## Индексирование
+
+.pull-left[
+__Выбрать 1 канал:__
+
+```r
+ch1 = img[,,,1] 
+ch1
+## stars object with 3 dimensions and 1 attribute
+## attribute(s):
+##                     Min. 1st Qu. Median    Mean 3rd Qu. Max.
+## BlueMarbleJuly.tif     1       5     14 51.1141      47  255
+## dimension(s):
+##      from  to offset delta refsys point values x/y
+## x       1 720   -180   0.5 WGS 84 FALSE   NULL [x]
+## y       1 360     90  -0.5 WGS 84 FALSE   NULL [y]
+## band    1   1     NA    NA     NA    NA   NULL
+```
+]
+
+.pull-right[
+
+```r
+plot(ch1)
+```
+
+![](09_SpatialData_files/figure-html/unnamed-chunk-76-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Индексирование
+
+.pull-left[
+__Выбрать диапазон ячеек растра__
+
+```r
+frag = img[, 320:470, 100:255, ] 
+frag
+## stars object with 3 dimensions and 1 attribute
+## attribute(s):
+##                     Min. 1st Qu. Median     Mean 3rd Qu. Max.
+## BlueMarbleJuly.tif     1      20     50 65.96065     106  221
+## dimension(s):
+##      from  to offset delta refsys point values x/y
+## x     320 470   -180   0.5 WGS 84 FALSE   NULL [x]
+## y     100 255     90  -0.5 WGS 84 FALSE   NULL [y]
+## band    1   3     NA    NA     NA    NA   NULL
+```
+]
+
+.pull-right[
+
+```r
+plot(st_rgb(frag))
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-78-1.png" height="400px" /&gt;
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

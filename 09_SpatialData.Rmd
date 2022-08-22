@@ -1185,3 +1185,15 @@ plot(st_rgb(img), reset = FALSE)
 plot(outlines, border = rgb(1,1,1,0.5), lwd = 0.5, add = TRUE)
 ```
 
+---
+
+## Визуализация растров (интерактивная)
+
+Объекты типа stars могут быть визуализированы аналогично векторным на интерактивных картах `mapview`:
+
+```{r, eval = F}
+mapview(dem, at = brks, col = clrs)
+```
+```{r, echo = FALSE}
+knitr::include_graphics('img/mapview4.png')
+```

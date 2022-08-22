@@ -1572,6 +1572,59 @@ plot(st_rgb(frag))
 
 &lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-78-1.png" height="400px" /&gt;
 ]
+
+---
+
+## Манипуляции
+
+Объекты типа `stars` поддерживают манипуляции, аналогичные тем, что могут применяться к векторным данным. Посмотрим это на примере данных по высоте земной поверхности с учетом и без покровного оледенения:
+
+```r
+etopo = read_stars(c(
+  '../r-geo-course/data/etopo1_bed.tif', 
+  '../r-geo-course/data/etopo1_ice.tif'
+))
+etopo
+## stars object with 2 dimensions and 2 attributes
+## attribute(s):
+##                   Min. 1st Qu.  Median      Mean 3rd Qu. Max.
+## etopo1_bed.tif  -10632   -4287 -2451.5 -2113.199      86 6159
+## etopo1_ice.tif  -10632   -4287 -2451.5 -1892.726     215 6159
+## dimension(s):
+##   from  to offset delta refsys point values x/y
+## x    1 720   -180   0.5 WGS 84 FALSE   NULL [x]
+## y    1 360     90  -0.5 WGS 84 FALSE   NULL [y]
+```
+
+
+---
+
+## Манипуляции
+
+_Переименуем_ каналы в `ice` и `bed` и посчитаем толщину покровного оледеления как их разность через _мутирование_:
+
+.pull-left[
+
+```r
+etopo = etopo |&gt; 
+  rename(bed = 1, ice = 2) |&gt; 
+  mutate(depth = ice - bed)
+
+plot(etopo['depth'], 
+     col = cm.colors(5),
+     breaks = c(0, 500, 1000, 
+            2000, 3000, 4000),
+     main = 'Мощность покровного оледенения',
+     reset = FALSE)
+plot(oceans, col = 'steelblue', 
+     add = TRUE)
+```
+]
+
+.pull-right[
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-80-1.png" height="400" /&gt;
+]
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

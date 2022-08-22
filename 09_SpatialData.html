@@ -1666,6 +1666,17 @@ icedepth
 ## x    1 720   -180   0.5 WGS 84 FALSE   NULL [x]
 ## y    1 360     90  -0.5 WGS 84 FALSE   NULL [y]
 ```
+
+---
+
+## Экспорт
+
+Чтобы экспортировать (сохранить в файл) любой растр, можно воспользоваться функцией `write_stars()`, указав имя выходного файла:
+
+
+```r
+write_stars(greenland, 'data/world/greenland.tif')
+```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

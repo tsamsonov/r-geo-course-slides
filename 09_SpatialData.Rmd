@@ -1152,3 +1152,27 @@ plot(dem, breaks = brks, col = clrs)
 ```{r, fig.width=6, fig.height=3, out.height = '300px'}
 plot(st_rgb(img))
 ```
+
+---
+
+## Визуализация растров (статичная)
+
+Для синтеза в заданной последовательности каналов достаточно их перемешать в последнем индексе:
+
+.pull-left[
+.code-small[
+```{r, fig.width=6, fig.height=3, out.height = '300px'}
+st_rgb(img[,,,c(3, 1, 2)]) |> plot()
+```
+]
+]
+
+.pull-right[
+.code-small[
+```{r, fig.width=6, fig.height=3, out.height = '300px'}
+st_rgb(img[,,,c(2, 3, 1)]) |> plot()
+```
+]
+]
+
+

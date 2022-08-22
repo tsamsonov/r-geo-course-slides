@@ -1418,6 +1418,36 @@ plot(st_rgb(img))
 ```
 
 &lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-67-1.png" height="300px" /&gt;
+
+---
+
+## Визуализация растров (статичная)
+
+Для синтеза в заданной последовательности каналов достаточно их перемешать в последнем индексе:
+
+.pull-left[
+.code-small[
+
+```r
+st_rgb(img[,,,c(3, 1, 2)]) |&gt; plot()
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-68-1.png" height="300px" /&gt;
+]
+]
+
+.pull-right[
+.code-small[
+
+```r
+st_rgb(img[,,,c(2, 3, 1)]) |&gt; plot()
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-69-1.png" height="300px" /&gt;
+]
+]
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

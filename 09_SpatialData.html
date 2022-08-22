@@ -1645,6 +1645,27 @@ plot(greenland)
 .pull-right[
 &lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-81-1.png" height="400" /&gt;
 ]
+
+---
+
+## Манипуляции
+
+_Выбор_ переменной позволяет оставить только ее:
+
+```r
+icedepth = etopo |&gt; 
+  select(depth)
+
+icedepth
+## stars object with 2 dimensions and 1 attribute
+## attribute(s):
+##        Min. 1st Qu. Median     Mean 3rd Qu. Max.
+## depth  -198       0      0 220.4736       0 4286
+## dimension(s):
+##   from  to offset delta refsys point values x/y
+## x    1 720   -180   0.5 WGS 84 FALSE   NULL [x]
+## y    1 360     90  -0.5 WGS 84 FALSE   NULL [y]
+```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -1329,3 +1329,15 @@ plot(greenland)
 ```{r, ref.label='filt', echo=F, out.height=400}
 ```
 ]
+
+---
+
+## Манипуляции
+
+_Выбор_ переменной позволяет оставить только ее:
+```{r}
+icedepth = etopo |> 
+  select(depth)
+
+icedepth
+```

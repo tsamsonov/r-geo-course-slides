@@ -1351,3 +1351,9 @@ icedepth
 ```{r, eval = FALSE}
 write_stars(greenland, 'data/world/greenland.tif')
 ```
+
+---
+
+class: center, middle
+
+# Пространственная привязка

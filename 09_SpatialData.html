@@ -1464,13 +1464,41 @@ plot(outlines, border = rgb(1,1,1,0.5), lwd = 0.5, add = TRUE)
 
 ## Визуализация растров (интерактивная)
 
-Объекты типа stars могут быть визуализированы аналогично векторным на интерактивных картах `mapview`:
+Объекты типа `stars` могут быть визуализированы аналогично векторным на интерактивных картах `mapview`:
 
 
 ```r
 mapview(dem, at = brks, col = clrs)
 ```
 &lt;img src="img/mapview4.png" width="482" /&gt;
+
+---
+
+## Обрезка
+
+__Ограничивающим прямоугольником:__
+
+```r
+box = st_bbox(c(xmin=-80, xmax=-10, ymax=85, ymin=58), crs=st_crs(4326))
+*dem_greenland = dem[box]
+plot(dem_greenland)
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-73-1.png" height="300px" /&gt;
+
+---
+
+## Обрезка
+
+__Произвольным контуром:__
+
+```r
+country = countries |&gt; filter(name == 'Afghanistan')
+*dem_country = dem[country]
+plot(dem_country)
+```
+
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-74-1.png" height="300px" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

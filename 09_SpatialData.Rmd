@@ -1578,3 +1578,29 @@ st_crs(countries)
 st_crs(countries) = st_crs(4326)
 st_crs(countries)
 ```
+
+---
+
+## Проецирование
+
+Для проецирования данных в другую систему координат следует использовать функцию `st_tranform(x, crs)`:
+.pull-left[
+```{r transmill, eval=F}
+# Проекция Миллера
+countries_mill = 
+  st_transform(countries, 
+               'ESRI:54003')
+par(mar = c(2,16,2,16))
+plot(st_geometry(countries_mill), 
+     col = 'lightgray',
+     lwd = 0.5,
+     graticule = TRUE, 
+     axes = TRUE)
+```
+]
+
+.pull-right[
+```{r, ref.label='transmill', fig.width=16, fig.height=16, crop = T, echo=F}
+```
+
+]

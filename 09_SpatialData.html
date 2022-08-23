@@ -2090,6 +2090,32 @@ st_crs(countries)
 ##         BBOX[-90,-180,90,180]],
 ##     ID["EPSG",4326]]
 ```
+
+---
+
+## Проецирование
+
+Для проецирования данных в другую систему координат следует использовать функцию `st_tranform(x, crs)`:
+.pull-left[
+
+```r
+# Проекция Миллера
+countries_mill = 
+  st_transform(countries, 
+               'ESRI:54003')
+par(mar = c(2,16,2,16))
+plot(st_geometry(countries_mill), 
+     col = 'lightgray',
+     lwd = 0.5,
+     graticule = TRUE, 
+     axes = TRUE)
+```
+]
+
+.pull-right[
+![](09_SpatialData_files/figure-html/unnamed-chunk-93-1.png)&lt;!-- --&gt;
+
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

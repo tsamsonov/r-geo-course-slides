@@ -1712,11 +1712,63 @@ __Пространственная привязка__ (_spatial reference_ ил�
 
 Существует три распространенных способа задания (хранения) пространственной привязки:
 
-- _PROJ.4 String_ — представление в виде строки.
 - _WKT (Well-Known Text)_ — представление в виде иерархического списка. Это _наиболее полный_ формат описания пространственной привязки, который рекомендуется к использованию для избежания неоднозначностей.
+- _PROJ.4 String_ — представление в виде строки.
 - _EPSG (European Petroleum Survey Group)_ — представление в виде числового кода.
 
 Для поиска проекций в перечисленных форматах представления удобно воспользоваться порталом [spatialreference.org](spatialreference.org).
+
+---
+
+## PROJ.4 String
+
+__PROJ.4 String__ — строковый формат представления информации о пространственной привязки, введенный в библиотеке [__PROJ__](http://proj.org), начиная с версии 4. Основные параметры:
+
+```
++datum     Datum name (see `proj -ld`)
++ellps     Ellipsoid name (see `proj -le`)
++lat_0     Latitude of origin
++lat_1     Latitude of first standard parallel
++lat_2     Latitude of second standard parallel
++lat_ts    Latitude of true scale
++lon_0     Central meridian
++proj      Projection name (see `proj -l`)
++units     meters, US survey feet, etc.
++vunits    vertical units.
++x_0       False easting
++y_0       False northing
++zone      UTM zone
+```
+
+---
+
+## PROJ.4 String
+
+Примеры записи координат в формате PROJ.4:
+
+- Географические координаты в _WGS84_ (без проекции):
+
+```
+## +proj=longlat +datum=WGS84 +no_defs
+```
+
+- Координаты в проекции _Web Mercator_ (проекция Google Maps, Яндекс.Карт и т.д.):
+
+```
+## +proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs
+```
+
+- Координаты в _конической равнопромежуточной проекции_:
+
+```
+## +proj=eqdc +lat_0=0 +lon_0=0 +lat_1=60 +lat_2=60 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs
+```
+
+- Координаты в проекции _UTM, зона 37_:
+
+```
+## +proj=utm +zone=37 +datum=WGS84 +units=m +no_defs
+```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

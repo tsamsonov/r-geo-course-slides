@@ -1602,5 +1602,52 @@ plot(st_geometry(countries_mill),
 .pull-right[
 ```{r, ref.label='transmill', fig.width=16, fig.height=16, crop = T, echo=F}
 ```
+]
 
+---
+
+## Проецирование
+
+Для проецирования данных в другую систему координат следует использовать функцию `st_tranform(x, crs)`:
+.pull-left[
+```{r transmoll, eval=F}
+# Проекция Мольвейде
+countries_moll = countries |> 
+  st_transform('+proj=moll')
+plot(st_geometry(countries_moll), 
+     col = 'lightgray',
+     lwd = 0.5,
+     graticule = TRUE, 
+     axes = TRUE)
+```
+]
+
+.pull-right[
+```{r, ref.label='transmoll', fig.width=16, fig.height=16, crop = T, echo=F}
+```
+]
+
+---
+
+## Проецирование
+
+Для проецирования данных в другую систему координат следует использовать функцию `st_tranform(x, crs)`:
+.pull-left[
+```{r transeqdc, eval=F}
+# Коническая равнопромежуточная
+countries_eqdc = countries |> 
+  filter(continent == 'Europe' & sovereignt != 'Russia') |> 
+  st_transform('+proj=eqdc +lon_0=10 +lat_1=30 +lat_2=60 +datum=WGS84 +units=m')
+
+plot(st_geometry(countries_eqdc), 
+     col = 'lightgray',
+     lwd = 0.5,
+     graticule = TRUE, 
+     axes = TRUE)
+```
+]
+
+.pull-right[
+```{r, ref.label='transeqdc', fig.width=16, fig.height=16, crop = T, echo=F}
+```
 ]

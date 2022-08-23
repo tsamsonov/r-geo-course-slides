@@ -2114,7 +2114,54 @@ plot(st_geometry(countries_mill),
 
 .pull-right[
 ![](09_SpatialData_files/figure-html/unnamed-chunk-93-1.png)&lt;!-- --&gt;
+]
 
+---
+
+## Проецирование
+
+Для проецирования данных в другую систему координат следует использовать функцию `st_tranform(x, crs)`:
+.pull-left[
+
+```r
+# Проекция Мольвейде
+countries_moll = countries |&gt; 
+  st_transform('+proj=moll')
+plot(st_geometry(countries_moll), 
+     col = 'lightgray',
+     lwd = 0.5,
+     graticule = TRUE, 
+     axes = TRUE)
+```
+]
+
+.pull-right[
+![](09_SpatialData_files/figure-html/unnamed-chunk-94-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Проецирование
+
+Для проецирования данных в другую систему координат следует использовать функцию `st_tranform(x, crs)`:
+.pull-left[
+
+```r
+# Коническая равнопромежуточная
+countries_eqdc = countries |&gt; 
+  filter(continent == 'Europe' &amp; sovereignt != 'Russia') |&gt; 
+  st_transform('+proj=eqdc +lon_0=10 +lat_1=30 +lat_2=60 +datum=WGS84 +units=m')
+
+plot(st_geometry(countries_eqdc), 
+     col = 'lightgray',
+     lwd = 0.5,
+     graticule = TRUE, 
+     axes = TRUE)
+```
+]
+
+.pull-right[
+![](09_SpatialData_files/figure-html/unnamed-chunk-95-1.png)&lt;!-- --&gt;
 ]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

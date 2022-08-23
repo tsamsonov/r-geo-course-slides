@@ -1740,6 +1740,17 @@ plot(st_geometry(countries_eqdc),
 ]
 
 .pull-right[
-```{r, ref.label='transeqdcrast', fig.width=16, fig.height=16, crop = T, echo=F}
+```{r, ref.label='transeqdcrast', fig.width=16, fig.height=16, out.height='400px', crop = T, echo=F}
 ```
 ]
+
+---
+
+## Рассмотренные темы
+
+1. Модели пространственных данных
+1. Векторные данные (simple features)
+1. Растровые данные
+1. Системы координат и проецирование
+
+Более подробно вопросы выбора проекций и построения сеток координат рассматриваются в следующей главе.

@@ -1651,3 +1651,41 @@ plot(st_geometry(countries_eqdc),
 ```{r, ref.label='transeqdc', fig.width=16, fig.height=16, crop = T, echo=F}
 ```
 ]
+
+---
+
+## Система координат растровых данных
+
+Работа с системой координат __растровых данных__ также предполагает четыре возможных процедуры: чтение, создание, замена и проецирование. Для первых трех операций, как и прежде, используется `st_crs()`:
+
+```{r, collapse=T}
+st_crs(dem) # читаем систему координат
+```
+
+---
+
+## Проецирование растровых данных
+
+Для проецирования растра в новую систему координат необходимо использовать функцию `st_warp()`.
+
+.pull-left[
+```{r transmillrast, eval=F}
+# Проекция Миллера
+img_mill = st_warp(
+  img, 
+  crs = 'ESRI:54003'
+)
+
+plot(st_rgb(img_mill), 
+     main = NULL, reset = FALSE)
+
+plot(st_geometry(countries_mill), 
+     border = rgb(1,1,1,0.5), 
+     lwd = 0.25, add = TRUE)
+```
+]
+
+.pull-right[
+```{r, ref.label='transmillrast', fig.width=16, fig.height=16, crop = T, echo=F}
+```
+]

@@ -2163,6 +2163,62 @@ plot(st_geometry(countries_eqdc),
 .pull-right[
 ![](09_SpatialData_files/figure-html/unnamed-chunk-95-1.png)&lt;!-- --&gt;
 ]
+
+---
+
+## Система координат растровых данных
+
+Работа с системой координат __растровых данных__ также предполагает четыре возможных процедуры: чтение, создание, замена и проецирование. Для первых трех операций, как и прежде, используется `st_crs()`:
+
+
+```r
+st_crs(dem) # читаем систему координат
+## Coordinate Reference System:
+##   User input: WGS 84 
+##   wkt:
+## GEOGCRS["WGS 84",
+##     DATUM["World Geodetic System 1984",
+##         ELLIPSOID["WGS 84",6378137,298.257223563,
+##             LENGTHUNIT["metre",1]]],
+##     PRIMEM["Greenwich",0,
+##         ANGLEUNIT["degree",0.0174532925199433]],
+##     CS[ellipsoidal,2],
+##         AXIS["geodetic latitude (Lat)",north,
+##             ORDER[1],
+##             ANGLEUNIT["degree",0.0174532925199433]],
+##         AXIS["geodetic longitude (Lon)",east,
+##             ORDER[2],
+##             ANGLEUNIT["degree",0.0174532925199433]],
+##     ID["EPSG",4326]]
+```
+
+---
+
+## Проецирование растровых данных
+
+Для проецирования растра в новую систему координат необходимо использовать функцию `st_warp()`.
+
+.pull-left[
+
+```r
+# Проекция Миллера
+img_mill = st_warp(
+  img, 
+  crs = 'ESRI:54003'
+)
+
+plot(st_rgb(img_mill), 
+     main = NULL, reset = FALSE)
+
+plot(st_geometry(countries_mill), 
+     border = rgb(1,1,1,0.5), 
+     lwd = 0.25, add = TRUE)
+```
+]
+
+.pull-right[
+![](09_SpatialData_files/figure-html/unnamed-chunk-97-1.png)&lt;!-- --&gt;
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

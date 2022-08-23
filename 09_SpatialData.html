@@ -2244,6 +2244,36 @@ plot(st_geometry(countries_moll),
 .pull-right[
 ![](09_SpatialData_files/figure-html/unnamed-chunk-97-1.png)&lt;!-- --&gt;
 ]
+
+---
+
+## Проецирование растровых данных
+
+Для проецирования растра в новую систему координат необходимо использовать функцию `st_warp()`.
+
+.pull-left[
+
+```r
+# Проекция коническая равнопромежуточная
+prj = '+proj=eqdc +lon_0=10 +lat_1=30 +lat_2=60 +datum=WGS84 +units=m'
+img_eqdc = st_warp(
+  img, 
+  crs = st_crs(prj)
+)
+img_eqdc_euro = 
+  img_eqdc[st_bbox(countries_eqdc)]
+
+plot(st_rgb(img_eqdc_euro), 
+     main = NULL, reset = FALSE)
+plot(st_geometry(countries_eqdc), 
+     border = rgb(1,1,1,0.5), 
+     lwd = 0.5, add = TRUE)
+```
+]
+
+.pull-right[
+![](09_SpatialData_files/figure-html/unnamed-chunk-98-1.png)&lt;!-- --&gt;
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

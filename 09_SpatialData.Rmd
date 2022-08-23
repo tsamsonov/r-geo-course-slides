@@ -1713,3 +1713,33 @@ plot(st_geometry(countries_moll),
 ```{r, ref.label='transmollrast', fig.width=16, fig.height=16, crop = T, echo=F}
 ```
 ]
+
+---
+
+## Проецирование растровых данных
+
+Для проецирования растра в новую систему координат необходимо использовать функцию `st_warp()`.
+
+.pull-left[
+```{r transeqdcrast, eval=F}
+# Проекция коническая равнопромежуточная
+prj = '+proj=eqdc +lon_0=10 +lat_1=30 +lat_2=60 +datum=WGS84 +units=m'
+img_eqdc = st_warp(
+  img, 
+  crs = st_crs(prj)
+)
+img_eqdc_euro = 
+  img_eqdc[st_bbox(countries_eqdc)]
+
+plot(st_rgb(img_eqdc_euro), 
+     main = NULL, reset = FALSE)
+plot(st_geometry(countries_eqdc), 
+     border = rgb(1,1,1,0.5), 
+     lwd = 0.5, add = TRUE)
+```
+]
+
+.pull-right[
+```{r, ref.label='transeqdcrast', fig.width=16, fig.height=16, crop = T, echo=F}
+```
+]

@@ -85,6 +85,10 @@ MathJax { color: red; }
     font-size: 20px;
 }
 
+.code-vsmall .remark-code {
+    font-size: 16px;
+}
+
 .remark-inline-code {
     background: pink;
     padding-left: 5px;

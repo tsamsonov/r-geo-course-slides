@@ -2216,6 +2216,31 @@ plot(st_geometry(countries_mill),
 ```
 ]
 
+---
+
+## Проецирование растровых данных
+
+Для проецирования растра в новую систему координат необходимо использовать функцию `st_warp()`.
+
+.pull-left[
+
+```r
+# Проекция Мольвейде
+img_moll = st_warp(
+  img, 
+  crs = st_crs('+proj=moll')
+)
+
+plot(st_rgb(img_moll, 
+            probs = c(0.01, 0.99),
+       stretch = "percent"), 
+     main = NULL, reset = FALSE)
+plot(st_geometry(countries_moll), 
+     border = rgb(1,1,1,0.5), 
+     lwd = 0.5, add = TRUE)
+```
+]
+
 .pull-right[
 ![](09_SpatialData_files/figure-html/unnamed-chunk-97-1.png)&lt;!-- --&gt;
 ]

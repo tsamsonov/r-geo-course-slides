@@ -4,8 +4,8 @@
     <title>Язык программирования R</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2021-09-07" />
-    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <meta name="date" content="2022-09-06" />
+    <script src="libs/header-attrs-2.15/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -13,11 +13,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Язык программирования R
+]
+.subtitle[
 ## Визуализация и анализ географических данных на языке R
+]
+.author[
 ### Тимофей Самсонов
+]
+.institute[
 ### МГУ имени Ломоносова, Географический факультет
-### 2021-09-07
+]
+.date[
+### 2022-09-06
+]
 
 ---
 
@@ -51,7 +61,7 @@ class: center, middle, inverse, title-slide
 
 Доля вопросов, касающихся R, существенно выросла за последние 10 лет.
 
-&lt;img src="img/stacktrends.png" width="65%" /&gt;
+&lt;img src="img/stacktrends.png" width="60%" /&gt;
 https://insights.stackoverflow.com/trends
 
 ---
@@ -60,34 +70,35 @@ https://insights.stackoverflow.com/trends
 
 
 
-.code-small[
+.code-vsmall[
 
 ```r
 library(tiobeindexr)
+## Downloading TIOBE Index Data using your Internet...
 top_20()
-## # A tibble: 20 x 5
-##    `Aug 2021` `Aug 2020` `Programming Language` `Programming Language` Ratings
+## # A tibble: 20 × 5
+##    `Sep 2022` `Sep 2021` `Programming Language` `Programming Language` Ratings
 ##         &lt;int&gt;      &lt;int&gt; &lt;lgl&gt;                  &lt;chr&gt;                  &lt;chr&gt;  
-##  1          1          1 NA                     C                      12.57% 
-##  2          2          3 NA                     Python                 11.86% 
-##  3          3          2 NA                     Java                   10.43% 
-##  4          4          4 NA                     C++                    7.36%  
-##  5          5          5 NA                     C#                     5.14%  
-##  6          6          6 NA                     Visual Basic           4.67%  
-##  7          7          7 NA                     JavaScript             2.95%  
-##  8          8          9 NA                     PHP                    2.19%  
-##  9          9         14 NA                     Assembly language      2.03%  
-## 10         10         10 NA                     SQL                    1.47%  
-## 11         11         18 NA                     Groovy                 1.36%  
-## 12         12         17 NA                     Classic Visual Basic   1.23%  
-## 13         13         42 NA                     Fortran                1.14%  
-## 14         14          8 NA                     R                      1.05%  
-## 15         15         15 NA                     Ruby                   1.01%  
-## 16         16         12 NA                     Swift                  0.98%  
-## 17         17         16 NA                     MATLAB                 0.98%  
-## 18         18         11 NA                     Go                     0.90%  
-## 19         19         36 NA                     Prolog                 0.80%  
-## 20         20         13 NA                     Perl                   0.78%
+##  1          1          2 NA                     Python                 15.74% 
+##  2          2          1 NA                     C                      13.96% 
+##  3          3          3 NA                     Java                   11.72% 
+##  4          4          4 NA                     C++                    9.76%  
+##  5          5          5 NA                     C#                     4.88%  
+##  6          6          6 NA                     Visual Basic           4.39%  
+##  7          7          7 NA                     JavaScript             2.82%  
+##  8          8          8 NA                     Assembly language      2.49%  
+##  9          9         10 NA                     SQL                    2.01%  
+## 10         10          9 NA                     PHP                    1.68%  
+## 11         11         24 NA                     Objective-C            1.49%  
+## 12         12         14 NA                     Go                     1.16%  
+## 13         13         20 NA                     Delphi/Object Pascal   1.09%  
+## 14         14         16 NA                     MATLAB                 1.06%  
+## 15         15         17 NA                     Fortran                1.03%  
+## 16         16         15 NA                     Swift                  0.98%  
+## 17         17         11 NA                     Classic Visual Basic   0.98%  
+## 18         18         18 NA                     R                      0.95%  
+## 19         19         19 NA                     Perl                   0.72%  
+## 20         20         13 NA                     Ruby                   0.66%
 ```
 ]
 
@@ -96,7 +107,7 @@ top_20()
 # Ранг популярности на GitHub
 
 .left-60[
-&lt;img src="img/redmonk2021Q1.png" width="95%" /&gt;
+&lt;img src="img/redmonk2022Q1.png" width="95%" /&gt;
 .vsmall[https://redmonk.com/sogrady/2021/08/05/language-rankings-6-21/]
 ]
 
@@ -125,7 +136,7 @@ R устойчиво находится в верхней квартили GitHu
 
 Высокорейтинговый журнал (.red[__Q1__] WoS, JCR 2020 = .green[3.984]) о развитии R и его библиотек
 
-&lt;iframe src="https://journal.r-project.org/" width="100%" height="400px"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://journal.r-project.org/" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
 https://journal.r-project.org/
 
 ---
@@ -134,7 +145,7 @@ https://journal.r-project.org/
 
 Высокорейтинговый журнал (.red[__Q1__] WoS, JCR 2019 = .green[13.642]) о разработке статистического программного обеспечения (большинство разработок сделано на .blue[__R__])
 
-&lt;iframe src="https://www.jstatsoft.org/index" width="100%" height="400px"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://www.jstatsoft.org/index" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
 https://www.jstatsoft.org/index
 
 ---
@@ -251,7 +262,7 @@ microbenchmark(
 ) |&gt; 
   summary() |&gt; 
   pull(mean)
-## [1] 1932.83719  655.83897    6.73491
+## [1] 1982.7004  372.3029    8.0783
 ```
 ]
 ]
@@ -267,9 +278,9 @@ __Квотация__ _(quotation)_ — это использование име�
 ```r
 data(starwars, package='dplyr')
 colnames(starwars)
-##  [1] "name"       "height"     "mass"       "hair_color" "skin_color" "eye_color" 
-##  [7] "birth_year" "sex"        "gender"     "homeworld"  "species"    "films"     
-## [13] "vehicles"   "starships"
+##  [1] "name"       "height"     "mass"       "hair_color" "skin_color"
+##  [6] "eye_color"  "birth_year" "sex"        "gender"     "homeworld" 
+## [11] "species"    "films"      "vehicles"   "starships"
 ```
 ]
 
@@ -279,7 +290,7 @@ colnames(starwars)
 
 ```r
 select(starwars, 'name', 'mass')
-## # A tibble: 87 x 2
+## # A tibble: 87 × 2
 ##    name                mass
 ##    &lt;chr&gt;              &lt;dbl&gt;
 ##  1 Luke Skywalker        77
@@ -302,7 +313,7 @@ select(starwars, 'name', 'mass')
 
 ```r
 select(starwars, name, mass)
-## # A tibble: 87 x 2
+## # A tibble: 87 × 2
 ##    name                mass
 ##    &lt;chr&gt;              &lt;dbl&gt;
 ##  1 Luke Skywalker        77
@@ -346,7 +357,7 @@ starwars |&gt;
 .small-pre[
 
 ```
-## # A tibble: 5 x 3
+## # A tibble: 5 × 3
 ##   name                   mass sex           
 ##   &lt;chr&gt;                 &lt;dbl&gt; &lt;chr&gt;         
 ## 1 Jabba Desilijic Tiure  1358 hermaphroditic
@@ -369,8 +380,8 @@ head(arrange(filter(select(starwars, name, mass), mass &gt; 100), desc(mass)) # 
 
 # CRAN — Comprehensive R Archive Network
 
-Язык R и пакеты (библиотеки) распространяются через CRAN. Каждый пакет проходит большое количество строгих автоматизированных проверок на работоспособность. В настоящий момент на CRAN доступно .red[__более 18000 пакетов__]!
-&lt;iframe src="https://cran.r-project.org/index.html" width="100%" height="400px"&gt;&lt;/iframe&gt;
+Язык R и пакеты (библиотеки) распространяются через CRAN. Каждый пакет проходит большое количество строгих автоматизированных проверок на работоспособность. В настоящий момент на CRAN доступно .red[__более 18500 пакетов__]!
+&lt;iframe src="https://cran.r-project.org/index.html" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
 
 ---
 
@@ -393,7 +404,7 @@ R отличается хорошо развитой экосистемой па
 # Индивидуальные сайты пакетов
 
 Большинство пакетов R хорошо документированы и имеют свой сайт
-&lt;iframe src="https://r-spatial.github.io/sf/" width="100%" height="400px"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://r-spatial.github.io/sf/" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
 https://r-spatial.github.io/sf/
 
 ---
@@ -401,7 +412,7 @@ https://r-spatial.github.io/sf/
 # Шпаргалки
 
 У создателей R есть замечательная традиция делать шпаргалки — _cheatsheets_
-&lt;iframe src="http://riatelab.github.io/cartography/vignettes/cheatsheet/cartography_cheatsheet.pdf" width="100%" height="400px"&gt;&lt;/iframe&gt;
+&lt;iframe src="http://riatelab.github.io/cartography/vignettes/cheatsheet/cartography_cheatsheet.pdf" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
 http://riatelab.github.io/cartography/vignettes/cheatsheet/cartography_cheatsheet.pdf
 
 ---
@@ -410,7 +421,7 @@ http://riatelab.github.io/cartography/vignettes/cheatsheet/cartography_cheatshee
 
 На CRAN есть полезные подборки пакетов по тематическим направлениям, которые ведутся экспертами. Например, так выглядит подборка пакетов по гидрологии:
 
-&lt;iframe src="https://cran.r-project.org/web/views/Hydrology.html" width="100%" height="400px"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://cran.r-project.org/web/views/Hydrology.html" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
 https://cran.r-project.org/web/views/Hydrology.html
 
 ---
@@ -433,7 +444,7 @@ https://www.rstudio.com
 
 Курс "Визуализация и анализ географических данных на языке R" позволяет освоить программирование на R с нуля до уровня уверенного пользователя.
 
-&lt;iframe src="https://tsamsonov.github.io/r-geo-course/index.html" width="100%" height="400px"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://tsamsonov.github.io/r-geo-course/index.html" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
 https://tsamsonov.github.io/r-geo-course/
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
@@ -482,6 +493,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

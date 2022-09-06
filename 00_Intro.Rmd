@@ -45,7 +45,7 @@ knitr::include_graphics('https://cran.r-project.org/Rlogo.svg')
 
 Доля вопросов, касающихся R, существенно выросла за последние 10 лет.
 
-```{r, echo=F, out.width = '65%'}
+```{r, echo=F, out.width = '60%'}
 knitr::include_graphics('img/stacktrends.png')
 ```
 https://insights.stackoverflow.com/trends
@@ -60,7 +60,7 @@ library(dplyr)
 library(kableExtra)
 ```
 
-.code-small[
+.code-vsmall[
 ```{r}
 library(tiobeindexr)
 top_20()
@@ -73,7 +73,7 @@ top_20()
 
 .left-60[
 ```{r, echo=F, out.width = '95%'}
-knitr::include_graphics('img/redmonk2021Q1.png')
+knitr::include_graphics('img/redmonk2022Q1.png')
 ```
 .vsmall[https://redmonk.com/sogrady/2021/08/05/language-rankings-6-21/]
 ]
@@ -294,7 +294,7 @@ head(arrange(filter(select(starwars, name, mass), mass > 100), desc(mass)) # Т�
 
 # CRAN — Comprehensive R Archive Network
 
-Язык R и пакеты (библиотеки) распространяются через CRAN. Каждый пакет проходит большое количество строгих автоматизированных проверок на работоспособность. В настоящий момент на CRAN доступно .red[__более 18000 пакетов__]!
+Язык R и пакеты (библиотеки) распространяются через CRAN. Каждый пакет проходит большое количество строгих автоматизированных проверок на работоспособность. В настоящий момент на CRAN доступно .red[__более 18500 пакетов__]!
 ```{r, echo = F}
 knitr::include_url("https://cran.r-project.org/index.html")
 ```

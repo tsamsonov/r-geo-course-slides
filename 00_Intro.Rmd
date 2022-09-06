@@ -113,28 +113,6 @@ knitr::include_graphics('https://149351115.v2.pressablecdn.com/wp-content/upload
 
 ---
 
-# The R Journal
-
-Высокорейтинговый журнал (.red[__Q1__] WoS, JCR 2020 = .green[3.984]) о развитии R и его библиотек
-
-```{r, echo = F}
-knitr::include_url("https://journal.r-project.org/")
-```
-https://journal.r-project.org/
-
----
-
-# Journal of Statistical Software
-
-Высокорейтинговый журнал (.red[__Q1__] WoS, JCR 2019 = .green[13.642]) о разработке статистического программного обеспечения (большинство разработок сделано на .blue[__R__])
-
-```{r, echo = F}
-knitr::include_url("https://www.jstatsoft.org/index")
-```
-https://www.jstatsoft.org/index
-
----
-
 # Основные свойства языка R
 
 .left-column[
@@ -380,6 +358,28 @@ knitr::include_graphics("https://d33wubrfki0l68.cloudfront.net/eea112c862c6881ff
 
 ---
 
+# The R Journal
+
+Высокорейтинговый журнал (.red[__Q1__] WoS, JCR 2020 = .green[3.984]) о развитии R и его библиотек
+
+```{r, echo = F}
+knitr::include_url("https://journal.r-project.org/")
+```
+https://journal.r-project.org/
+
+---
+
+# Journal of Statistical Software
+
+Высокорейтинговый журнал (.red[__Q1__] WoS, JCR 2019 = .green[13.642]) о разработке статистического программного обеспечения (большинство разработок сделано на .blue[__R__])
+
+```{r, echo = F}
+knitr::include_url("https://www.jstatsoft.org/index")
+```
+https://www.jstatsoft.org/index
+
+---
+
 # Конференция UseR!
 
 Ежегодная международная конференция, на которой собираются специалисты по языку R и разработчики его пакетов.
@@ -407,7 +407,7 @@ https://tsamsonov.github.io/r-geo-course/
 Курс _"Пространственная статистика и моделирование на языке R"_  позволяет выйти на профессиональный уровень в области анализа пространственных данных:
 
 ```{r, echo = F}
-knitr::include_url("https://tsamsonov.github.io/r-geo-course/index.html")
+knitr::include_url("https://tsamsonov.github.io/r-spatstat-course/index.html")
 ```
 https://tsamsonov.github.io/r-spatstat-course/
 

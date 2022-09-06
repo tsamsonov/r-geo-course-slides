@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>1. Типы данных, условия, ввод и вывод</title>
+    <title>Типы данных, условия, ввод и вывод</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2021-09-07" />
-    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <meta name="date" content="2022-09-06" />
+    <script src="libs/header-attrs-2.15/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -13,11 +13,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# 1. Типы данных, условия, ввод и вывод
+.title[
+# Типы данных, условия, ввод и вывод
+]
+.subtitle[
 ## Визуализация и анализ географических данных на языке R
+]
+.author[
 ### Тимофей Самсонов
+]
+.institute[
 ### МГУ имени Ломоносова, Географический факультет
-### 2021-09-07
+]
+.date[
+### 2022-09-06
+]
 
 ---
 
@@ -261,7 +271,7 @@ birth
 ```r
 current = Sys.Date()
 current
-## [1] "2021-09-07"
+## [1] "2022-09-06"
 ```
 
 ---
@@ -272,14 +282,14 @@ current
 
 ```r
 current - birth
-## Time difference of 12985 days
+## Time difference of 13349 days
 ```
 
 Сложение даты и интервала дает новую дату:
 
 ```r
 current + 40
-## [1] "2021-10-17"
+## [1] "2022-10-16"
 ```
 
 ---
@@ -515,7 +525,7 @@ print(paste("2 в степени 10 равно", 2^10))
 ## [1] "2 в степени 10 равно 1024"
 
 print(paste("Сегодняшняя дата - ", Sys.Date()))
-## [1] "Сегодняшняя дата -  2021-09-07"
+## [1] "Сегодняшняя дата -  2022-09-06"
 ```
 
 ---
@@ -542,7 +552,7 @@ cat("2 в степени 10 равно", 2^10)
 ## 2 в степени 10 равно 1024
 
 cat("Сегодняшнаяя дата -", Sys.Date())
-## Сегодняшнаяя дата - 18877
+## Сегодняшнаяя дата - 19241
 ```
 
 ---
@@ -553,9 +563,9 @@ cat("Сегодняшнаяя дата -", Sys.Date())
 
 ```r
 (a = rnorm(1)) # сгенерируем случайное число, запишем в переменную и выведем на экран
-## [1] -0.05668954
+## [1] 0.464623
 (b = 2 * a) # переменная a доступна, ее можно использовать и далее для вычислений
-## [1] -0.1133791
+## [1] 0.929246
 ```
 
 ---
@@ -583,7 +593,7 @@ if (condition) {
 
 ```r
 (a = round(rnorm(1), 1))
-## [1] -2.6
+## [1] -0.3
 
 if (a &lt; 0){
   cat('Получилось отрицательное число!')
@@ -691,6 +701,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

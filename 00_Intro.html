@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 # Язык программирования R
 ]
 .subtitle[
-## Визуализация и анализ географических данных на языке R
+## Программирование и анализ данных
 ]
 .author[
 ### Тимофей Самсонов
@@ -86,6 +86,7 @@ https://insights.stackoverflow.com/trends
 
 ```r
 library(tiobeindexr)
+## Downloading TIOBE Index Data using your Internet...
 top_20()
 ## # A tibble: 20 × 5
 ##    `Sep 2022` `Sep 2021` `Programming Language` `Programming Language` Ratings
@@ -255,7 +256,7 @@ microbenchmark(
 ) |&gt; 
   summary() |&gt; 
   pull(mean)
-## [1] 2016.42955  339.19972    5.30632
+## [1] 1709.18019  354.62125    8.01282
 ```
 ]
 ]
@@ -271,7 +272,8 @@ __Квотация__ _(quotation)_ — это использование име�
 ```r
 data(starwars, package='dplyr')
 colnames(starwars)
-##  [1] "name"       "height"     "mass"       "hair_color" "skin_color" "eye_color"  "birth_year" "sex"        "gender"     "homeworld" 
+##  [1] "name"       "height"     "mass"       "hair_color" "skin_color"
+##  [6] "eye_color"  "birth_year" "sex"        "gender"     "homeworld" 
 ## [11] "species"    "films"      "vehicles"   "starships"
 ```
 ]

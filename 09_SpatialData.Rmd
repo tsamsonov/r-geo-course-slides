@@ -21,6 +21,39 @@ knitr::opts_knit$set(global.par = TRUE)
 knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
 ```
 
+# Пространственные данные
+
+R отличается хорошо развитой экосистемой пакетов для работы с пространственными данными. Умеет работать с ними автономно и путем взаимодействия с внешними библиотеками (GDAL, GEOS, PROJ, Leaflet) и ГИС-пакетами (QGIS, SAGA, GRASS, Whitebox).
+```{r, echo = F}
+knitr::include_graphics("img/spackages.png")
+```
+
+---
+
+# Дополнительные книги
+
+__Spatial Data Science with applications in R__ (Pebesma, Bivand):
+
+```{r, echo = F}
+knitr::include_url("https://r-spatial.org/book/")
+```
+
+https://r-spatial.org/book/
+
+---
+
+# Дополнительные книги
+
+__Geocomputation with R__ (Lovelace, Nowosad, Muenchow):
+
+```{r, echo = F}
+knitr::include_url("https://geocompr.robinlovelace.net")
+```
+
+https://geocompr.robinlovelace.net
+
+---
+
 ## Используемые пакеты
 
 ```{r}

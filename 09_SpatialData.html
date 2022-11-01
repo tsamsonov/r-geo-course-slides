@@ -4,8 +4,8 @@
     <title>Пространственные данные</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2022-08-23" />
-    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <meta name="date" content="2022-11-01" />
+    <script src="libs/header-attrs-2.15/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -26,13 +26,40 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2022-08-23
+### 2022-11-01
 ]
 
 ---
 
 
 
+
+# Пространственные данные
+
+R отличается хорошо развитой экосистемой пакетов для работы с пространственными данными. Умеет работать с ними автономно и путем взаимодействия с внешними библиотеками (GDAL, GEOS, PROJ, Leaflet) и ГИС-пакетами (QGIS, SAGA, GRASS, Whitebox).
+&lt;img src="img/spackages.png" width="659" /&gt;
+
+---
+
+# Дополнительные книги
+
+__Spatial Data Science with applications in R__ (Pebesma, Bivand):
+
+&lt;iframe src="https://r-spatial.org/book/" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
+
+https://r-spatial.org/book/
+
+---
+
+# Дополнительные книги
+
+__Geocomputation with R__ (Lovelace, Nowosad, Muenchow):
+
+&lt;iframe src="https://geocompr.robinlovelace.net" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
+
+https://geocompr.robinlovelace.net
+
+---
 
 ## Используемые пакеты
 
@@ -128,7 +155,7 @@ __Simple Features__ (официально _Simple Features Access_) — это �
 
 
 
-![](09_SpatialData_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -184,7 +211,8 @@ __sf__ опирается на библиотеки [PROJ](https://proj.org), [G
 ```r
 countries = st_read('../r-geo-course/data/ne/countries.gpkg')
 ## Reading layer `admin_0_map_units' from data source 
-##   `/Users/tsamsonov/GitHub/r-geo-course/data/ne/countries.gpkg' using driver `GPKG'
+##   `/Users/tsamsonov/GitHub/r-geo-course/data/ne/countries.gpkg' 
+##   using driver `GPKG'
 ## Simple feature collection with 183 features and 72 fields
 ## Geometry type: MULTIPOLYGON
 ## Dimension:     XY
@@ -322,7 +350,7 @@ outlines[[8]][[1]]
 plot(countries)
 ```
 
-![](09_SpatialData_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -334,7 +362,7 @@ plot(countries)
 plot(st_geometry(countries))
 ```
 
-![](09_SpatialData_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -346,7 +374,7 @@ plot(st_geometry(countries))
 plot(countries['sovereignt'], key.pos = NULL) # Здесь легенда не нужна
 ```
 
-![](09_SpatialData_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -358,7 +386,7 @@ plot(countries['sovereignt'], key.pos = NULL) # Здесь легенда не �
 plot(countries['gdp_md_est'], graticule = TRUE, axes = TRUE)
 ```
 
-![](09_SpatialData_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -392,7 +420,7 @@ text(cities_large$longitude,
 ]
 
 .pull-right[
-![](09_SpatialData_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -454,7 +482,7 @@ italy = countries |&gt;
 plot(st_geometry(italy))
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-25-1.png" width="250px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-28-1.png" width="250px" /&gt;
 ]
 
 .pull-right[
@@ -468,7 +496,7 @@ plot(outlines, col = 'lightgrey')
 plot(largest, col = 'red', add = TRUE)
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-26-1.png" width="400px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-29-1.png" width="400px" /&gt;
 ]
 
 ---
@@ -489,7 +517,7 @@ plot(continents['gdp'])
 ]
 
 .pull-right[
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-27-1.png" width="400px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-30-1.png" width="400px" /&gt;
 ]
 
 ---
@@ -571,7 +599,7 @@ plot(mp, col = 'red',
 ]
 
 .pull-right[
-![](09_SpatialData_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -606,7 +634,7 @@ print(pol)
 plot(pol, col = 'lightblue')
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-32-1.png" width="400px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-35-1.png" width="400px" /&gt;
 ]
 
 ---
@@ -641,7 +669,7 @@ print(pol2)
 plot(pol2, col = 'lightblue')
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-34-1.png" width="400px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-37-1.png" width="400px" /&gt;
 ]
 
 ---
@@ -697,7 +725,7 @@ plot(pol, col = 'grey') # Обычный полигон (серый)
 plot(mpol, col = 'pink', add = TRUE) # Мультиполигон (розовый)
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-37-1.png" width="500px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-40-1.png" width="500px" /&gt;
 
 ---
 
@@ -732,7 +760,7 @@ print(mpol2)
 plot(mpol2, col = 'olivedrab')
 ```
 
-![](09_SpatialData_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-42-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -767,7 +795,7 @@ plot(mline, lwd = 3, col = 'blue')
 plot(pol2, col = 'lightblue', add = TRUE)
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-41-1.png" height="250px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-44-1.png" height="250px" /&gt;
 ]
 
 ---
@@ -792,7 +820,7 @@ plot(col)
 ]
 
 .pull-right[
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-43-1.png" height="200px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-46-1.png" height="200px" /&gt;
 
 ]
 
@@ -854,7 +882,7 @@ countries |&gt;
   plot(add = TRUE)
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-46-1.png" height="250px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-49-1.png" height="250px" /&gt;
 
 ---
 
@@ -941,7 +969,7 @@ box()
 ]
 
 .pull-right[
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-49-1.png" height="450px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-52-1.png" height="450px" /&gt;
 ]
 
 ---
@@ -987,7 +1015,7 @@ plot(
 ]
 
 .pull-right[
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-51-1.png" height="400px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-54-1.png" height="400px" /&gt;
 ]
 
 ---
@@ -1024,7 +1052,7 @@ plot(st_cast(mls, 'MULTIPOINT'),
   pch = 20, cex = 2, add = TRUE)
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-53-1.png" height="250px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-56-1.png" height="250px" /&gt;
 ]
 
 ---
@@ -1058,7 +1086,7 @@ plot(st_cast(mls2, 'MULTIPOINT'),
   pch = 20, cex = 2, add = TRUE)
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-55-1.png" height="300px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-58-1.png" height="300px" /&gt;
 ]
 
 ---
@@ -1142,7 +1170,7 @@ plot(st_point_on_surface(indonesia),
 
 .pull-left[
 &lt;br&gt;
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-58-1.png" width="600px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-61-1.png" width="600px" /&gt;
 ]
 
 ---
@@ -1371,7 +1399,7 @@ plot(dem)
 ]
 
 .pull-right[
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-65-1.png" height="400px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-68-1.png" height="400px" /&gt;
 
 ]
 
@@ -1404,7 +1432,7 @@ plot(dem, breaks = brks, col = clrs)
 ]
 
 .pull-right[
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-66-1.png" height="400px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-69-1.png" height="400px" /&gt;
 ]
 
 ---
@@ -1417,7 +1445,7 @@ plot(dem, breaks = brks, col = clrs)
 plot(st_rgb(img))
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-67-1.png" height="300px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-70-1.png" height="300px" /&gt;
 
 ---
 
@@ -1432,7 +1460,7 @@ plot(st_rgb(img))
 st_rgb(img[,,,c(3, 1, 2)]) |&gt; plot()
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-68-1.png" height="300px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-71-1.png" height="300px" /&gt;
 ]
 ]
 
@@ -1443,7 +1471,7 @@ st_rgb(img[,,,c(3, 1, 2)]) |&gt; plot()
 st_rgb(img[,,,c(2, 3, 1)]) |&gt; plot()
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-69-1.png" height="300px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-72-1.png" height="300px" /&gt;
 ]
 ]
 
@@ -1458,7 +1486,7 @@ plot(st_rgb(img), reset = FALSE)
 plot(outlines, border = rgb(1,1,1,0.5), lwd = 0.5, add = TRUE)
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-70-1.png" height="300px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-73-1.png" height="300px" /&gt;
 
 ---
 
@@ -1484,7 +1512,7 @@ box = st_bbox(c(xmin=-80, xmax=-10, ymax=85, ymin=58), crs=st_crs(4326))
 plot(dem_greenland)
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-73-1.png" height="300px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-76-1.png" height="300px" /&gt;
 
 ---
 
@@ -1498,7 +1526,7 @@ country = countries |&gt; filter(name == 'Afghanistan')
 plot(dem_country)
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-74-1.png" height="300px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-77-1.png" height="300px" /&gt;
 
 ---
 
@@ -1539,7 +1567,7 @@ ch1
 plot(ch1)
 ```
 
-![](09_SpatialData_files/figure-html/unnamed-chunk-76-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-79-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -1570,7 +1598,7 @@ frag
 plot(st_rgb(frag))
 ```
 
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-78-1.png" height="400px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-81-1.png" height="400px" /&gt;
 ]
 
 ---
@@ -1622,7 +1650,7 @@ plot(oceans, col = 'steelblue',
 ]
 
 .pull-right[
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-80-1.png" height="400" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-83-1.png" height="400" /&gt;
 ]
 
 ---
@@ -1643,7 +1671,7 @@ plot(greenland)
 ]
 
 .pull-right[
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-81-1.png" height="400" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-84-1.png" height="400" /&gt;
 ]
 
 ---
@@ -2113,7 +2141,7 @@ plot(st_geometry(countries_mill),
 ]
 
 .pull-right[
-![](09_SpatialData_files/figure-html/unnamed-chunk-93-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-96-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -2136,7 +2164,7 @@ plot(st_geometry(countries_moll),
 ]
 
 .pull-right[
-![](09_SpatialData_files/figure-html/unnamed-chunk-94-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-97-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -2161,7 +2189,7 @@ plot(st_geometry(countries_eqdc),
 ]
 
 .pull-right[
-![](09_SpatialData_files/figure-html/unnamed-chunk-95-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-98-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -2242,7 +2270,7 @@ plot(st_geometry(countries_moll),
 ]
 
 .pull-right[
-![](09_SpatialData_files/figure-html/unnamed-chunk-97-1.png)&lt;!-- --&gt;
+![](09_SpatialData_files/figure-html/unnamed-chunk-100-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -2272,7 +2300,7 @@ plot(st_geometry(countries_eqdc),
 ]
 
 .pull-right[
-&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-98-1.png" height="400px" /&gt;
+&lt;img src="09_SpatialData_files/figure-html/unnamed-chunk-101-1.png" height="400px" /&gt;
 ]
 
 ---

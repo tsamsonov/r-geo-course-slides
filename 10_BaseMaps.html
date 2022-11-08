@@ -673,6 +673,61 @@ scales = c(10, 50, 110)
 
 ![](10_BaseMaps_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
 
+---
+
+## Отбор
+
+Довольно часто плотность объектов превышает необходимую:
+
+
+```r
+cities_eu = st_read(ne, 'ne_10m_populated_places', quiet=T) |&gt; 
+  st_transform(prj) |&gt; 
+  st_crop(box)
+
+cnt_eu = cnt050 |&gt; 
+  st_transform(prj) |&gt; 
+  st_crop(box)
+
+ggplot() +
+  geom_sf(data = cnt_eu, size = 0.25) +
+  geom_sf(data = cities_eu, size = 0.5, color = 'darkviolet') +
+  geom_sf_text(data = cities_eu, 
+               mapping = aes(label = NAME),
+               size = 1.5, nudge_y = 30000) +
+  theme_bw()
+```
+
+---
+
+## Отбор
+
+![](10_BaseMaps_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+
+---
+
+## Отбор
+
+Проблему можно решить путём отбора объектов по атрибутам:
+
+
+```r
+capitals = filter(cities_eu, FEATURECLA == 'Admin-0 capital')
+
+ggplot() +
+  geom_sf(data = cnt_eu, size = 0.25) +
+  geom_sf(data = capitals, size = 1.2, color = 'darkviolet') +
+  geom_text_repel(data = capitals, stat = "sf_coordinates",
+                size = 2.5, aes(label = NAME, geometry = geom), 
+                fontface = 'bold') +
+  theme_bw()
+```
+
+---
+
+## Отбор
+
+![](10_BaseMaps_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

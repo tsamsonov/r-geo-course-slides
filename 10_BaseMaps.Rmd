@@ -637,3 +637,58 @@ ggplot() +
   ggtitle(glue::glue('Уровень детализации {scales[3]}M'))
 ```
 
+---
+
+## Отбор
+
+Довольно часто плотность объектов превышает необходимую:
+
+```{r pts, eval=F}
+cities_eu = st_read(ne, 'ne_10m_populated_places', quiet=T) |> 
+  st_transform(prj) |> 
+  st_crop(box)
+
+cnt_eu = cnt050 |> 
+  st_transform(prj) |> 
+  st_crop(box)
+
+ggplot() +
+  geom_sf(data = cnt_eu, size = 0.25) +
+  geom_sf(data = cities_eu, size = 0.5, color = 'darkviolet') +
+  geom_sf_text(data = cities_eu, 
+               mapping = aes(label = NAME),
+               size = 1.5, nudge_y = 30000) +
+  theme_bw()
+```
+
+---
+
+## Отбор
+
+```{r, fig.height=3.5, ref.label='pts', echo=F}
+```
+
+---
+
+## Отбор
+
+Проблему можно решить путём отбора объектов по атрибутам:
+
+```{r pts2, eval=F}
+capitals = filter(cities_eu, FEATURECLA == 'Admin-0 capital')
+
+ggplot() +
+  geom_sf(data = cnt_eu, size = 0.25) +
+  geom_sf(data = capitals, size = 1.2, color = 'darkviolet') +
+  geom_text_repel(data = capitals, stat = "sf_coordinates",
+                size = 2.5, aes(label = NAME, geometry = geom), 
+                fontface = 'bold') +
+  theme_bw()
+```
+
+---
+
+## Отбор
+
+```{r, fig.height=3.5, ref.label='pts2', echo=F}
+```

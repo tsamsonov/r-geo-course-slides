@@ -1,0 +1,246 @@
+---
+title: "Основы картографии"
+subtitle: "Визуализация и анализ географических данных на языке R"
+author: "Тимофей Самсонов"
+institute: "МГУ имени Ломоносова, Географический факультет"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: [default, "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+---
+
+```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
+library(datasets)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
+knitr::opts_knit$set(global.par = TRUE)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
+```
+
+## Используемые пакеты
+
+```{r}
+library(sf)
+library(stars)
+library(dplyr)
+library(ggplot2)
+library(ggrepel)
+library(ggnewscale)
+library(rnaturalearth)
+library(rmapshaper)
+library(RColorBrewer)
+```
+
+---
+
+## Загрузка данных Natural Earth
+
+Данные NE могут быть выгружены онлайн:
+
+```{r, cache=TRUE}
+countries = ne_countries(scale = 110, returnclass = 'sf')
+coast = ne_coastline(scale = 110, returnclass = 'sf')
+
+ocean = ne_download(scale = 110,
+                    type = 'ocean',
+                    category = 'physical',
+                    returnclass = 'sf')
+
+cities = ne_download(scale = 110,
+                     type = 'populated_places',
+                     category = 'cultural',
+                     returnclass = 'sf')
+```
+
+---
+
+## Загрузка данных Natural Earth
+
+В то же время, более эффективно использовать локальную копию данных:
+
+```{r, cache=TRUE}
+ne = '/Volumes/Data/Spatial/Natural Earth/natural_earth_vector.gpkg'
+rivers = st_read(ne, 'ne_110m_rivers_lake_centerlines', quiet = TRUE)
+lakes = st_read(ne, 'ne_110m_lakes', quiet = TRUE)
+land = st_read(ne, 'ne_110m_land', quiet = TRUE)
+borders = st_read(ne, 'ne_110m_admin_0_boundary_lines_land', quiet = TRUE)
+
+lyr110 = lst(ocean, land, coast, countries, 
+             rivers, lakes, cities, borders)
+```
+
+---
+
+## Визуализация средствами ggplot2
+
+- `geom_sf()` вызывает `stat_sf()` и `coord_sf()` чтобы отобразить объекты типа `sf` в нужной системе координат;
+- `geom_stars()` отображает объекты типа `stars`;
+- `coord_sf()` обеспечивает поддержку картографических проекций и позволяет отображать данные в нужной системе координат на лету;
+- `stat_sf()` отвечает за отображение переменных данных на графические переменные для пространственных данных;
+- `geom_sf_label()` позволяет отображать подписи объектов на плашке;
+- `geom_sf_text()` позволяет размещать подписи объектов без плашки.
+
+---
+
+## Визуализация средствами ggplot2
+
+Пример — политическая карта мира
+
+```{r map1, eval = F}
+ggplot() +
+  geom_sf(data = lyr110$countries, color = NA, 
+          mapping = aes(fill = as.factor(mapcolor7)), 
+          show.legend = FALSE) +
+  scale_fill_manual(values = brewer.pal(7, 'Set2')) +
+  geom_sf(data = lyr110$borders, size = 0.2) +
+  geom_sf(data = lyr110$ocean, fill = 'azure', color = NA) +
+  geom_sf(data = lyr110$coast, size = 0.4, color = 'steelblue4') +
+  theme_void()
+```
+
+---
+
+## Визуализация средствами ggplot2
+
+Пример — политическая карта мира
+
+```{r, ref.label='map1', echo=F, fig.height=3}
+```
+
+---
+
+## Визуализация средствами ggplot2
+
+Базовую карту можно сохранить как список слоев и использовать в дальнейшем при визуализации, чтобы не повторять многочисленные инструкции:
+
+```{r}
+lyr110$megacities = lyr110$cities |> 
+  filter(SCALERANK == 0, ! NAME %in% c('Washington, D.C.', 
+        'Paris', 'Riyadh', 'Rome', 'São Paulo', 'Kolkata'))
+
+basemap = list(
+  geom_sf(data = lyr110$countries, color = NA, 
+          mapping = aes(fill = as.factor(mapcolor7)), 
+          show.legend = FALSE),
+  scale_fill_manual(values = brewer.pal(7, 'Set2')),
+  geom_sf(data = lyr110$borders, size = 0.2),
+  geom_sf(data = lyr110$ocean, fill = 'azure', color = NA),
+  geom_sf(data = lyr110$coast, size = 0.4, color = 'steelblue4'),
+  geom_sf(data = lyr110$megacities, shape = 21, 
+          fill = 'white', stroke = 0.75, size = 2)
+)
+```
+
+---
+
+## Подписи объектов
+
+Полученный список теперь можно использовать в качестве карты-подложки. Нанесем точки населенных пунктов:
+
+```{r map2, eval = F}
+ggplot() +
+  basemap +
+  geom_sf_text(data = lyr110$megacities, 
+               mapping = aes(label = NAME_EN),
+               size = 3, nudge_y = 5, 
+               family = 'Open Sans', fontface = 'bold') +
+  theme_void()
+```
+
+---
+
+## Подписи объектов
+
+Полученный список теперь можно использовать в качестве карты-подложки. Нанесем точки населенных пунктов:
+
+```{r, ref.label='map2', echo=F, fig.height=3}
+```
+
+---
+
+## Подписи объектов
+
+Полученный список теперь можно использовать в качестве карты-подложки. Нанесем точки населенных пунктов:
+
+```{r map3, eval = F}
+ggplot() +
+  basemap +
+  geom_text_repel(data = lyr110$megacities, stat = "sf_coordinates",
+                  size = 3, aes(label = NAME, geometry = geometry), 
+                  family = 'Open Sans', fontface = 'bold') +
+  theme_void()
+```
+
+---
+
+## Подписи объектов
+
+Полученный список теперь можно использовать в качестве карты-подложки. Нанесем точки населенных пунктов:
+
+```{r, ref.label='map3', echo=F, fig.height=3}
+```
+
+---
+
+## Улучшение читаемости подписей
+
+Полученный список теперь можно использовать в качестве карты-подложки. Нанесем точки населенных пунктов:
+
+```{r map_lab1, eval = F}
+basemap0 = list(
+  geom_sf(data = lyr110$countries, color = NA, alpha = 0.5,
+          mapping = aes(fill = as.factor(mapcolor7)), show.legend = FALSE),
+  scale_fill_manual(values = brewer.pal(7, 'Set2')),
+  geom_sf(data = lyr110$borders, alpha = 0.5, size = 0.2),
+  geom_sf(data = lyr110$ocean, fill = 'azure', color = NA),
+  geom_sf(data = lyr110$coast, alpha = 0.5, size = 0.4, color = 'steelblue4'),
+  geom_sf(data = lyr110$megacities, shape = 21, fill = 'white', stroke = 0.75, size = 2)
+)
+ggplot() +
+  basemap0 +
+  geom_text_repel(data = lyr110$megacities, stat = "sf_coordinates",
+                  size = 3, aes(label = NAME, geometry = geometry), 
+                  family = 'Open Sans', fontface = 'bold') +
+  theme_void()
+```
+
+---
+
+## Улучшение читаемости подписей
+
+Полученный список теперь можно использовать в качестве карты-подложки. Нанесем точки населенных пунктов:
+
+```{r , ref.label='map_lab1', echo=F, fig.height=3}
+```
+
+---
+
+## Улучшение читаемости подписей
+
+Альтернативное решение — можно сделать полупрозрачную плашку под подписью:
+
+```{r map_lab2, eval = F}
+ggplot() +
+  basemap +
+  geom_label_repel(data = lyr110$megacities, stat = "sf_coordinates",
+                  aes(label = NAME, geometry = geometry), 
+                  size = 3, 
+                  label.size = NA, 
+                  label.padding=.1, 
+                  fill = alpha("white", 0.7), 
+                  family = 'Open Sans', fontface = 'bold') +
+  theme_void()
+```
+
+---
+
+## Улучшение читаемости подписей
+
+Полученный список теперь можно использовать в качестве карты-подложки. Нанесем точки населенных пунктов:
+
+```{r, ref.label='map_lab2', echo=F, fig.height=3}
+```

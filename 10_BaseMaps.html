@@ -551,9 +551,128 @@ ggplot() +
 
 ## Отображение растровых данных
 
-Если рельеф показывается и на сушу и на море, его придется раздлелить на 2 ЦМР, иначе цветовая окраска будет некорректной:
+Если рельеф показывается и на сушу и на море, его придется разделить на 2 ЦМР, иначе цветовая окраска будет некорректной:
 
 ![](10_BaseMaps_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+
+---
+
+## Отображение растровых данных
+
+Решение: кропнуть растр полигонами суши и океана, отобразить независимо:
+
+```r
+sf_use_s2(FALSE)
+dem_land = dem[lyr110$land]
+dem_ocean = dem[lyr110$ocean]
+
+map = ggplot() +
+  geom_stars(data = dem_ocean) +
+  scale_fill_gradientn(
+    colours = c('navyblue', 'steelblue4', 'skyblue2', 'azure', 'azure'),
+    values = scales::rescale(
+      c(min(dem_ocean[[1]], na.rm = T), 
+        -4000, -200, 0, 
+        max(dem_ocean[[1]], na.rm = T))
+    ),
+    na.value = NA
+  ) +
+  new_scale_fill() + # обнуляем цветовую щкалу!
+  geom_stars(data = dem_land) +
+  scale_fill_gradientn(
+    colours = c('darkslategray', 'darkslategray', 'olivedrab', 
+                'lightyellow', 'firebrick', 'pink', 'white'), 
+    values = scales::rescale(
+      c(min(dem_land[[1]], na.rm = T), 
+        -50, 100, 300, 1500, 3500, 
+        max(dem_land[[1]], na.rm = T)
+      )
+    ), 
+    na.value = NA
+  ) +
+  hydro_lyrs +
+  coord_sf() +
+  theme_void()
+```
+
+---
+
+## Отображение растровых данных
+
+
+```r
+map + coord_sf(xlim = c(10, 75), ylim = c(20, 50)) + anno
+```
+
+![](10_BaseMaps_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+
+---
+
+## Детализация
+
+При создании карт очень важно обеспечить адекватный уровень детализации данных. Иначе изображение будет загромождено деталиями или наоборот будет неинформативным. Иногда проблему можно решить путем выбора картографической основы подходящей детализации:
+
+
+```r
+cnt010 = st_read(ne, 'ne_10m_admin_0_countries')
+## Reading layer `ne_10m_admin_0_countries' from data source 
+##   `/Volumes/Data/Spatial/Natural Earth/natural_earth_vector.gpkg' 
+##   using driver `GPKG'
+## Simple feature collection with 255 features and 94 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -180 ymin: -90 xmax: 180 ymax: 83.6341
+## Geodetic CRS:  WGS 84
+cnt050 = st_read(ne, 'ne_50m_admin_0_countries')
+## Reading layer `ne_50m_admin_0_countries' from data source 
+##   `/Volumes/Data/Spatial/Natural Earth/natural_earth_vector.gpkg' 
+##   using driver `GPKG'
+## Simple feature collection with 241 features and 94 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -180 ymin: -89.99893 xmax: 180 ymax: 83.59961
+## Geodetic CRS:  WGS 84
+cnt110 = st_read(ne, 'ne_110m_admin_0_countries')
+## Reading layer `ne_110m_admin_0_countries' from data source 
+##   `/Volumes/Data/Spatial/Natural Earth/natural_earth_vector.gpkg' 
+##   using driver `GPKG'
+## Simple feature collection with 177 features and 94 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -180 ymin: -90 xmax: 180 ymax: 83.64513
+## Geodetic CRS:  WGS 84
+
+prj = '+proj=laea +lat_0=50 +lon_0=10'
+
+box = st_bbox(c(xmin = -10, xmax = 33, 
+                ymin = 33, ymax = 60),
+              crs = st_crs(4326)) |&gt; 
+  st_as_sfc() |&gt; 
+  st_transform(prj) |&gt; 
+  st_bbox()
+
+cnts = list(cnt010, cnt050, cnt110)
+scales = c(10, 50, 110)
+```
+
+---
+
+## Детализация
+
+![](10_BaseMaps_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
+
+---
+
+## Детализация
+
+![](10_BaseMaps_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
+
+---
+
+## Детализация
+
+![](10_BaseMaps_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -16,7 +16,7 @@ output:
 
 ```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
 library(datasets)
-knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
+# knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
 knitr::opts_knit$set(global.par = TRUE)
 knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
 ```
@@ -247,7 +247,7 @@ ggplot() +
 
 ---
 
-## Проекции и градусные сетки
+## Проекции
 
 Замечательной особенностью ggplot2 является умени проецировать данные на лету непосредственно при отображении карты. Запишем непроецированную карту в отдельную переменную:
 
@@ -266,7 +266,7 @@ map = ggplot() +
 
 ---
 
-## Проекции и градусные сетки
+## Проекции
 
 Проекция __Мольвейде__:
 ```{r fig.height=4, out.height='400px'}
@@ -275,7 +275,7 @@ map + coord_sf(crs = "+proj=moll")
 
 ---
 
-## Проекции и градусные сетки
+## Проекции
 
 Проекция __Эккерта III__:
 ```{r fig.height=4, out.height='400px'}
@@ -284,7 +284,7 @@ map + coord_sf(crs = "+proj=eck3")
 
 ---
 
-## Проекции и градусные сетки
+## Проекции
 
 Проекция __Equal Earth__:
 ```{r fig.height=4, out.height='400px'}
@@ -293,7 +293,7 @@ map + coord_sf(crs = "+proj=eqearth")
 
 ---
 
-## Проекции и градусные сетки
+## Проекции
 
 Проекция __Атласа Times__:
 ```{r fig.height=4, out.height='400px'}
@@ -302,10 +302,131 @@ map + coord_sf(crs = "+proj=times")
 
 ---
 
-## Проекции и градусные сетки
+## Проекции
 
 Проекция __Миллера__:
 ```{r fig.height=4, out.height='400px'}
 map + coord_sf(crs = "+proj=mill")
 ```
+
+---
+
+## Градусные сетки
+
+При создании карт мира целесообразно заготовить сетку параллелей и меридианов, а также контур Земного шара, который будет опоясывать карту. Для того чтобы контур проецировался в виде гладкой кривой, следует уплотнить его вершины. Это можно сделать посредством `smoothr::densify()`: 
+
+```{r}
+lons = seq(-180, 180, by = 30)
+lats = seq(-90, 90, by = 30)
+
+# Сетка координат
+grat = st_graticule(lon = lons, lat = lats)
+
+# Контур Земли
+box = st_bbox(c(xmin = -180, xmax = 180, 
+                ymax = 90, ymin = -90), 
+              crs = st_crs(4326)) |> 
+  st_as_sfc() |> 
+  smoothr::densify(max_distance = 1) 
+```
+
+---
+
+## Градусные сетки
+
+Для того чтобы красиво подписать выходы сетки координат вдоль криволинейной границы карты, можно запрограммировать следующую функцию:
+```{r}
+degree_labels = function(grat, vjust, hjust, 
+                         size, lon = T, lat = T) {
+  pts = grat |>  
+    st_cast('POINT') |> 
+    group_by(degree, type, degree_label) |> 
+    filter(row_number() == 1)
+    
+  list(
+    if (lon) geom_sf_text(data = filter(pts, type == 'E'), 
+                vjust = vjust, size = size,
+                mapping = aes(label = degree_label), parse = TRUE),
+    if (lat) geom_sf_text(data = filter(pts, type == 'N'), 
+                hjust = hjust, size = size,
+                mapping = aes(label = degree_label), parse = TRUE)
+  )  
+}
+```
+
+
+
+---
+
+## Градусные сетки
+
+Присоединим новые параметры карты к уже существующим:
+```{r}
+basemap_grat = c(basemap, list(
+  geom_sf(data = grat, size = 0.1),
+  geom_sf(data = box, size = 0.5, fill = NA)
+))
+
+map_grat = ggplot() +
+  basemap_grat +
+  geom_label_repel(data = lyr110$megacities, stat = "sf_coordinates",
+                  aes(label = NAME, geometry = geometry), 
+                  size = 3, 
+                  label.size = NA, 
+                  label.padding=.1, 
+                  fill = alpha("white", 0.7), 
+                  family = 'Open Sans', fontface = 'bold') +
+  theme_void()
+```
+
+---
+
+## Градусные сетки
+
+Проекция __Мольвейде__:
+```{r fig.height=4, out.height='350px'}
+map_grat + coord_sf(crs = "+proj=moll") +
+  degree_labels(grat, vjust = +1.5, hjust = +1.5, size = 3)
+```
+
+---
+
+## Градусные сетки
+
+Проекция __Эккерта III__:
+```{r fig.height=4, out.height='350px'}
+map_grat + coord_sf(crs = "+proj=eck3") +
+  degree_labels(grat, vjust = +1.5, hjust = +1.5, size = 3)
+```
+
+---
+
+## Градусные сетки
+
+Проекция __Equal Earth__:
+```{r fig.height=4, out.height='350px'}
+map_grat + coord_sf(crs = "+proj=eqearth") +
+  degree_labels(grat, vjust = +1.5, hjust = +1.5, size = 3)
+```
+
+---
+
+## Градусные сетки
+
+Проекция __Атласа Times__:
+```{r fig.height=4, out.height='350px'}
+map_grat + coord_sf(crs = "+proj=times") +
+  degree_labels(grat, vjust = +1.5, hjust = +1.5, size = 3)
+```
+
+---
+
+## Градусные сетки
+
+Проекция __Миллера__:
+```{r fig.height=4, out.height='350px'}
+map_grat + coord_sf(crs = "+proj=mill") +
+  degree_labels(grat, vjust = +1.5, hjust = +1.5, size = 3)
+```
+
 

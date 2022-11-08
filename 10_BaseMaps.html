@@ -408,8 +408,8 @@ degree_labels = function(grat, vjust, hjust,
 
 ```r
 basemap_grat = c(basemap, list(
-  geom_sf(data = grat, size = 0.05),
-  geom_sf(data = box, size = 1, fill = NA)
+  geom_sf(data = grat, size = 0.1),
+  geom_sf(data = box, size = 0.5, fill = NA)
 ))
 
 map_grat = ggplot() +
@@ -489,7 +489,71 @@ map_grat + coord_sf(crs = "+proj=mill") +
 
 &lt;img src="10_BaseMaps_files/figure-html/unnamed-chunk-23-1.png" height="350px" /&gt;
 
+---
 
+### Отображение растровых данных
+
+На общегеографических картах довольно часто присутствует изображение рельефа. Чтобы добавить его на карту, можно использовать специальный тип геометрии `geom_stars`:
+
+
+```r
+dem = read_stars('../r-geo-course/data/world/gebco.tif') # Цифровая модель рельефа
+
+ggplot() +
+  geom_stars(data = dem) +
+  geom_sf(data = lyr110$coast, size = 0.4, color = 'white') +
+  coord_sf() +
+  theme_void()
+```
+
+---
+
+### Отображение растровых данных
+
+На общегеографических картах довольно часто присутствует изображение рельефа. Чтобы добавить его на карту, можно использовать специальный тип геометрии `geom_stars`:
+
+![](10_BaseMaps_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+
+---
+
+## Отображение растровых данных
+
+Если рельеф показывается и на сушу и на море, его придется раздлелить на 2 ЦМР, иначе цветовая окраска будет некорректной:
+
+
+```r
+pal = c('navyblue', 'steelblue', 'azure', 'darkslategray', 
+        'olivedrab', 'lightyellow', 'firebrick', 'pink', 'white')
+val = c(min(dem[[1]]), -4000, -200, 0, 100, 300, 
+        1000, 2500, max(dem[[1]])) |&gt; scales::rescale()
+hydro_lyrs = list(
+  geom_sf(data = lyr110$coast, size = 0.4, color = 'steelblue4'),
+  geom_sf(data = lyr110$rivers, size = 0.3, color = 'steelblue4'),
+  geom_sf(data = lyr110$lakes, size = 0.3, color = 'steelblue4', fill = 'azure')
+)
+ggplot() +
+  geom_stars(data = dem) +
+  scale_fill_gradientn(colours = pal, 
+                       values = val) +
+  hydro_lyrs +
+  coord_sf() + theme_void()
+```
+
+---
+
+## Отображение растровых данных
+
+Если рельеф показывается и на сушу и на море, есго придется раздлелить на 2 ЦМР, иначе цветовая окраска будет некорректной:
+
+![](10_BaseMaps_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+
+---
+
+## Отображение растровых данных
+
+Если рельеф показывается и на сушу и на море, его придется раздлелить на 2 ЦМР, иначе цветовая окраска будет некорректной:
+
+![](10_BaseMaps_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

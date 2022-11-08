@@ -429,4 +429,85 @@ map_grat + coord_sf(crs = "+proj=mill") +
   degree_labels(grat, vjust = +1.5, hjust = +1.5, size = 3)
 ```
 
+---
 
+### Отображение растровых данных
+
+На общегеографических картах довольно часто присутствует изображение рельефа. Чтобы добавить его на карту, можно использовать специальный тип геометрии `geom_stars`:
+
+```{r map_stars, eval = F}
+dem = read_stars('../r-geo-course/data/world/gebco.tif') # Цифровая модель рельефа
+
+ggplot() +
+  geom_stars(data = dem) +
+  geom_sf(data = lyr110$coast, size = 0.4, color = 'white') +
+  coord_sf() +
+  theme_void()
+```
+
+---
+
+### Отображение растровых данных
+
+На общегеографических картах довольно часто присутствует изображение рельефа. Чтобы добавить его на карту, можно использовать специальный тип геометрии `geom_stars`:
+
+```{r, ref.label='map_stars', echo=F, fig.height=3}
+```
+
+---
+
+## Отображение растровых данных
+
+Если рельеф показывается и на сушу и на море, его придется раздлелить на 2 ЦМР, иначе цветовая окраска будет некорректной:
+
+```{r map_stars2, eval = F}
+pal = c('navyblue', 'steelblue', 'azure', 'darkslategray', 
+        'olivedrab', 'lightyellow', 'firebrick', 'pink', 'white')
+val = c(min(dem[[1]]), -4000, -200, 0, 100, 300, 
+        1000, 2500, max(dem[[1]])) |> scales::rescale()
+hydro_lyrs = list(
+  geom_sf(data = lyr110$coast, size = 0.4, color = 'steelblue4'),
+  geom_sf(data = lyr110$rivers, size = 0.3, color = 'steelblue4'),
+  geom_sf(data = lyr110$lakes, size = 0.3, color = 'steelblue4', fill = 'azure')
+)
+ggplot() +
+  geom_stars(data = dem) +
+  scale_fill_gradientn(colours = pal, 
+                       values = val) +
+  hydro_lyrs +
+  coord_sf() + theme_void()
+```
+
+---
+
+## Отображение растровых данных
+
+Если рельеф показывается и на сушу и на море, есго придется раздлелить на 2 ЦМР, иначе цветовая окраска будет некорректной:
+
+```{r, ref.label='map_stars2', echo=F, fig.height=3}
+```
+
+---
+
+## Отображение растровых данных
+
+Если рельеф показывается и на сушу и на море, его придется разделить на 2 ЦМР, иначе цветовая окраска будет некорректной:
+
+```{r, echo = F, fig.height=3}
+anno = list(
+  annotate("rect", xmin = 45, xmax = 60, ymin = 22, ymax = 32, 
+           color = 'white', size = 2, fill = NA),
+  annotate("rect", xmin = 45, xmax = 57, ymin = 35, ymax = 48, 
+           color = 'white', size = 2, fill = NA),
+  annotate("rect", xmin = 26, xmax = 43, ymin = 40, ymax = 48, 
+           color = 'white', size = 2, fill = NA)
+)
+
+ggplot() +
+  geom_stars(data = dem) +
+  scale_fill_gradientn(colours = pal, values = val) +
+  hydro_lyrs +
+  anno +
+  coord_sf(xlim = c(10, 75), ylim = c(20, 50)) +
+  theme_void()
+```

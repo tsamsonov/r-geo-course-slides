@@ -18,7 +18,7 @@ output:
 library(datasets)
 knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
 knitr::opts_knit$set(global.par = TRUE)
-knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300, crop = T)
 ```
 
 ## Пакеты
@@ -43,7 +43,7 @@ options(scipen = 999)
 
 ## Исходные данные
 
-```{r}
+```{r, cache=T}
 ne = '/Volumes/Data/Spatial/Natural Earth/natural_earth_vector.gpkg'
 
 countries = st_read(ne, 'ne_110m_admin_0_countries', quiet = T)
@@ -57,4 +57,172 @@ borders = st_read(ne, 'ne_110m_admin_0_boundary_lines_land', quiet = T)
 
 lyr = lst(ocean, land, coast, countries, 
           rivers, lakes, cities, borders)
+```
+
+---
+
+## Данные WorldClim
+
+```{r, cache=TRUE, fig.height=20}
+prec = raster::getData("worldclim", var = "prec", res = 10) |> 
+  st_as_stars() # преобразуем в stars для удобства работы
+plot(prec) # это 12-канальный растр
+```
+
+---
+
+## Данные WorldClim
+
+Проекция Миллера:
+
+```{r, cache = TRUE}
+precp = prec |> 
+  st_warp(crs = "+proj=mill")
+
+lyrp = lapply(lyr, st_transform, crs = "+proj=mill") # Цилиндрическая проекция Миллера
+```
+
+---
+
+## Данные WorldClim
+
+Визуализируем полученные данные на карте:
+```{r jan, eval = F}
+ramp = colorRampPalette(c("white", "violetred"))
+
+# Визуализируем данные на январь:
+plot(precp[,,,1], 
+     col = ramp(10),
+     main = 'Количество осадков в январе, мм',
+     reset = FALSE) # разрешаем добавлять объекты на карту.
+
+plot(st_geometry(lyrp$ocean), border = 'steelblue', 
+     col = 'lightblue', add = TRUE)
+
+```
+
+---
+
+## Данные WorldClim
+
+Визуализируем полученные данные на карте:
+
+```{r, ref.label='jan', echo=F, out.height='400px'}
+```
+
+---
+
+## Пакет tmap
+
+Пакет __tmap__ предоставляет простой в использовании и достаточно мощный механизм формирования тематических карт. Шаблон построения карты в этом пакете напоминает _ggplot_ и выглядит следующим образом:
+```{r eval=FALSE}
+tm_shape(<DATA>) +
+  tm_<METHOD>(<PARAMETERS>)
+```
+
+где:
+
+- `DATA` - объект пространственного типа (`sf`, `sp`, `stars` или `raster`)
+- `METHOD` - метод визуализации этого объекта (способ изображения)
+- `PARAMETERS` - параметры метода
+
+---
+
+## Полигональные объекты
+
+.left-40[
+```{r pol, eval = F}
+tm_shape(lyrp$countries) +
+   # качественная переменная
+  tm_polygons('ECONOMY') +
+tm_shape(lyrp$ocean)+
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.right-60[
+```{r, ref.label='pol', echo=F}
+```
+]
+
+---
+
+## Количественный фон / картограммы
+
+__Количественный фон__ или __картограммы__ получаются через `tm_polygons()`:
+
+```{r cart, eval = F, cache=TRUE}
+lifexp = WDI::WDI(indicator = 'SP.DYN.LE00.IN')
+gap = read_excel('../r-geo-course/data/gapminder.xlsx', 2)
+lifedf = left_join(gap, 
+                   filter(lifexp, year == 2016), 
+                   by = c('name' = 'country')) |>
+  rename(lifexp = SP.DYN.LE00.IN) |> 
+  mutate(geo = stringr::str_to_upper(geo))
+coun = lyrp$countries |> 
+  left_join(lifedf, by = c('ADM0_A3' = 'geo'))
+
+tm_shape(coun) +
+  tm_polygons('lifexp', border.col = 'gray20') + # количественная переменная
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue4')
+```
+
+---
+
+## Количественный фон / картограммы
+
+```{r, ref.label='cart', echo=F, out.height='400px'}
+```
+
+---
+
+## Картодиаграммы
+
+Для реализации способа __картодиаграмм__ используется геометрия `tm_bubbles()`. Чтобы оставить отображение границ полигонов, нам необходимо к одной геометрии применить несколько способов изображения:
+
+```{r cardi, eval = F}
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue') +
+tm_shape(lyrp$countries) +
+  tm_fill(col = 'white') +
+  tm_borders(col = 'grey') +
+  tm_bubbles('GDP_MD_EST', 
+             scale = 3,
+             col = 'red', 
+             alpha = 0.5) # количественная переменная
+```
+
+---
+
+## Картодиаграммы
+
+```{r, ref.label='cardi', echo=F, out.height='400px'}
+```
+
+---
+
+## Значки
+
+Значковый способ реализуется аналогично картодиграммам. Например, крупнейшие города:
+
+```{r pts, eval = F}
+tm_shape(lyrp$countries) +
+  tm_fill(col = 'white') +
+  tm_borders(col = 'grey') +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue') +
+tm_shape(lyrp$cities) +
+  tm_bubbles('POP2015', col = 'olivedrab', alpha = 0.8)
+```
+
+---
+
+## Картодиаграммы
+
+```{r, ref.label='pts', echo=F, out.height='400px'}
 ```

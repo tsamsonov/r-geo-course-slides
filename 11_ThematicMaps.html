@@ -73,6 +73,155 @@ borders = st_read(ne, 'ne_110m_admin_0_boundary_lines_land', quiet = T)
 lyr = lst(ocean, land, coast, countries, 
           rivers, lakes, cities, borders)
 ```
+
+---
+
+## Данные WorldClim
+
+
+```r
+prec = raster::getData("worldclim", var = "prec", res = 10) |&gt; 
+  st_as_stars() # преобразуем в stars для удобства работы
+plot(prec) # это 12-канальный растр
+```
+
+![](11_ThematicMaps_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+
+## Данные WorldClim
+
+Проекция Миллера:
+
+
+```r
+precp = prec |&gt; 
+  st_warp(crs = "+proj=mill")
+
+lyrp = lapply(lyr, st_transform, crs = "+proj=mill") # Цилиндрическая проекция Миллера
+```
+
+---
+
+## Данные WorldClim
+
+Визуализируем полученные данные на карте:
+
+```r
+ramp = colorRampPalette(c("white", "violetred"))
+
+# Визуализируем данные на январь:
+plot(precp[,,,1], 
+     col = ramp(10),
+     main = 'Количество осадков в январе, мм',
+     reset = FALSE) # разрешаем добавлять объекты на карту.
+
+plot(st_geometry(lyrp$ocean), border = 'steelblue', 
+     col = 'lightblue', add = TRUE)
+
+```
+
+---
+
+## Данные WorldClim
+
+Визуализируем полученные данные на карте:
+
+&lt;img src="11_ThematicMaps_files/figure-html/unnamed-chunk-5-1.png" height="400px" /&gt;
+
+---
+
+## Пакет tmap
+
+Пакет __tmap__ предоставляет простой в использовании и достаточно мощный механизм формирования тематических карт. Шаблон построения карты в этом пакете напоминает _ggplot_ и выглядит следующим образом:
+
+```r
+tm_shape(&lt;DATA&gt;) +
+  tm_&lt;METHOD&gt;(&lt;PARAMETERS&gt;)
+```
+
+где:
+
+- `DATA` - объект пространственного типа (`sf`, `sp`, `stars` или `raster`)
+- `METHOD` - метод визуализации этого объекта (способ изображения)
+- `PARAMETERS` - параметры метода
+
+---
+
+## Полигональные объекты
+
+.left-40[
+
+```r
+tm_shape(lyrp$countries) +
+   # качественная переменная
+  tm_polygons('ECONOMY') +
+tm_shape(lyrp$ocean)+
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.right-60[
+![](11_ThematicMaps_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Количественный фон / картограммы
+
+__Количественный фон__ или __картограммы__ получаются через `tm_polygons()`:
+
+
+```r
+lifexp = WDI::WDI(indicator = 'SP.DYN.LE00.IN')
+gap = read_excel('../r-geo-course/data/gapminder.xlsx', 2)
+lifedf = left_join(gap, 
+                   filter(lifexp, year == 2016), 
+                   by = c('name' = 'country')) |&gt;
+  rename(lifexp = SP.DYN.LE00.IN) |&gt; 
+  mutate(geo = stringr::str_to_upper(geo))
+coun = lyrp$countries |&gt; 
+  left_join(lifedf, by = c('ADM0_A3' = 'geo'))
+
+tm_shape(coun) +
+  tm_polygons('lifexp', border.col = 'gray20') + # количественная переменная
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue4')
+```
+
+---
+
+## Количественный фон / картограммы
+
+&lt;img src="11_ThematicMaps_files/figure-html/unnamed-chunk-8-1.png" height="400px" /&gt;
+
+---
+
+## Картодиаграммы
+
+Для реализации способа __картодиаграмм__ используется геометрия `tm_bubbles()`. Чтобы оставить отображение границ полигонов, нам необходимо к одной геометрии применить несколько способов изображения:
+
+
+```r
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue') +
+tm_shape(lyrp$countries) +
+  tm_fill(col = 'white') +
+  tm_borders(col = 'grey') +
+  tm_bubbles('GDP_MD_EST', 
+             scale = 3,
+             col = 'red', 
+             alpha = 0.5) # количественная переменная
+```
+
+---
+
+## Количественный фон / картограммы
+
+&lt;img src="11_ThematicMaps_files/figure-html/unnamed-chunk-9-1.png" height="400px" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

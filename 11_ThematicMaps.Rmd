@@ -1,0 +1,60 @@
+---
+title: "Тематические карты"
+subtitle: "Визуализация и анализ географических данных на языке R"
+author: "Тимофей Самсонов"
+institute: "МГУ имени Ломоносова, Географический факультет"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: [default, "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+---
+
+```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
+library(datasets)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
+knitr::opts_knit$set(global.par = TRUE)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
+```
+
+## Пакеты
+
+Для выполнения кода данной лекции вам понадобятся следующие пакеты:
+```{r}
+library(sf)
+library(stars)
+library(tmap)
+library(readxl)
+library(raster)
+library(mapview)
+library(classInt)
+library(gapminder)
+library(dplyr)
+library(googlesheets4)
+library(rnaturalearth)
+options(scipen = 999)
+```
+
+---
+
+## Исходные данные
+
+```{r}
+ne = '/Volumes/Data/Spatial/Natural Earth/natural_earth_vector.gpkg'
+
+countries = st_read(ne, 'ne_110m_admin_0_countries', quiet = T)
+coast =  st_read(ne, 'ne_110m_coastline', quiet = T)
+ocean = st_read(ne, 'ne_110m_ocean', quiet = T)
+cities = st_read(ne, 'ne_110m_populated_places', quiet = T)
+rivers = st_read(ne, 'ne_110m_rivers_lake_centerlines', quiet = T)
+lakes = st_read(ne, 'ne_110m_lakes', quiet = T)
+land = st_read(ne, 'ne_110m_land', quiet = T)
+borders = st_read(ne, 'ne_110m_admin_0_boundary_lines_land', quiet = T)
+
+lyr = lst(ocean, land, coast, countries, 
+          rivers, lakes, cities, borders)
+```

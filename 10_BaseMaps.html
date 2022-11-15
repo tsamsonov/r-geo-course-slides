@@ -51,6 +51,19 @@ library(RColorBrewer)
 
 ---
 
+## Источники данных для картографирования
+
+- Сверхмелкие масштабы (10M и мельче): __Natural Earth__ (мир)
+
+- Мелкие масштабы (1 - 10M): __ВСЕГЕИ__ (Россия)
+
+- Средние масштабы (100k - 1M): .red[__?__]
+
+- Крупные масштабы (крупнее 100k): __OpenStreetMap (OSM)__ (мир)
+
+
+---
+
 ## Загрузка данных Natural Earth
 
 Данные NE могут быть выгружены онлайн:
@@ -728,6 +741,40 @@ ggplot() +
 ## Отбор
 
 ![](10_BaseMaps_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Классификация --&gt;
+
+&lt;!-- Для классификации объектов необходимо создать соответствующий атрибут, который ранжирует их по величине. Например, можно классифиципровать населенные пункты по численности населения: --&gt;
+
+&lt;!-- ```{r classes, eval = F} --&gt;
+&lt;!-- capitals = capitals |&gt;  --&gt;
+&lt;!--   mutate(RANK = cut(POP_MAX, c(0, 100000, 1000000, 15000000)), --&gt;
+&lt;!--          SIZE = as.numeric(RANK)) --&gt;
+
+&lt;!-- ggplot() + --&gt;
+&lt;!--   geom_sf(data = cnt_eu, size = 0.25) + --&gt;
+&lt;!--   geom_sf(data = capitals, mapping = aes(size = SIZE), colour = "black",  --&gt;
+&lt;!--           fill = "white", shape = 21,  stroke = 1) + --&gt;
+&lt;!--   geom_text_repel(data = capitals, stat = "sf_coordinates", --&gt;
+&lt;!--                 aes(label = NAME, geometry = geom, size = SIZE),  --&gt;
+&lt;!--                 fontface = 'bold') + --&gt;
+&lt;!--   labs(size = NULL) + --&gt;
+&lt;!--   scale_size(guide = 'none')+ --&gt;
+&lt;!--   theme_bw() --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+
+&lt;!-- ## Классификация --&gt;
+
+&lt;!-- ```{r, echo = F, ref.label='classes', fig.height=12, crop=T, out.height='1000px'} --&gt;
+
+&lt;!-- ``` --&gt;
+
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

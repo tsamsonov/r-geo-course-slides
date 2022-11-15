@@ -37,6 +37,19 @@ library(RColorBrewer)
 
 ---
 
+## Источники данных для картографирования
+
+- Сверхмелкие масштабы (10M и мельче): __Natural Earth__ (мир)
+
+- Мелкие масштабы (1 - 10M): __ВСЕГЕИ__ (Россия)
+
+- Средние масштабы (100k - 1M): .red[__?__]
+
+- Крупные масштабы (крупнее 100k): __OpenStreetMap (OSM)__ (мир)
+
+
+---
+
 ## Загрузка данных Natural Earth
 
 Данные NE могут быть выгружены онлайн:
@@ -692,3 +705,37 @@ ggplot() +
 
 ```{r, fig.height=3.5, ref.label='pts2', echo=F}
 ```
+
+<!-- --- -->
+
+<!-- ## Классификация -->
+
+<!-- Для классификации объектов необходимо создать соответствующий атрибут, который ранжирует их по величине. Например, можно классифиципровать населенные пункты по численности населения: -->
+
+<!-- ```{r classes, eval = F} -->
+<!-- capitals = capitals |>  -->
+<!--   mutate(RANK = cut(POP_MAX, c(0, 100000, 1000000, 15000000)), -->
+<!--          SIZE = as.numeric(RANK)) -->
+
+<!-- ggplot() + -->
+<!--   geom_sf(data = cnt_eu, size = 0.25) + -->
+<!--   geom_sf(data = capitals, mapping = aes(size = SIZE), colour = "black",  -->
+<!--           fill = "white", shape = 21,  stroke = 1) + -->
+<!--   geom_text_repel(data = capitals, stat = "sf_coordinates", -->
+<!--                 aes(label = NAME, geometry = geom, size = SIZE),  -->
+<!--                 fontface = 'bold') + -->
+<!--   labs(size = NULL) + -->
+<!--   scale_size(guide = 'none')+ -->
+<!--   theme_bw() -->
+<!-- ``` -->
+
+<!-- --- -->
+
+<!-- ## Классификация -->
+
+<!-- ```{r, echo = F, ref.label='classes', fig.height=12, crop=T, out.height='1000px'} -->
+
+<!-- ``` -->
+
+
+

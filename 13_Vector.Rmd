@@ -137,7 +137,7 @@ par(def)
 
 ## Топологические отношения
 
-Выборка по топологическому отношению:
+Выборка по пересечению:
 
 .pull-left[
 .code-small[
@@ -171,7 +171,7 @@ plot(cities, col = 'black',
 
 ## Топологические отношения
 
-Выборка по топологическому отношению:
+Выборка по пересечению:
 
 .pull-left[
 .code-small[
@@ -186,7 +186,7 @@ largest = countries |>
 
 # Отбираем точки внутри стран 
 # с максимальным ВВП
-sel = cities[largest, ]
+sel = cities[largest, ] #<<
 
 # Смотрим что получилось
 plot(outlines, lwd = 0.5)
@@ -199,6 +199,33 @@ plot(sel, pch = 20, col = 'black',
 
 .pull-right[
 ```{r, ref.label='sel2', echo=F}
+```
+]
+
+---
+
+## Топологические отношения
+
+Выборка по касанию границ:
+
+.pull-left[
+.code-small[
+```{r sel3, eval=F}
+cz = countries |> 
+  filter(sovereignt == 'Czechia')
+
+neighbors = countries[cz, op=st_touches] #<<
+
+plot(st_geometry(neighbors), 
+     col = 'lightgray', lwd = 0.5)
+
+plot(cz, col = 'darkgray', add = TRUE)
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='sel3', echo=F}
 ```
 ]
 

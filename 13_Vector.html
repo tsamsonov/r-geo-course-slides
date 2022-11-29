@@ -390,8 +390,39 @@ mf_init(frame)
 
 ---
 
-## Топологические отношения
+## Абсолютные зоны окружения (буферные)
 
+.pull-left[
+.code-small[
+
+```r
+# Выберем станцию метро и построим буферную зону
+krop = stations |&gt; 
+  filter(NAME == "Кропоткинская")
+zone = st_buffer(krop, dist = 300)
+
+sel_poi = poi_food[zone, ]
+
+mf_init(frame)
+  mf_map(water, col = 'steelblue3', 
+         add = TRUE)
+  mf_map(zone, col = 'sienna1', lwd = 4, 
+         add = T)
+  mf_map(roads, col = 'black', 
+         add = T)
+  mf_map(poi_food, cex = 0.5, 
+         col = "deepskyblue4", 
+         add = TRUE)
+  mf_map(sel_poi, cex = 1.5, 
+         col = "darkred", 
+         add = TRUE)
+```
+]
+]
+
+.pull-right[
+![](13_Vector_files/figure-html/buf2-1.png)&lt;!-- --&gt;
+]
 
 
 

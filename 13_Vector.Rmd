@@ -26,9 +26,8 @@ knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300, cr
 Для выполнения кода данной лекции вам понадобятся следующие пакеты:
 ```{r}
 library(sf)
-library(tidyverse)
+library(dplyr)
 library(classInt)
-library(osrm) # Использование онлайн-сервиса маршрутизации OSRM
 library(mapsf) # Удобное построение тематических карт средствами plot()
 options(scipen = 999)
 ```
@@ -133,3 +132,74 @@ par(def)
 `st_covers(x, y)`             | `x` покрывает `y` (все точки `y` содержатся в `x`)
 `st_covered_by(x, y)`         | `x` покрыт `y` (все точки `x` содержатся в `y`)
 `st_equals_exact(x, y)`       | `x` совпадает `y` точно (упорядоченные множества точек `x` и `y` совпадают)
+
+---
+
+## Топологические отношения
+
+Выборка по топологическому отношению:
+
+.pull-left[
+.code-small[
+```{r sel1, eval=F}
+countries = st_read(
+  '../r-geo-course/data/ne/countries.gpkg',
+  quiet = T
+)
+
+outlines = st_geometry(countries)
+
+cities = st_read(
+  '../r-geo-course/data/ne/cities.gpkg',
+  quiet = T
+)
+
+# Наносим исходную конфигурацию
+plot(outlines, lwd = 0.5)
+plot(cities, col = 'black', 
+     pch = 20, cex = 0.5, add = TRUE)
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='sel1', echo=F}
+```
+]
+
+---
+
+## Топологические отношения
+
+Выборка по топологическому отношению:
+
+.pull-left[
+.code-small[
+```{r sel2, eval=F}
+# отключаем s2 чтобы не было ошибок 
+# при выборке
+sf::sf_use_s2(FALSE)
+
+largest = countries |> 
+  select(pop_est) |> 
+  filter(pop_est > 100000000)
+
+# Отбираем точки внутри стран 
+# с максимальным ВВП
+sel = cities[largest, ]
+
+# Смотрим что получилось
+plot(outlines, lwd = 0.5)
+plot(largest, col = 'gray', add = TRUE)
+plot(sel, pch = 20, col = 'black', 
+     add = TRUE)
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='sel2', echo=F}
+```
+]
+
+

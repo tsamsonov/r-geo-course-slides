@@ -75,7 +75,7 @@ rayons = read_sf("../r-geo-course/data/boundary_polygon.gpkg") # Границы 
 stations = read_sf("../r-geo-course/data/metro_stations.gpkg") # Станции метро
 water = read_sf("../r-geo-course/data/water_polygon.gpkg") # Водные объекты
 poi = read_sf("../r-geo-course/data/poi_point.gpkg") # Точки интереса
-poi.food = poi |&gt; # Только общепит
+poi_food = poi |&gt; # Только общепит
   select(NAME, AMENITY) |&gt;  
   filter(AMENITY %in% c("restaurant", "bar", "cafe", 
                         "pub", "fast_food"))
@@ -93,12 +93,13 @@ frame = roads |&gt;
 ```
 ]
 
-
 ---
 
 ## Метрические отношения
 
 .pull-left[
+__Задача__: подсчитать сколько заведений общепита на каждой улице.
+
 
 ```r
 # Визуализируем входные данные
@@ -110,7 +111,7 @@ plot(water,
 plot(roads,
      col = "gray70", 
      add = TRUE)
-plot(poi.food, 
+plot(poi_food, 
      col = "deepskyblue4", 
      pch = 20, 
      cex = 0.5, 
@@ -124,9 +125,60 @@ plot(poi.food,
 
 ---
 
+## Метрические отношения
+
+Для этого вычислим матрицу попарных расстояний между дорогами и точками и найдем ближайшую улицу к каждой точке:
+
+
+```r
+dist_matrix = st_distance(roads, poi_food)
+print(dist_matrix[1:5,1:5])
+## Units: [m]
+##          [,1]      [,2]      [,3]      [,4]     [,5]
+## [1,] 4962.292 3420.6849 3240.2066 2145.2044 4748.686
+## [2,] 2247.737  705.2923  524.9411  570.3986 2035.341
+## [3,] 2213.236  670.7904  490.4167  605.1606 2000.759
+## [4,] 2197.874  655.4285  475.0629  620.4411 1985.242
+## [5,] 3910.957 2368.5560 2188.1348 1092.5472 3698.246
+
+ids = apply(dist_matrix, 2, \(X) order(X)[1])
+head(ids)
+## [1] 13 19 12 29 39 23
+```
+
+---
+
+## Метрические отношения
+
+Результаты необходимо проагрегировать:
+
+
+```r
+stats = table(ids) |&gt; as_tibble()
+print(stats)
+## # A tibble: 657 × 2
+##    ids       n
+##    &lt;chr&gt; &lt;int&gt;
+##  1 6         1
+##  2 7         1
+##  3 10        2
+##  4 12        4
+##  5 13        2
+##  6 19        1
+##  7 23        2
+##  8 27        1
+##  9 29        3
+## 10 31        2
+## # … with 647 more rows
+```
+
+
+
+---
+
 ## Топологические отношения
 
-&lt;img src="13_Vector_files/figure-html/unnamed-chunk-4-1.png" height="450px" /&gt;
+&lt;img src="13_Vector_files/figure-html/unnamed-chunk-6-1.png" height="450px" /&gt;
 
 ---
 
@@ -184,7 +236,7 @@ plot(cities, col = 'black',
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -219,7 +271,7 @@ plot(sel, pch = 20, col = 'black',
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -246,7 +298,7 @@ plot(cz, col = 'darkgray', add = TRUE)
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
 ]
 
 

@@ -143,16 +143,30 @@ print(stats, n = 5)
 ```{r}
 roads_stats = roads |> 
   mutate(id = row_number()) |> 
-  left_join(stats, by = 'id')
+  left_join(stats, by = 'id') |> 
+  mutate(n = ifelse(is.na(n), 0, n)) |> 
+  arrange(n)
 ```
 
 ```{r}
 roads_stats |> select(NAME, n) |>  
-  arrange(desc(n)) |> head(5) |> 
-  st_drop_geometry()
+  tail(5) |> st_drop_geometry()
 ```
-
 ]
+
+---
+
+## Метрические отношения
+
+Визуализируем результаты с помощью __mapsf__:
+```{r}
+mf_init(frame)
+  mf_map(water, col = 'steelblue3', add = TRUE)
+  mf_map(roads_stats, var = 'n', 
+         type = 'choro', breaks = 'fisher',
+         nbreaks = 7, pal = 'Greens',
+         lwd = 4, col_na = 'grey', add = TRUE)
+```
 
 
 ---

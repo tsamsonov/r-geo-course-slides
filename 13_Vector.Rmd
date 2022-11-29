@@ -158,15 +158,30 @@ roads_stats |> select(NAME, n) |>
 
 ## Метрические отношения
 
+.pull-left[
 Визуализируем результаты с помощью __mapsf__:
-```{r}
+
+```{r lines, eval = F}
 mf_init(frame)
-  mf_map(water, col = 'steelblue3', add = TRUE)
+  mf_map(water, col = 'steelblue3', 
+         add = TRUE)
   mf_map(roads_stats, var = 'n', 
-         type = 'choro', breaks = 'fisher',
-         nbreaks = 7, pal = 'Greens',
-         lwd = 4, col_na = 'grey', add = TRUE)
+         type = 'choro', 
+         breaks = 'fisher',
+         nbreaks = 7, pal = 'Reds',
+         lwd = 4, col_na = 'grey', 
+         add = TRUE)
+  mf_map(poi_food, cex = 0.5, 
+         col = "deepskyblue4", 
+         add = TRUE)
 ```
+]
+
+.pull-right[
+```{r, ref.label = 'lines', echo = F}
+```
+]
+
 
 
 ---
@@ -361,5 +376,44 @@ plot(cz, col = 'darkgray', add = TRUE)
 ```{r, ref.label='sel3', echo=F}
 ```
 ]
+
+---
+
+## Топологические отношения
+
+.pull-left[
+Количественное агрегирование по районам:
+.code-small[
+```{r aggr1, eval = F}
+poi_food = poi_food |> mutate(count = 1)
+rayons_poi = aggregate(
+  poi_food['count'], 
+  rayons, 
+  sum
+) %>%
+  mutate(density = 1000000 * count / st_area(.))
+
+mf_init(frame)
+  mf_map(rayons_poi, var = 'density', lwd = 4,
+         type = 'choro', breaks = 'pretty',
+         nbreaks = 7, pal = 'Greens', add = TRUE)
+  mf_map(water, col = 'steelblue3', add = TRUE)
+  mf_map(roads, col = 'black', add = T)
+  mf_map(poi_food, cex = 0.5, 
+         col = "deepskyblue4", add = TRUE)
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='aggr1', echo = F}
+```
+]
+
+---
+
+## Топологические отношения
+
+
 
 

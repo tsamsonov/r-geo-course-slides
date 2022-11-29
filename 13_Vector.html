@@ -178,32 +178,61 @@ print(stats, n = 5)
 ```r
 roads_stats = roads |&gt; 
   mutate(id = row_number()) |&gt; 
-  left_join(stats, by = 'id')
+  left_join(stats, by = 'id') |&gt; 
+  mutate(n = ifelse(is.na(n), 0, n)) |&gt; 
+  arrange(n)
 ```
 
 
 ```r
 roads_stats |&gt; select(NAME, n) |&gt;  
-  arrange(desc(n)) |&gt; head(5) |&gt; 
-  st_drop_geometry()
+  tail(5) |&gt; st_drop_geometry()
 ## # A tibble: 5 × 2
 ##   NAME                  n
-## * &lt;chr&gt;             &lt;int&gt;
-## 1 улица Арбат          43
-## 2 улица Новый Арбат    24
+## * &lt;chr&gt;             &lt;dbl&gt;
+## 1 Пятницкая улица      17
+## 2 Мясницкая улица      20
 ## 3 Цветной бульвар      22
-## 4 Мясницкая улица      20
-## 5 Никольская улица     17
+## 4 улица Новый Арбат    24
+## 5 улица Арбат          43
 ```
-
 ]
+
+---
+
+## Метрические отношения
+
+.pull-left[
+Визуализируем результаты с помощью __mapsf__:
+
+
+```r
+mf_init(frame)
+  mf_map(water, col = 'steelblue3', 
+         add = TRUE)
+  mf_map(roads_stats, var = 'n', 
+         type = 'choro', 
+         breaks = 'fisher',
+         nbreaks = 7, pal = 'Reds',
+         lwd = 4, col_na = 'grey', 
+         add = TRUE)
+  mf_map(poi_food, cex = 0.5, 
+         col = "deepskyblue4", 
+         add = TRUE)
+```
+]
+
+.pull-right[
+![](13_Vector_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+]
+
 
 
 ---
 
 ## Топологические отношения
 
-&lt;img src="13_Vector_files/figure-html/unnamed-chunk-8-1.png" height="450px" /&gt;
+&lt;img src="13_Vector_files/figure-html/unnamed-chunk-9-1.png" height="450px" /&gt;
 
 ---
 
@@ -261,7 +290,7 @@ plot(cities, col = 'black',
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -296,7 +325,7 @@ plot(sel, pch = 20, col = 'black',
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -323,8 +352,47 @@ plot(cz, col = 'darkgray', add = TRUE)
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 ]
+
+---
+
+## Топологические отношения
+
+.pull-left[
+Количественное агрегирование по районам:
+.code-small[
+
+```r
+poi_food = poi_food |&gt; mutate(count = 1)
+rayons_poi = aggregate(
+  poi_food['count'], 
+  rayons, 
+  sum
+) %&gt;%
+  mutate(density = 1000000 * count / st_area(.))
+
+mf_init(frame)
+  mf_map(rayons_poi, var = 'density', lwd = 4,
+         type = 'choro', breaks = 'pretty',
+         nbreaks = 7, pal = 'Greens', add = TRUE)
+  mf_map(water, col = 'steelblue3', add = TRUE)
+  mf_map(roads, col = 'black', add = T)
+  mf_map(poi_food, cex = 0.5, 
+         col = "deepskyblue4", add = TRUE)
+```
+]
+]
+
+.pull-right[
+![](13_Vector_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Топологические отношения
+
+
 
 
     </textarea>

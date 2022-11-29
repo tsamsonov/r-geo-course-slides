@@ -118,21 +118,41 @@ plot(poi_food,
 dist_matrix = st_distance(roads, poi_food)
 print(dist_matrix[1:5,1:5])
 
-ids = apply(dist_matrix, 2, \(X) order(X)[1])
-head(ids)
+id = apply(dist_matrix, 2, \(X) order(X)[1])
+head(id)
 ```
 
 ---
 
 ## Метрические отношения
 
+.pull-left[
 Результаты необходимо проагрегировать:
 
 ```{r}
-stats = table(ids) |> as_tibble()
-print(stats)
+stats = table(id) |> 
+  as_tibble() |> 
+  mutate(id = as.integer(id))
+
+print(stats, n = 5)
+```
+]
+
+.pull-right[
+И далее присоединить к линиям дорог:
+```{r}
+roads_stats = roads |> 
+  mutate(id = row_number()) |> 
+  left_join(stats, by = 'id')
 ```
 
+```{r}
+roads_stats |> select(NAME, n) |>  
+  arrange(desc(n)) |> head(5) |> 
+  st_drop_geometry()
+```
+
+]
 
 
 ---

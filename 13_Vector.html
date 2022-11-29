@@ -141,8 +141,8 @@ print(dist_matrix[1:5,1:5])
 ## [4,] 2197.874  655.4285  475.0629  620.4411 1985.242
 ## [5,] 3910.957 2368.5560 2188.1348 1092.5472 3698.246
 
-ids = apply(dist_matrix, 2, \(X) order(X)[1])
-head(ids)
+id = apply(dist_matrix, 2, \(X) order(X)[1])
+head(id)
 ## [1] 13 19 12 29 39 23
 ```
 
@@ -150,35 +150,60 @@ head(ids)
 
 ## Метрические отношения
 
+.pull-left[
 Результаты необходимо проагрегировать:
 
 
 ```r
-stats = table(ids) |&gt; as_tibble()
-print(stats)
+stats = table(id) |&gt; 
+  as_tibble() |&gt; 
+  mutate(id = as.integer(id))
+
+print(stats, n = 5)
 ## # A tibble: 657 × 2
-##    ids       n
-##    &lt;chr&gt; &lt;int&gt;
-##  1 6         1
-##  2 7         1
-##  3 10        2
-##  4 12        4
-##  5 13        2
-##  6 19        1
-##  7 23        2
-##  8 27        1
-##  9 29        3
-## 10 31        2
-## # … with 647 more rows
+##      id     n
+##   &lt;int&gt; &lt;int&gt;
+## 1     6     1
+## 2     7     1
+## 3    10     2
+## 4    12     4
+## 5    13     2
+## # … with 652 more rows
+```
+]
+
+.pull-right[
+И далее присоединить к линиям дорог:
+
+```r
+roads_stats = roads |&gt; 
+  mutate(id = row_number()) |&gt; 
+  left_join(stats, by = 'id')
 ```
 
+
+```r
+roads_stats |&gt; select(NAME, n) |&gt;  
+  arrange(desc(n)) |&gt; head(5) |&gt; 
+  st_drop_geometry()
+## # A tibble: 5 × 2
+##   NAME                  n
+## * &lt;chr&gt;             &lt;int&gt;
+## 1 улица Арбат          43
+## 2 улица Новый Арбат    24
+## 3 Цветной бульвар      22
+## 4 Мясницкая улица      20
+## 5 Никольская улица     17
+```
+
+]
 
 
 ---
 
 ## Топологические отношения
 
-&lt;img src="13_Vector_files/figure-html/unnamed-chunk-6-1.png" height="450px" /&gt;
+&lt;img src="13_Vector_files/figure-html/unnamed-chunk-8-1.png" height="450px" /&gt;
 
 ---
 
@@ -236,7 +261,7 @@ plot(cities, col = 'black',
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -271,7 +296,7 @@ plot(sel, pch = 20, col = 'black',
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -298,7 +323,7 @@ plot(cz, col = 'darkgray', add = TRUE)
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 ]
 
 

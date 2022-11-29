@@ -67,10 +67,10 @@ ocean = st_read(ne, 'ne_110m_ocean', quiet = T)
 cities = st_read(ne, 'ne_110m_populated_places', quiet = T)
 rivers = st_read(ne, 'ne_110m_rivers_lake_centerlines', quiet = T)
 lakes = st_read(ne, 'ne_110m_lakes', quiet = T)
-land = st_read(ne, 'ne_110m_land', quiet = T)
+# land = st_read(ne, 'ne_110m_land', quiet = T)
 borders = st_read(ne, 'ne_110m_admin_0_boundary_lines_land', quiet = T)
 
-lyr = lst(ocean, land, coast, countries, 
+lyr = lst(ocean, coast, countries, 
           rivers, lakes, cities, borders)
 ```
 
@@ -219,9 +219,343 @@ tm_shape(lyrp$countries) +
 
 ---
 
-## Количественный фон / картограммы
+## Картодиаграммы
 
 &lt;img src="11_ThematicMaps_files/figure-html/unnamed-chunk-9-1.png" height="400px" /&gt;
+
+---
+
+## Значки
+
+Значковый способ реализуется аналогично картодиграммам. Например, крупнейшие города:
+
+
+```r
+tm_shape(lyrp$countries) +
+  tm_fill(col = 'white') +
+  tm_borders(col = 'grey') +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue') +
+tm_shape(lyrp$cities) +
+  tm_bubbles('POP2015', col = 'olivedrab', alpha = 0.8)
+```
+
+---
+
+## Значки
+
+&lt;img src="11_ThematicMaps_files/figure-html/unnamed-chunk-10-1.png" height="400px" /&gt;
+
+---
+
+## Надписи
+
+__Надписи__ объектов на карте размещаются с помощью функции `tm_text`. Дополним предыдущую карту названиями городов:
+
+
+```r
+tm_shape(lyrp$countries) +
+  tm_fill(col = 'white') +
+  tm_borders(col = 'grey') +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue') +
+tm_shape(lyrp$cities) +
+  tm_bubbles('POP2015', col = 'olivedrab', alpha = 0.8) +
+  tm_text('name_ru', size = 0.5, remove.overlap = TRUE, 
+          auto.placement = TRUE)
+```
+
+
+---
+
+## Надписи
+
+&lt;img src="11_ThematicMaps_files/figure-html/unnamed-chunk-11-1.png" height="400px" /&gt;
+
+---
+
+## Растровые данные
+
+При отображении растровых данных используется способ отображения `tm_raster()`.
+
+.pull-left[
+
+```r
+tm_shape(precp[,,,1]) +
+    tm_raster('prec1',
+              breaks = c(10, 50, 100, 
+                         200, 500, 1000),
+              palette = ramp(5)) +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.pull-right[
+&lt;img src="11_ThematicMaps_files/figure-html/unnamed-chunk-12-1.png" height="400px" /&gt;
+]
+
+---
+
+## Растровые данные
+
+Также растровые данные можно отображать в категориальном режиме
+
+.pull-left[
+
+```r
+data(land, package = 'tmap')
+
+tm_shape(land) +
+  tm_raster('cover')
+```
+]
+
+.pull-right[
+&lt;img src="11_ThematicMaps_files/figure-html/unnamed-chunk-13-1.png" height="400px" /&gt;
+]
+
+
+---
+
+## Цветовые шкалы
+
+.pull-left[
+Удобным инструментом подбора шкалы является функция `palette_explorer()` из пакета __tmaptools__:
+
+
+```r
+tmaptools::palette_explorer()
+```
+]
+
+.pull-right[
+&lt;img src="../r-geo-course/images/palette_explorer.png" width="573" /&gt;
+]
+
+---
+
+## Цветовые шкалы
+
+.pull-left[
+Категориальная палитра _Dark2_:
+
+```r
+tm_shape(lyrp$countries) +
+  tm_polygons('ECONOMY', 
+              palette = 'Dark2') + 
+tm_shape(lyrp$ocean)+
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.pull-right[
+&lt;img src="11_ThematicMaps_files/figure-html/unnamed-chunk-16-1.png" height="400px" /&gt;
+]
+
+---
+
+## Цветовые шкалы
+
+.pull-left[
+Последовательная палитра _PuBuGn_:
+
+```r
+tm_shape(precp[,,,1]) +
+    tm_raster('prec1',
+              breaks = c(10, 50, 100, 200, 500, 1000),
+              palette = 'PuBuGn') +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.pull-right[
+![](11_ThematicMaps_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Цветовые шкалы
+
+.pull-left[
+Вручную подобранные цвета:
+
+```r
+tm_shape(precp[,,,1]) +
+    tm_raster(
+      'prec1',
+      breaks = c(10, 50, 100, 200, 500, 1000),
+      palette = c('white', 'gray80', 
+                  'gray60', 'gray40', 'gray20')) +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.pull-right[
+![](11_ThematicMaps_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Цветовые шкалы
+
+.pull-left[
+Вручную подобранные категориальные цвета:
+
+```r
+pal = c("#003200", "#3C9600", "#006E00", 
+        "#556E19", "#00C800", "#8CBE8C",
+		   "#467864", "#B4E664", "#9BC832", 
+		   "#EBFF64", "#F06432", "#9132E6",
+		   "#E664E6", "#9B82E6", "#B4FEF0", 
+		   "#646464", "#C8C8C8", "#FF0000",
+		   "#FFFFFF", "#5ADCDC")
+
+tm_shape(land) +
+  tm_raster('cover', palette = pal)
+```
+]
+
+.pull-right[
+![](11_ThematicMaps_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Классификации
+
+.pull-left[
+С классификациями объектов удобно работать через пакет `classInt`:
+
+```r
+nclasses = 5
+intervals = classIntervals(
+  countries$POP_EST,
+  n = nclasses, 
+  style = "jenks"
+)
+plot(intervals, 
+     pal = ramp(nclasses), 
+     cex=0.5, 
+     main = "Естественные интервалы")
+```
+]
+
+.pull-right[
+![](11_ThematicMaps_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Классификации
+
+Также классификацию можно выполнять непосредственно при визуализации Ряд функций отображения имеют следующие параметры:
+
+- `n` --- количество классов
+- `style` --- метод классификации (так же как и в `classIntervals()`)
+- `breaks` --- значения границ интервалов (необходимы, если `style == fixed`)
+- `interval.closure` --- замыкание интервала (по умолчанию стоит `left`, что означает, что в интервал включается нижняя граница, за исключением последнего интервала, включающего и нижнюю и верхнюю границу) 
+- `midpoint` --- нейтральное значение, которое используется для сопоставления с центральным цветом в расходящихся цветовых палитрах
+
+---
+
+## Классификации
+
+Визуализируем данные по температуре, используя классическую красно-бело-синюю палитру _RdBu_ и нейтральную точку 0 градусов по Цельсию
+
+.pull-left[
+
+```r
+temp = raster::getData("worldclim", 
+                       var = "tmean", res = 10) |&gt; 
+  st_as_stars() |&gt; 
+  mutate(tmean1 = tmean1 / 10) |&gt; 
+  st_warp(crs = "+proj=mill")
+tm_shape(temp[,,,3]) +
+    tm_raster('tmean1',
+              colorNA = 'grey',
+              n = 11,
+              midpoint = 0,
+              style = 'pretty',
+              legend.reverse = TRUE,
+              palette = '-Spectral') +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.pull-right[
+![](11_ThematicMaps_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Компоновки
+
+Пакет tmap позволяет делать достаточно разнообразные настройки компоновки. Большинство из них осуществляется посредством `tm_layout()`:
+
+.pull-left[
+.code-small[
+
+```r
+map = tm_shape(coun, projection = '+proj=moll') +
+  tm_polygons('lifexp', 
+              palette = 'YlGn',
+              n = 4,
+              style = 'jenks',
+              border.col = 'gray20', 
+              title = 'Лет',
+              colorNA = 'lightgray',
+              textNA = 'Нет данных',
+              legend.reverse = TRUE,
+              legend.format = 
+                list(text.separator = '—')) +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue4')
+```
+]
+]
+
+.pull-right[
+.code-small[
+
+```r
+map +
+  tm_layout(frame = FALSE,
+          main.title.position = 0.22,
+          legend.outside = TRUE,
+          legend.outside.position = 'right',
+          fontfamily = 'Open Sans',
+          main.title.size = 1.2,
+          main.title = 'Продолжительность жизни',
+          legend.bg.color = 'white',
+          outer.margins = c(0.02, 0.05, 0.02, 0.02),
+          inner.margins = c(0.02, 0.02, 0.07, 0.02)) +
+tm_graticules(x = seq(-150, 150, by = 30),
+        y = seq(-60, 60, by = 30),
+        lwd = 0.2,
+        col = "black")
+```
+]
+]
+
+---
+
+## Компоновки
+
+![](11_ThematicMaps_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

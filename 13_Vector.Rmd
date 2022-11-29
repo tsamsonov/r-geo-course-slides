@@ -1,0 +1,135 @@
+---
+title: "Векторный анализ"
+subtitle: "Визуализация и анализ географических данных на языке R"
+author: "Тимофей Самсонов"
+institute: "МГУ имени Ломоносова, Географический факультет"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: [default, "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+---
+
+```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
+library(datasets)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
+knitr::opts_knit$set(global.par = TRUE)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300, crop = T)
+```
+
+## Пакеты
+
+Для выполнения кода данной лекции вам понадобятся следующие пакеты:
+```{r}
+library(sf)
+library(tidyverse)
+library(classInt)
+library(osrm) # Использование онлайн-сервиса маршрутизации OSRM
+library(mapsf) # Удобное построение тематических карт средствами plot()
+options(scipen = 999)
+```
+
+---
+
+## Метрические отношения
+
+---
+
+## Топологические отношения
+
+```{r, echo = FALSE, out.height='450px', fig.height=4, fig.width=8}
+def = par(no.readonly = TRUE)
+
+par(mfrow=c(2,4))
+par(mar = c(2,1,5,1))
+
+a = list(
+  c(0,0,0,20,20,20,20,0,0,0),
+  c(0,0,0,20,20,20,20,0,0,0),
+  c(0,0,0,20,20,20,20,0,0,0),
+  c(0,0,0,20,20,20,20,0,0,0),
+  c(0,0,0,20,20,20,20,0,0,0),
+  c(0,5,0,15,10,15,10,5,0,5),
+  c(0,0,0,20,20,20,20,0,0,0),
+  c(2,5,2,15,12,15,12,5,2,5)
+)
+  
+b = list(
+  c(30,0,30,20,50,20,50,0,30,0),
+  c(10,10,10,30,30,30,30,10,10,10),
+  c(0,0,0,20,20,20,20,0,0,0),
+  c(20,5,20,15,30,15,30,5,20,5),
+  c(10,5,10,15,20,15,20,5,10,5),
+  c(0,0,0,20,20,20,20,0,0,0),
+  c(8,5,8,15,18,15,18,5,8,5),
+  c(0,0,0,20,20,20,20,0,0,0)
+)
+
+labels = c(
+  'Не пересекается \n(A disjoint B)',
+  'Перекрывает \n(A overlaps B)',
+  'Совпадает \n(A equals B)',
+  'Касается \n(A touches B)',
+  'Покрывает \n(A covers B)',
+  'Покрыт \n(A covered by B)',
+  'Содержит \n(A сontains B)',
+  'Содержится \n(A within B)'
+)
+
+ashift = c(0, -5, -5, 0, -5, 0, -6, 0)
+bshift = c(0, 5, 5, 0, 0, 5, 0, 6)
+
+ncases = length(b)
+
+for (i in 1:ncases) {
+  aline = st_linestring(matrix(a[[i]], ncol = 2, byrow = TRUE))
+  bline = st_linestring(matrix(b[[i]], ncol = 2, byrow = TRUE))
+  
+  apol = st_cast(aline, 'POLYGON')
+  bpol = st_cast(bline, 'POLYGON')
+  
+  ac = st_centroid(apol)
+  bc = st_centroid(bpol)
+  
+  geom = st_sfc(list(apol, bpol))
+  
+  poly = st_intersection(apol, bpol)
+  line = st_intersection(bline, aline)
+  
+  plot(geom, main = labels[i])
+  plot(poly, col = 'lightgrey', add = TRUE)
+  plot(line, lwd = 4, col = 'blue', add = TRUE)
+  text(c(ac[1] + ashift[i], bc[1] + bshift[i]), c(ac[2], bc[2]), labels = c('A', 'B'), cex = 2)
+}
+
+par(def)
+```
+
+---
+
+## Топологические отношения
+
+Функция                       | Топологическое отношение
+------------------------------|--------------------------------------------------------------------
+`st_intersects(x, y)`         | `x` имеет общие точки с `y`
+`st_disjoint(x, y)`           | `x` не имеет общих точек с `y`
+`st_touches(x, y)`            | `x` касается `y` (граница `x` имеет общие точки с границей `y` И внутренняя область `x` не имеет имеет общих точек с внутренней областью `y`)
+`st_crosses(x, y)`            | `x` пересекает `y` (граница `x` имеет общие точки с границей `y`, при этом размерность их пересечения меньше размерности хотя бы одного из исходных объектов)
+`st_within(x, y)`             | `x` внутри `y` (все точки `x` содержатся в `y` И внутренняя область `x` имеет общие точки с внутренней областью `y`)
+---
+
+## Топологические отношения
+
+Функция                       | Топологическое отношение
+------------------------------|--------------------------------------------------------------------
+`st_contains(x, y)`           | `x` содержит `y` (все точки `y` содержатся в `x` И внутренняя область `y` имеет общие точки с внутренней областью `x`)
+`st_contains_properly(x, y)`  | `x` содержит `y` полностью (все точки `y` содержатся в `x` И граница `x` не имеет общих точек с границей `y`)
+`st_overlaps(x, y)`           | `x` перекрывает `y` (внутренняя область `x` имеет как общие, так и не общие точки с внутренней областью `y`)
+`st_equals(x, y)`             | `x` совпадает `y` (множества точек `x` и `y` совпадают)
+`st_covers(x, y)`             | `x` покрывает `y` (все точки `y` содержатся в `x`)
+`st_covered_by(x, y)`         | `x` покрыт `y` (все точки `x` содержатся в `y`)
+`st_equals_exact(x, y)`       | `x` совпадает `y` точно (упорядоченные множества точек `x` и `y` совпадают)

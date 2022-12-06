@@ -32,6 +32,16 @@ library(mapsf) # Удобное построение тематических к
 options(scipen = 999)
 ```
 
+
+---
+
+## Пакет mapsf
+
+```{r, echo = F}
+knitr::include_url("https://riatelab.github.io/mapsf/articles/web_only/img/mapsf_cheatsheet.png")
+```
+https://raw.githubusercontent.com/riatelab/mapsf/master/vignettes/web_only/img/mapsf_cheatsheet.pdf
+
 ---
 
 ## Пространственные запросы
@@ -446,5 +456,60 @@ mf_init(frame)
 ```
 ]
 
+---
+
+## Конкурентные зоны окружения (диаграмма Вороного)
+
+.pull-left[
+```{r vor1, eval = F}
+zones = stations |> 
+  as('Spatial') |> 
+  dismo::voronoi() |>  
+  st_as_sf() |>  
+  st_crop(frame)
+  
+plot(zones %>% st_geometry())
+plot(stations, add = TRUE, 
+     pch = 19, col = 'black')
+```
+]
+
+.pull-right[
+```{r, ref.label='vor1', echo = F}
+```
+]
+
+---
+
+## Конкурентные зоны окружения (диаграмма Вороного)
+
+.pull-left[
+Агрегирование по ячейкам диаграммы Вороного:
+
+.code-small[
+```{r vor2, eval = F}
+zones_poi = aggregate(poi_food['count'], zones, sum)
+
+mf_init(frame)
+  mf_map(water, col = 'steelblue3', 
+         add = TRUE)
+  mf_map(zones_poi, lwd = 3, col = NULL, add = T)
+  mf_map(zones_poi, var = 'count', 
+         col = 'olivedrab',
+         type = 'prop',
+         add = T)
+  mf_map(roads, col = 'black', 
+         add = T)
+  mf_map(poi_food, cex = 0.5, 
+         col = "deepskyblue4", 
+         add = TRUE)
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='vor2', echo = F}
+```
+]
 
 

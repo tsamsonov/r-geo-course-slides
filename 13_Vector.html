@@ -46,6 +46,14 @@ library(mapsf) # Удобное построение тематических к
 options(scipen = 999)
 ```
 
+
+---
+
+## Пакет mapsf
+
+&lt;iframe src="https://riatelab.github.io/mapsf/articles/web_only/img/mapsf_cheatsheet.png" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
+https://raw.githubusercontent.com/riatelab/mapsf/master/vignettes/web_only/img/mapsf_cheatsheet.pdf
+
 ---
 
 ## Пространственные запросы
@@ -120,7 +128,7 @@ plot(poi_food,
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -223,7 +231,7 @@ mf_init(frame)
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
 ]
 
 
@@ -232,7 +240,7 @@ mf_init(frame)
 
 ## Топологические отношения
 
-&lt;img src="13_Vector_files/figure-html/unnamed-chunk-9-1.png" height="450px" /&gt;
+&lt;img src="13_Vector_files/figure-html/unnamed-chunk-10-1.png" height="450px" /&gt;
 
 ---
 
@@ -290,7 +298,7 @@ plot(cities, col = 'black',
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -325,7 +333,7 @@ plot(sel, pch = 20, col = 'black',
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -352,7 +360,7 @@ plot(cz, col = 'darkgray', add = TRUE)
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -385,7 +393,7 @@ mf_init(frame)
 ]
 
 .pull-right[
-![](13_Vector_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+![](13_Vector_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -424,6 +432,61 @@ mf_init(frame)
 ![](13_Vector_files/figure-html/buf2-1.png)&lt;!-- --&gt;
 ]
 
+---
+
+## Конкурентные зоны окружения (диаграмма Вороного)
+
+.pull-left[
+
+```r
+zones = stations |&gt; 
+  as('Spatial') |&gt; 
+  dismo::voronoi() |&gt;  
+  st_as_sf() |&gt;  
+  st_crop(frame)
+  
+plot(zones %&gt;% st_geometry())
+plot(stations, add = TRUE, 
+     pch = 19, col = 'black')
+```
+]
+
+.pull-right[
+![](13_Vector_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Конкурентные зоны окружения (диаграмма Вороного)
+
+.pull-left[
+Агрегирование по ячейкам диаграммы Вороного:
+
+.code-small[
+
+```r
+zones_poi = aggregate(poi_food['count'], zones, sum)
+
+mf_init(frame)
+  mf_map(water, col = 'steelblue3', 
+         add = TRUE)
+  mf_map(zones_poi, lwd = 3, col = NULL, add = T)
+  mf_map(zones_poi, var = 'count', 
+         col = 'olivedrab',
+         type = 'prop',
+         add = T)
+  mf_map(roads, col = 'black', 
+         add = T)
+  mf_map(poi_food, cex = 0.5, 
+         col = "deepskyblue4", 
+         add = TRUE)
+```
+]
+]
+
+.pull-right[
+![](13_Vector_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+]
 
 
     </textarea>

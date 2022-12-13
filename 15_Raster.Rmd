@@ -471,14 +471,15 @@ temp = rast(files)
 data(land, package = 'tmap')
 terraland = rast(land['cover'])
 
-pal = c("#003200", "#3C9600", "#006E00", "#556E19", "#00C800", "#8CBE8C",
-		   "#467864", "#B4E664", "#9BC832", "#EBFF64", "#F06432", "#9132E6",
-		   "#E664E6", "#9B82E6", "#B4FEF0", "#646464", "#C8C8C8", "#FF0000",
-		   "#FFFFFF", "#5ADCDC")
-
+pal = c("#003200", "#3C9600", "#006E00", "#556E19", "#00C800", 
+        "#8CBE8C", "#467864", "#B4E664", "#9BC832", "#EBFF64", 
+        "#F06432", "#9132E6", "#E664E6", "#9B82E6", "#B4FEF0", 
+        "#646464", "#C8C8C8", "#FF0000", "#FFFFFF", "#5ADCDC")
 ggplot() +
   geom_spatraster(data = terraland) +
-  scale_fill_manual(values = pal, guide = guide_legend(ncol = 3), name = NULL) + 
+  scale_fill_manual(values = pal, 
+                    guide = guide_legend(ncol = 3), 
+                    name = NULL) + 
   theme(legend.position = 'bottom')
 ```
 
@@ -486,7 +487,7 @@ ggplot() +
 
 ## Зональные операции
 
-```{r, ref.label='land1', echo=F}
+```{r, ref.label='land1', out.height='500px', echo=F}
 ```
 
 ---

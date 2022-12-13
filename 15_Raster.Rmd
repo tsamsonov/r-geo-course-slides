@@ -312,6 +312,104 @@ ggplot() +
 
 ---
 
+## Отмывка рельефа
+
+Отмывка рельефа средствами terra получается при комбинировании растров углов наклона и экспозиции склона. Для повышения контрастности можно предварительно умножить высоты на определенный масштабный коэффициент:
+
+```{r}
+# углы наклона для классической отмывки
+slope_rad10 = terrain(dem * 10, 'slope', unit = 'radians')
+
+# углы наклона для вертикальной отмывки
+slope_rad5 = terrain(dem * 5, 'slope', unit = 'radians')
+
+# экспозиция для любой отмывки
+aspect_rad = terrain(dem, 'aspect', unit = 'radians')
+```
+
+---
+
+## Отмывка рельефа
+
+.pull-left[
+Классическая отмывка при северо-западном освещении:
+```{r shade1, eval=F}
+hill = shade(
+  slope = slope_rad10, 
+  aspect = aspect_rad, 
+  angle = 45, 
+  direction = 315
+)
+
+ggplot() +
+  geom_spatraster(data = hill) +
+  scale_fill_gradient(
+    low = 'black', 
+    high = 'white'
+  ) +
+  ggtitle('Отмывка классическая')
+```
+]
+
+.pull-right[
+```{r, ref.label='shade1', echo=F}
+```
+]
+
+---
+
+## Отмывка рельефа
+
+.pull-left[
+Отвесная отмывка при вертикальном освещении (подчеркивает линии хребтов):
+```{r shade2, eval=F}
+hill_vert = shade(
+  slope = slope_rad5, 
+  aspect = aspect_rad, 
+  angle = 90
+)
+
+ggplot() +
+  geom_spatraster(data = hill_vert) +
+  scale_fill_gradient(
+    low = 'black', 
+    high = 'white'
+  ) +
+  ggtitle('Отмывка отвесная')
+```
+]
+
+.pull-right[
+```{r, ref.label='shade2', echo=F}
+```
+]
+
+---
+
+## Отмывка рельефа
+
+.pull-left[
+Кобинированная отмывка:
+```{r shade3, eval=F}
+hill_comb = hill * hill_vert
+
+ggplot() +
+  geom_spatraster(data = hill_comb) +
+  scale_fill_gradient(
+    low = 'black', 
+    high = 'white'
+  ) +
+  ggtitle('Отмывка комбинированная')
+```
+]
+
+.pull-right[
+```{r, ref.label='shade3', echo=F}
+```
+]
+
+---
+
 ## Анализ расстояний
 
 Доступность станций метро
@@ -366,7 +464,7 @@ ggplot() +
 ## Зональные операции
 
 ```{r land1, eval=F}
-files = list.files('/Volumes/Data/Spatial/WorldClim/2.1',
+files = list.files('/Volumes/Data/Spatial/WorldClim/2.1/tavg',
                    full.names = TRUE)
 temp = rast(files)
 

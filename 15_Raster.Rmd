@@ -236,3 +236,76 @@ ggplot() +
 ```
 ]
 
+---
+
+## Морфометрия рельефа
+
+.pull-left[
+Высоты:
+```{r dem1, eval=F}
+dem = rast('../r-geo-course/data/dem_fergana.tif')
+
+ggplot() +
+  geom_spatraster(data = dem) +
+  scale_fill_hypso_c() +
+  labs(title = 'Ферганская долина', 
+       fill = 'Высота, [м]')
+```
+]
+
+.pull-right[
+```{r, ref.label='dem1', echo=F}
+```
+]
+
+---
+
+## Морфометрия рельефа
+
+.pull-left[
+Углы наклона:
+```{r dem2, eval=F}
+slope = terrain(dem, 'slope', 
+                unit = 'degrees')
+
+ggplot() +
+  geom_spatraster(data = slope) +
+  scale_fill_gradient(
+    low = 'lightcyan', 
+    high = 'darkred'
+  ) +
+  labs(title = 'Углы наклона', 
+       fill = 'Градусы [°]')
+```
+]
+
+.pull-right[
+```{r, ref.label='dem2', echo=F}
+```
+]
+
+---
+
+## Морфометрия рельефа
+
+.pull-left[
+Экспозиция:
+```{r dem3, eval=F}
+aspect = terrain(dem, 'aspect', 
+                 unit = 'degrees')
+
+ggplot() +
+  geom_spatraster(data = aspect) +
+  scale_fill_gradientn(
+    colors = rainbow(9), 
+    values = 0:8 / 8
+  ) +
+  labs(title = 'Экспозиция', 
+       fill = 'Градусы [°]')
+```
+]
+
+.pull-right[
+```{r, ref.label='dem3', echo=F}
+```
+]

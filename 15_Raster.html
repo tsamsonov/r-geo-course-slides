@@ -728,7 +728,42 @@ ggplot() +
 ]
 
 
+---
 
+## Извлечение данных
+
+Одна из наиболее распространенных задач по извлечению растровых данных — это построение профиля вдоль заданной линии. Воспользуемся интерактивным редактором для проведения линии профиля
+
+```r
+mp = mapview(temp$tmean6)
+profile = mapedit::drawFeatures(mp)
+```
+
+&lt;img src="../r-geo-course/images/mapedit_profile.png" width="490" /&gt;
+
+
+
+---
+
+## Извлечение данных
+
+Сначала извлекаются данные вместе с координатами, затем необходимо вычислить кумулятивное расстояние от начала профиля:
+
+
+```r
+temprof = terra::extract(temp, profile, cells = TRUE, xy = TRUE)
+
+tempdf = temprof %&gt;%
+  mutate(dist = 0.001 * c(0, dplyr::select(., x, y) |&gt;  
+                             geosphere::distGeo() |&gt; 
+                             cumsum() |&gt; 
+                             head(-1))) |&gt;  
+  select(-c(x, y, cell, ID)) |&gt; 
+  pivot_longer(-dist, 
+               names_to = 'month', values_to = 'tavg', 
+               names_prefix = 'wc2.1_10m_tavg_', 
+               names_transform = as.integer)
+```
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

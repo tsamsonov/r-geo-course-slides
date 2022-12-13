@@ -516,6 +516,7 @@ ggplot(zonal_stats) +
 
 ## Глобальные операции
 
+.pull-left[
 
 ```r
 global(temp, max, na.rm = T) 
@@ -532,6 +533,12 @@ global(temp, max, na.rm = T)
 ## wc2.1_10m_tavg_10 32.65125
 ## wc2.1_10m_tavg_11 32.78800
 ## wc2.1_10m_tavg_12 32.82525
+```
+]
+
+.pull-right[
+
+```r
 global(temp, min, na.rm = T) 
 ##                         min
 ## wc2.1_10m_tavg_01 -45.88400
@@ -547,6 +554,8 @@ global(temp, min, na.rm = T)
 ## wc2.1_10m_tavg_11 -43.43475
 ## wc2.1_10m_tavg_12 -45.32700
 ```
+]
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

@@ -450,8 +450,16 @@ ggplot(zonal_stats) +
 
 ## Глобальные операции
 
+.pull-left[
 ```{r}
 global(temp, max, na.rm = T) 
+```
+]
+
+.pull-right[
+```{r}
 global(temp, min, na.rm = T) 
 ```
+]
+
 

@@ -580,4 +580,44 @@ global(temp, min, na.rm = T)
 ```
 ]
 
+---
+
+## Извлечение данных
+
+Данные можно извлекать посредством `extract` по объектам различной размерности. Например, в точке:
+
+.pull-left[
+.code-vsmall[
+```{r extr1, eval = F}
+pnt = tibble::tibble(
+  x = -45, y = 70,
+  z = terra::extract(ice.depth, 
+                     bind_cols(x,y))[, 2]
+)
+
+ggplot() +
+  geom_spatraster(data = ice.depth) +
+  scale_fill_gradient(low = 'white', 
+                      high = 'navyblue', 
+                      na.value = "transparent") +
+  geom_point(aes(x, y), pnt, 
+             size = 3, color = 'red') +
+  geom_text(aes(x, y, label = z), 
+            pnt, fontface = 'bold', size = 5,
+            vjust = 'bottom', hjust = 'left',
+            nudge_x = 1, nudge_y = 1) +
+  coord_sf(xlim = c(-80, -10), ylim = c(58, 85)) +
+  labs(title = 'Мощность покровного оледенения',
+       fill = '[м]', x = NULL, y = NULL)
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='extr1', fig.width=4.5, out.height='450px', echo = F}
+```
+]
+
+
+
 

@@ -74,6 +74,7 @@ options(scipen = 999)
 ## coord. ref. : lon/lat WGS 84 (EPSG:4326) 
 ## source      : etopo1_ice.tif 
 ## name        : etopo1_ice
+countries = read_sf('../r-geo-course/data/countries.gpkg')
 ```
 
 ---
@@ -104,6 +105,67 @@ ggplot() +
 
 &lt;img src="15_Raster_files/figure-html/unnamed-chunk-4-1.png" height="350px" /&gt;
 
+---
+
+## Растровая алгебра
+
+__Типы операций:__
+
+- _Локальные_ — анализируется одна ячейка растра или совпадающие в пространстве ячейки нескольких растров
+
+
+- _Фокальные_ — анализируются все ячейки в окрестности. Фокальные методы алгебры карт также называются _методами анализа соседства_.
+
+
+- _Зональные_ — анализируются все ячейки в пределах зон, определяемых извне (например, вторым растровым слоем).
+
+
+- _Глобальные_ — анализируются все ячейки растра.
+
+---
+
+## Локальные операции
+
+Вычисление толщины покровного оледенения
+
+.pull-left[
+.code-small[
+
+```r
+ice.depth = ice - bed
+ice.depth[ice.depth == 0] = NA
+
+ggplot() +
+  geom_spatraster(data = bed) +
+  scale_fill_gradient(low = 'black', 
+                      high = 'white',
+                      guide="none") +
+  new_scale_fill() +
+  geom_spatraster(data = ice.depth) +
+  scale_fill_gradient(low = 'white', 
+                      high = 'navyblue', 
+                      na.value = "transparent") +
+  geom_sf(data = countries, fill = NA) +
+  labs(title = 'Мощность покровного оледенения',
+         fill = '[м]')
+```
+]
+]
+
+.pull-right[
+![](15_Raster_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Фокальные операции
+
+В общем случае фиксированная окрестность может иметь различную форму, однако наиболее часто используется квадратная окрестность размером `\(3\times3\)`:
+
+&lt;div class="figure"&gt;
+&lt;img src="../r-geo-course/images/raster_neighborhoods.png" alt="Виды растровых окрестностей. Темной точкой выделена анализируемая ячейка" width="50%" /&gt;
+&lt;p class="caption"&gt;Виды растровых окрестностей. Темной точкой выделена анализируемая ячейка&lt;/p&gt;
+&lt;/div&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -45,6 +45,7 @@ options(scipen = 999)
 # Чтение данных
 (bed = rast('../r-geo-course/data/etopo1_bed.tif'))
 (ice = rast('../r-geo-course/data/etopo1_ice.tif'))
+countries = read_sf('../r-geo-course/data/countries.gpkg')
 ```
 
 ---
@@ -69,3 +70,63 @@ ggplot() +
   ggtitle('ETOPO Ice surface')
 ```
 
+---
+
+## Растровая алгебра
+
+__Типы операций:__
+
+- _Локальные_ — анализируется одна ячейка растра или совпадающие в пространстве ячейки нескольких растров
+
+
+- _Фокальные_ — анализируются все ячейки в окрестности. Фокальные методы алгебры карт также называются _методами анализа соседства_.
+
+
+- _Зональные_ — анализируются все ячейки в пределах зон, определяемых извне (например, вторым растровым слоем).
+
+
+- _Глобальные_ — анализируются все ячейки растра.
+
+---
+
+## Локальные операции
+
+Вычисление толщины покровного оледенения
+
+.pull-left[
+.code-small[
+```{r depth, eval = F}
+ice.depth = ice - bed
+ice.depth[ice.depth == 0] = NA
+
+ggplot() +
+  geom_spatraster(data = bed) +
+  scale_fill_gradient(low = 'black', 
+                      high = 'white',
+                      guide="none") +
+  new_scale_fill() +
+  geom_spatraster(data = ice.depth) +
+  scale_fill_gradient(low = 'white', 
+                      high = 'navyblue', 
+                      na.value = "transparent") +
+  geom_sf(data = countries, fill = NA) +
+  labs(title = 'Мощность покровного оледенения',
+         fill = '[м]')
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='depth', echo = F}
+```
+]
+
+---
+
+## Фокальные операции
+
+В общем случае фиксированная окрестность может иметь различную форму, однако наиболее часто используется квадратная окрестность размером $3\times3$:
+
+```{r, fig.cap='Виды растровых окрестностей. Темной точкой выделена анализируемая ячейка', echo = FALSE, out.width='50%'}
+knitr::include_graphics('../r-geo-course/images/raster_neighborhoods.png')
+```

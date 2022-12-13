@@ -1,0 +1,71 @@
+---
+title: "Растровый анализ"
+subtitle: "Визуализация и анализ географических данных на языке R"
+author: "Тимофей Самсонов"
+institute: "МГУ имени Ломоносова, Географический факультет"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: [default, "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+---
+
+```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
+library(datasets)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
+knitr::opts_knit$set(global.par = TRUE)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300, crop = T)
+```
+
+## Пакеты
+
+Для выполнения кода данной лекции вам понадобятся следующие пакеты:
+```{r}
+library(sf)
+library(stars)
+library(geosphere)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(terra)
+library(tidyterra)
+library(ggnewscale)
+options(scipen = 999)
+```
+
+---
+
+## Исходные данные
+
+```{r}
+# Чтение данных
+(bed = rast('../r-geo-course/data/etopo1_bed.tif'))
+(ice = rast('../r-geo-course/data/etopo1_ice.tif'))
+```
+
+---
+
+## Исходные данные
+
+```{r, out.height='350px'}
+ggplot() +
+  geom_spatraster(data = bed) +
+  scale_fill_hypso_tint_c(palette = "gmt_globe") +
+  ggtitle('ETOPO Bedrock')
+```
+
+---
+
+## Исходные данные
+
+```{r, out.height='350px'}
+ggplot() +
+  geom_spatraster(data = ice) +
+  scale_fill_hypso_tint_c(palette = "gmt_globe") +
+  ggtitle('ETOPO Ice surface')
+```
+

@@ -309,3 +309,149 @@ ggplot() +
 ```{r, ref.label='dem3', echo=F}
 ```
 ]
+
+---
+
+## Анализ расстояний
+
+Доступность станций метро
+```{r}
+roads = read_sf("../r-geo-course/data/roads.gpkg") # Дороги
+poi = read_sf("../r-geo-course/data/poi_point.gpkg") # Точки интереса
+rayons = read_sf("../r-geo-course/data/boundary_polygon.gpkg") # Границы районов
+stations = read_sf("../r-geo-course/data/metro_stations.gpkg") # Станции метро
+water = read_sf("../r-geo-course/data/water_polygon.gpkg") # Водные объекты
+
+dist_grid = stations |> 
+  rast(resolution = 25) |> 
+  rasterize(stations, y = _) |> 
+  gridDist(NA)
+```
+
+---
+
+## Анализ расстояний
+
+.pull-left[
+.code-small[
+```{r euc, eval=F}
+ggplot() +
+  geom_spatraster_contour_filled(
+    data = dist_grid
+  ) +
+  geom_spatraster_contour(
+    data = dist_grid, 
+    linewidth = 0.25, 
+    color = 'black') +
+  geom_sf(data = water, 
+          linewidth = 0.1) +
+  geom_sf(data = roads, 
+          linewidth = 0.1) +
+  geom_sf(data = stations, 
+          color = 'darkviolet') +
+  labs(title = 'Расстояние до ближайшей станции метро',
+       fill = 'м') +
+  theme_bw()
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='euc', echo=F}
+```
+]
+
+---
+
+## Зональные операции
+
+```{r land1, eval=F}
+files = list.files('/Volumes/Data/Spatial/WorldClim/2.1',
+                   full.names = TRUE)
+temp = rast(files)
+
+data(land, package = 'tmap')
+terraland = rast(land['cover'])
+
+pal = c("#003200", "#3C9600", "#006E00", "#556E19", "#00C800", "#8CBE8C",
+		   "#467864", "#B4E664", "#9BC832", "#EBFF64", "#F06432", "#9132E6",
+		   "#E664E6", "#9B82E6", "#B4FEF0", "#646464", "#C8C8C8", "#FF0000",
+		   "#FFFFFF", "#5ADCDC")
+
+ggplot() +
+  geom_spatraster(data = terraland) +
+  scale_fill_manual(values = pal, guide = guide_legend(ncol = 3), name = NULL) + 
+  theme(legend.position = 'bottom')
+```
+
+---
+
+## Зональные операции
+
+```{r, ref.label='land1', echo=F}
+```
+
+---
+
+## Зональные операции
+
+Необходимо привести растры к общей сетке
+```{r}
+(cover = project(terraland, temp, method = 'near'))
+```
+
+---
+
+## Зональные операции
+
+.pull-left[
+```{r}
+stats = zonal(temp, cover, mean, na.rm = TRUE)
+
+zonal_stats = stats |> 
+  rename(cover = 1) |> 
+  pivot_longer(-cover, 
+               names_to = 'month', values_to = 'tavg', 
+               names_prefix = 'wc2.1_10m_tavg_', 
+               names_transform = as.integer) |> 
+  mutate(month = ordered(month, 1:12, month.abb))
+```
+]
+
+.pull-right[
+```{r}
+head(zonal_stats)
+```
+]
+
+---
+
+## Зональные операции
+
+.pull-left[
+Экспозиция:
+```{r zonal1, eval=F}
+ggplot(zonal_stats) +
+  geom_line(aes(x = month, 
+                y = tavg, 
+                color = cover, 
+                group = cover), 
+            size = 1) +
+  scale_color_manual(values = pal)
+```
+]
+
+.pull-right[
+```{r, ref.label='zonal1', echo=F}
+```
+]
+
+---
+
+## Глобальные операции
+
+```{r}
+global(temp, max, na.rm = T) 
+global(temp, min, na.rm = T) 
+```
+

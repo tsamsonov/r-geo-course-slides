@@ -352,6 +352,202 @@ ggplot() +
 .pull-right[
 ![](15_Raster_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
 ]
+
+---
+
+## Анализ расстояний
+
+Доступность станций метро
+
+```r
+roads = read_sf("../r-geo-course/data/roads.gpkg") # Дороги
+poi = read_sf("../r-geo-course/data/poi_point.gpkg") # Точки интереса
+rayons = read_sf("../r-geo-course/data/boundary_polygon.gpkg") # Границы районов
+stations = read_sf("../r-geo-course/data/metro_stations.gpkg") # Станции метро
+water = read_sf("../r-geo-course/data/water_polygon.gpkg") # Водные объекты
+
+dist_grid = stations |&gt; 
+  rast(resolution = 25) |&gt; 
+  rasterize(stations, y = _) |&gt; 
+  gridDist(NA)
+```
+
+---
+
+## Анализ расстояний
+
+.pull-left[
+.code-small[
+
+```r
+ggplot() +
+  geom_spatraster_contour_filled(
+    data = dist_grid
+  ) +
+  geom_spatraster_contour(
+    data = dist_grid, 
+    linewidth = 0.25, 
+    color = 'black') +
+  geom_sf(data = water, 
+          linewidth = 0.1) +
+  geom_sf(data = roads, 
+          linewidth = 0.1) +
+  geom_sf(data = stations, 
+          color = 'darkviolet') +
+  labs(title = 'Расстояние до ближайшей станции метро',
+       fill = 'м') +
+  theme_bw()
+```
+]
+]
+
+.pull-right[
+![](15_Raster_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Зональные операции
+
+
+```r
+files = list.files('/Volumes/Data/Spatial/WorldClim/2.1',
+                   full.names = TRUE)
+temp = rast(files)
+
+data(land, package = 'tmap')
+terraland = rast(land['cover'])
+
+pal = c("#003200", "#3C9600", "#006E00", "#556E19", "#00C800", "#8CBE8C",
+		   "#467864", "#B4E664", "#9BC832", "#EBFF64", "#F06432", "#9132E6",
+		   "#E664E6", "#9B82E6", "#B4FEF0", "#646464", "#C8C8C8", "#FF0000",
+		   "#FFFFFF", "#5ADCDC")
+
+ggplot() +
+  geom_spatraster(data = terraland) +
+  scale_fill_manual(values = pal, guide = guide_legend(ncol = 3), name = NULL) + 
+  theme(legend.position = 'bottom')
+```
+
+---
+
+## Зональные операции
+
+![](15_Raster_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+
+---
+
+## Зональные операции
+
+Необходимо привести растры к общей сетке
+
+```r
+(cover = project(terraland, temp, method = 'near'))
+## class       : SpatRaster 
+## dimensions  : 1080, 2160, 1  (nrow, ncol, nlyr)
+## resolution  : 0.1666667, 0.1666667  (x, y)
+## extent      : -180, 180, -90, 90  (xmin, xmax, ymin, ymax)
+## coord. ref. : lon/lat WGS 84 (EPSG:4326) 
+## source(s)   : memory
+## categories  : label 
+## name        :                      lyr.1 
+## min value   : Broadleaf Evergreen Forest 
+## max value   :               Water bodies
+```
+
+---
+
+## Зональные операции
+
+.pull-left[
+
+```r
+stats = zonal(temp, cover, mean, na.rm = TRUE)
+
+zonal_stats = stats |&gt; 
+  rename(cover = 1) |&gt; 
+  pivot_longer(-cover, 
+               names_to = 'month', values_to = 'tavg', 
+               names_prefix = 'wc2.1_10m_tavg_', 
+               names_transform = as.integer) |&gt; 
+  mutate(month = ordered(month, 1:12, month.abb))
+```
+]
+
+.pull-right[
+
+```r
+head(zonal_stats)
+## # A tibble: 6 × 3
+##   cover                      month  tavg
+##   &lt;chr&gt;                      &lt;ord&gt; &lt;dbl&gt;
+## 1 Broadleaf Evergreen Forest Jan    23.6
+## 2 Broadleaf Evergreen Forest Feb    23.8
+## 3 Broadleaf Evergreen Forest Mar    24.2
+## 4 Broadleaf Evergreen Forest Apr    24.2
+## 5 Broadleaf Evergreen Forest May    24.0
+## 6 Broadleaf Evergreen Forest Jun    23.4
+```
+]
+
+---
+
+## Зональные операции
+
+.pull-left[
+Экспозиция:
+
+```r
+ggplot(zonal_stats) +
+  geom_line(aes(x = month, 
+                y = tavg, 
+                color = cover, 
+                group = cover), 
+            size = 1) +
+  scale_color_manual(values = pal)
+```
+]
+
+.pull-right[
+![](15_Raster_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Глобальные операции
+
+
+```r
+global(temp, max, na.rm = T) 
+##                        max
+## wc2.1_10m_tavg_01 34.00950
+## wc2.1_10m_tavg_02 32.82425
+## wc2.1_10m_tavg_03 32.90950
+## wc2.1_10m_tavg_04 34.19375
+## wc2.1_10m_tavg_05 36.25325
+## wc2.1_10m_tavg_06 38.35550
+## wc2.1_10m_tavg_07 39.54950
+## wc2.1_10m_tavg_08 38.43275
+## wc2.1_10m_tavg_09 35.79000
+## wc2.1_10m_tavg_10 32.65125
+## wc2.1_10m_tavg_11 32.78800
+## wc2.1_10m_tavg_12 32.82525
+global(temp, min, na.rm = T) 
+##                         min
+## wc2.1_10m_tavg_01 -45.88400
+## wc2.1_10m_tavg_02 -44.80000
+## wc2.1_10m_tavg_03 -57.92575
+## wc2.1_10m_tavg_04 -64.19250
+## wc2.1_10m_tavg_05 -64.81150
+## wc2.1_10m_tavg_06 -64.35825
+## wc2.1_10m_tavg_07 -68.46075
+## wc2.1_10m_tavg_08 -66.52250
+## wc2.1_10m_tavg_09 -64.56325
+## wc2.1_10m_tavg_10 -55.90000
+## wc2.1_10m_tavg_11 -43.43475
+## wc2.1_10m_tavg_12 -45.32700
+```
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

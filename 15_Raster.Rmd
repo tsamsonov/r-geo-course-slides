@@ -658,3 +658,29 @@ tempdf = temprof %>%
                names_transform = as.integer)
 ```
 
+---
+
+## Извлечение данных
+
+.pull-left[
+```{r profile, eval = F}
+ggplot(tempdf, 
+       aes(x = dist, y = tavg)) +
+  geom_line() +
+  geom_smooth(span = 0.1) +
+  annotate('text', x = 0, 
+           y = 10, label = 'A') +
+  annotate('text', x = max(tempdf$dist), 
+           y = 10, label = 'B') +
+  ggtitle('Профиль среднемесячной 
+          температуры июня по линии A—B') +
+  facet_wrap(~month)
+```
+]
+
+.pull-right[
+```{r, ref.label='profile', echo=F}
+```
+]
+
+

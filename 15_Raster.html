@@ -765,6 +765,32 @@ tempdf = temprof %&gt;%
                names_transform = as.integer)
 ```
 
+---
+
+## Извлечение данных
+
+.pull-left[
+
+```r
+ggplot(tempdf, 
+       aes(x = dist, y = tavg)) +
+  geom_line() +
+  geom_smooth(span = 0.1) +
+  annotate('text', x = 0, 
+           y = 10, label = 'A') +
+  annotate('text', x = max(tempdf$dist), 
+           y = 10, label = 'B') +
+  ggtitle('Профиль среднемесячной 
+          температуры июня по линии A—B') +
+  facet_wrap(~month)
+```
+]
+
+.pull-right[
+![](15_Raster_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+]
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -205,3 +205,34 @@ ggplot() +
 ```
 ]
 
+---
+
+## Распознавание границ
+
+.pull-left[
+```{r sobel2, eval=F}
+# Отберем все ячейки, обладающие 
+# высокими значениями производных
+faults = abs(filtered) > 1500
+faults[faults == 0] = NA
+
+ggplot() +
+  geom_spatraster(data = dem) +
+  scale_fill_hypso_tint_c(
+    palette = "etopo1"
+  ) + 
+  new_scale_fill() +
+  geom_spatraster(data = faults) +
+  scale_fill_discrete(
+    type = 'black', 
+    na.value = "transparent"
+  ) +
+  ggtitle('Уступы континента')
+```
+]
+
+.pull-right[
+```{r, ref.label='sobel2', echo=F}
+```
+]
+

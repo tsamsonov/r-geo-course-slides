@@ -248,6 +248,37 @@ ggplot() +
 ![](15_Raster_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
 ]
 
+---
+
+## Распознавание границ
+
+.pull-left[
+
+```r
+# Отберем все ячейки, обладающие 
+# высокими значениями производных
+faults = abs(filtered) &gt; 1500
+faults[faults == 0] = NA
+
+ggplot() +
+  geom_spatraster(data = dem) +
+  scale_fill_hypso_tint_c(
+    palette = "etopo1"
+  ) + 
+  new_scale_fill() +
+  geom_spatraster(data = faults) +
+  scale_fill_discrete(
+    type = 'black', 
+    na.value = "transparent"
+  ) +
+  ggtitle('Уступы континента')
+```
+]
+
+.pull-right[
+![](15_Raster_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+]
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

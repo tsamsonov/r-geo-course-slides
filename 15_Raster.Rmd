@@ -91,7 +91,7 @@ __Типы операций:__
 
 ## Локальные операции
 
-Вычисление толщины покровного оледенения
+Вычисление мощности покровного оледенения
 
 .pull-left[
 .code-small[
@@ -130,3 +130,78 @@ ggplot() +
 ```{r, fig.cap='Виды растровых окрестностей. Темной точкой выделена анализируемая ячейка', echo = FALSE, out.width='50%'}
 knitr::include_graphics('../r-geo-course/images/raster_neighborhoods.png')
 ```
+
+---
+
+## Сглаживание
+
+```{r}
+# Вырежем кусок из ЦМР
+dem = crop(ice, ext(-120, -75, 10, 40))
+
+# Среднее
+wgt = matrix(c(1, 1, 1,
+               1, 1, 1,
+               1, 1, 1) / 9, 
+              nrow = 3)
+# на самом деле проще написать так:
+# wgt = matrix(1/9, 3, 3), но полная форма записана для наглядности
+
+# выполним обработку ЦМР с помощью фокального фильтра
+filtered = focal(dem, w = wgt)
+```
+
+---
+
+## Сглаживание
+
+```{r, out.height='350px'}
+ggplot() +
+  geom_spatraster(data = c(dem, filtered)) +
+  scale_fill_hypso_tint_c(palette = "etopo1") + 
+  facet_wrap(~lyr)
+```
+
+---
+
+## Гауссово сглаживание
+
+```{r, out.height='300px'}
+filtered = focal(dem, focalMat(dem, 0.5, "Gauss"))
+
+ggplot() +
+  geom_spatraster(data = c(dem, filtered)) +
+  scale_fill_hypso_tint_c(palette = "etopo1") + 
+  facet_wrap(~lyr)
+```
+
+---
+
+## Распознавание границ
+
+.pull-left[
+```{r sobel, eval=F}
+# Матрица Собеля:
+wgt = matrix(c(1, 2, 1,
+                0, 0, 0,
+               -1,-2,-1) / 4, 
+              nrow=3)
+filtered = focal(dem, wgt)
+
+# Это поверхность производных:
+
+ggplot() +
+  geom_spatraster(data = filtered) +
+  scale_fill_gradient2(
+    low = 'navyblue', 
+     high = 'darkred'
+  ) +
+  ggtitle('Производная поверхности')
+```
+]
+
+.pull-right[
+```{r, ref.label='sobel', echo=F}
+```
+]
+

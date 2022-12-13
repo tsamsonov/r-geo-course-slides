@@ -504,44 +504,63 @@ ggplot() +
 ## Зональные операции
 
 .pull-left[
+.code-small[
 ```{r}
-stats = zonal(temp, cover, mean, na.rm = TRUE)
+cover_north = crop(
+  cover, ext(-180, 180, 0, 90)
+)
+temp_north = crop(
+  temp, ext(-180, 180, 0, 90)
+)
+stats = zonal(temp_north, cover_north, 
+              mean, na.rm = TRUE)
 
 zonal_stats = stats |> 
   rename(cover = 1) |> 
-  pivot_longer(-cover, 
-               names_to = 'month', values_to = 'tavg', 
-               names_prefix = 'wc2.1_10m_tavg_', 
-               names_transform = as.integer) |> 
-  mutate(month = ordered(month, 1:12, month.abb))
+  pivot_longer(
+    -cover, 
+    names_to = 'month', 
+    values_to = 'tavg', 
+    names_prefix = 'wc2.1_10m_tavg_', 
+    names_transform = as.integer
+  ) |> 
+  mutate(month = ordered(month, 1:12, 
+                         month.abb))
 ```
+]
 ]
 
 .pull-right[
+.code-vsmall[
 ```{r}
-head(zonal_stats)
+head(zonal_stats, 20)
 ```
+]
 ]
 
 ---
 
 ## Зональные операции
 
-.pull-left[
-Экспозиция:
+.left-40[
+Климатограммы:
 ```{r zonal1, eval=F}
 ggplot(zonal_stats) +
-  geom_line(aes(x = month, 
-                y = tavg, 
-                color = cover, 
-                group = cover), 
-            size = 1) +
-  scale_color_manual(values = pal)
+  geom_line(
+    aes(x = month, 
+        y = tavg, 
+        color = cover, 
+        group = cover), 
+    size = 1
+  ) +
+  scale_color_manual(
+    values = pal
+  )
 ```
 ]
 
-.pull-right[
-```{r, ref.label='zonal1', echo=F}
+.right-60[
+```{r, ref.label='zonal1', out.height='500px', fig.width=9, echo=F}
 ```
 ]
 

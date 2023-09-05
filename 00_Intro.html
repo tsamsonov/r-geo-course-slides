@@ -4,8 +4,8 @@
     <title>Язык программирования R</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2022-09-06" />
-    <script src="libs/header-attrs-2.15/header-attrs.js"></script>
+    <meta name="date" content="2023-09-05" />
+    <script src="libs/header-attrs-2.23/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2022-09-06
+### 2023-09-05
 ]
 
 ---
@@ -89,29 +89,45 @@ library(tiobeindexr)
 ## Downloading TIOBE Index Data using your Internet...
 top_20()
 ## # A tibble: 20 × 5
-##    `Sep 2022` `Sep 2021` `Programming Language` `Programming Language` Ratings
+##    `Aug 2023` `Aug 2022` `Programming Language` `Programming Language` Ratings
 ##         &lt;int&gt;      &lt;int&gt; &lt;lgl&gt;                  &lt;chr&gt;                  &lt;chr&gt;  
-##  1          1          2 NA                     Python                 15.74% 
-##  2          2          1 NA                     C                      13.96% 
-##  3          3          3 NA                     Java                   11.72% 
-##  4          4          4 NA                     C++                    9.76%  
-##  5          5          5 NA                     C#                     4.88%  
-##  6          6          6 NA                     Visual Basic           4.39%  
-##  7          7          7 NA                     JavaScript             2.82%  
-##  8          8          8 NA                     Assembly language      2.49%  
-##  9          9         10 NA                     SQL                    2.01%  
-## 10         10          9 NA                     PHP                    1.68%  
-## 11         11         24 NA                     Objective-C            1.49%  
-## 12         12         14 NA                     Go                     1.16%  
-## 13         13         20 NA                     Delphi/Object Pascal   1.09%  
-## 14         14         16 NA                     MATLAB                 1.06%  
-## 15         15         17 NA                     Fortran                1.03%  
-## 16         16         15 NA                     Swift                  0.98%  
-## 17         17         11 NA                     Classic Visual Basic   0.98%  
-## 18         18         18 NA                     R                      0.95%  
-## 19         19         19 NA                     Perl                   0.72%  
-## 20         20         13 NA                     Ruby                   0.66%
+##  1          1          1 NA                     Python                 13.33% 
+##  2          2          2 NA                     C                      11.41% 
+##  3          3          4 NA                     C++                    10.63% 
+##  4          4          3 NA                     Java                   10.33% 
+##  5          5          5 NA                     C#                     7.04%  
+##  6          6          8 NA                     JavaScript             3.29%  
+##  7          7          6 NA                     Visual Basic           2.63%  
+##  8          8          9 NA                     SQL                    1.53%  
+##  9          9          7 NA                     Assembly language      1.34%  
+## 10         10         10 NA                     PHP                    1.27%  
+## 11         11         21 NA                     Scratch                1.22%  
+## 12         12         15 NA                     Go                     1.16%  
+## 13         13         17 NA                     MATLAB                 1.05%  
+## 14         14         18 NA                     Fortran                1.03%  
+## 15         15         31 NA                     COBOL                  0.96%  
+## 16         16         16 NA                     R                      0.92%  
+## 17         17         19 NA                     Ruby                   0.91%  
+## 18         18         11 NA                     Swift                  0.90%  
+## 19         19         22 NA                     Rust                   0.89%  
+## 20         20         28 NA                     Julia                  0.85%
 ```
+]
+
+
+---
+
+# Рейтинг популярности PYPL
+
+.left-40[
+__PYPL__ _(PopularitY of Programming Language Index)_ — показывает, насколько часто люди ищут обучающие материалы по языкам программирования на _Google_
+
+&lt;img src="img/pypl.png" width="70%" /&gt;
+https://pypl.github.io/PYPL.html
+]
+
+.right-60[
+&lt;img src="img/pypl2023.png" width="100%" /&gt;
 ]
 
 ---
@@ -119,8 +135,8 @@ top_20()
 # Ранг популярности на GitHub
 
 .left-60[
-&lt;img src="img/redmonk2022Q1.png" width="95%" /&gt;
-.vsmall[https://redmonk.com/sogrady/2021/08/05/language-rankings-6-21/]
+&lt;img src="img/redmonk2023Q1.png" width="90%" /&gt;
+.vsmall[https://redmonk.com/sogrady/2023/05/16/language-rankings-1-23/]
 ]
 
 .right-40[
@@ -256,7 +272,7 @@ microbenchmark(
 ) |&gt; 
   summary() |&gt; 
   pull(mean)
-## [1] 1709.18019  354.62125    8.01282
+## [1] 1982.58597  411.09888    7.33929
 ```
 ]
 ]
@@ -297,7 +313,7 @@ select(starwars, 'name', 'mass')
 ##  8 R5-D4                 32
 ##  9 Biggs Darklighter     84
 ## 10 Obi-Wan Kenobi        77
-## # … with 77 more rows
+## # ℹ 77 more rows
 ```
 ]]
 
@@ -320,7 +336,7 @@ select(starwars, name, mass)
 ##  8 R5-D4                 32
 ##  9 Biggs Darklighter     84
 ## 10 Obi-Wan Kenobi        77
-## # … with 77 more rows
+## # ℹ 77 more rows
 ```
 ]]
 

@@ -37,7 +37,7 @@ colors
 ```
 
 ```{r, collapse=TRUE}
-lengths = c(28, 40, 45, 19, 38)
+lengths = c(41, 43, 45, 19, 38)
 lengths
 ```
 
@@ -91,14 +91,14 @@ lengths[c(5, 1, 4, 2)]
 Извлечение по условию:
 ```{r}
 lengths
-lengths > 20
-lengths[lengths > 20]
+lengths > 40
+lengths[lengths > 40]
 ```
 ]
 
 Формирование по условию:
 ```{r}
-ifelse(lengths > 20, 'Длинная', 'Короткая')
+ifelse(lengths > 40, 'Длинная', 'Короткая')
 ```
 
 ---
@@ -110,7 +110,7 @@ ifelse(lengths > 20, 'Длинная', 'Короткая')
 ```{r, collapse=TRUE}
 lengths * 1000 
 sqrt(lengths)
-stations = c(20, 21, 22, 12, 24)
+stations = c(26, 24, 22, 12, 24)
 stations / lengths
 ```
 ]
@@ -285,7 +285,6 @@ res[[1]]  # элемент!
 res[["sum"]]  # элемент!
 res$sum
 ```
-
 ]
 
 
@@ -428,7 +427,7 @@ for (i in 1:10) {
 
 # Циклы
 
-Пример — вычисление медианы для каждого столбца таблицы линий метро:
+Пример по столбцам — вычисление медианы каждой переменной:
 ```{r}
 n = ncol(df)
 medians = vector('numeric', n)
@@ -442,6 +441,20 @@ for (i in 1:n) {
 }
 colnames(df) # Переменные
 medians # Медианные значения
+```
+
+---
+
+# Циклы
+
+Пример по строкам — вывод информации о каждой станции:
+```{r}
+k = nrow(df)
+
+for (i in 1:k) {
+  cat(df[i, 'colors'],  'ветка метро имеет длину', 
+      df[i, 'lengths'], 'км', fill = TRUE)
+}
 ```
 
 ---

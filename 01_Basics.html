@@ -4,8 +4,8 @@
     <title>Типы данных, условия, ввод и вывод</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2022-09-06" />
-    <script src="libs/header-attrs-2.15/header-attrs.js"></script>
+    <meta name="date" content="2023-09-05" />
+    <script src="libs/header-attrs-2.23/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2022-09-06
+### 2023-09-05
 ]
 
 ---
@@ -271,7 +271,7 @@ birth
 ```r
 current = Sys.Date()
 current
-## [1] "2022-09-06"
+## [1] "2023-09-05"
 ```
 
 ---
@@ -282,14 +282,14 @@ current
 
 ```r
 current - birth
-## Time difference of 13349 days
+## Time difference of 13713 days
 ```
 
 Сложение даты и интервала дает новую дату:
 
 ```r
 current + 40
-## [1] "2022-10-16"
+## [1] "2023-10-15"
 ```
 
 ---
@@ -437,7 +437,7 @@ as.integer(2.7)
 a = 2.5
 b = as.character(a)
 b + 2
-## Error in b + 2: нечисловой аргумент для бинарного оператора
+## Error in b + 2: non-numeric argument to binary operator
 nchar(b)
 ## [1] 3
 ```
@@ -525,7 +525,7 @@ print(paste("2 в степени 10 равно", 2^10))
 ## [1] "2 в степени 10 равно 1024"
 
 print(paste("Сегодняшняя дата - ", Sys.Date()))
-## [1] "Сегодняшняя дата -  2022-09-06"
+## [1] "Сегодняшняя дата -  2023-09-05"
 ```
 
 ---
@@ -552,7 +552,7 @@ cat("2 в степени 10 равно", 2^10)
 ## 2 в степени 10 равно 1024
 
 cat("Сегодняшнаяя дата -", Sys.Date())
-## Сегодняшнаяя дата - 19241
+## Сегодняшнаяя дата - 19605
 ```
 
 ---
@@ -563,9 +563,9 @@ cat("Сегодняшнаяя дата -", Sys.Date())
 
 ```r
 (a = rnorm(1)) # сгенерируем случайное число, запишем в переменную и выведем на экран
-## [1] 0.464623
+## [1] 0.2090505
 (b = 2 * a) # переменная a доступна, ее можно использовать и далее для вычислений
-## [1] 0.929246
+## [1] 0.4181009
 ```
 
 ---
@@ -593,7 +593,7 @@ if (condition) {
 
 ```r
 (a = round(rnorm(1), 1))
-## [1] -0.3
+## [1] 0.3
 
 if (a &lt; 0){
   cat('Получилось отрицательное число!')
@@ -602,7 +602,7 @@ if (a &lt; 0){
 } else {
   cat('Получился нуль!')
 }
-## Получилось отрицательное число!
+## Получилось положительное число!
 ```
 
 ---

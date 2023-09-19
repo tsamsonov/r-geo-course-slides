@@ -95,8 +95,6 @@ tribble(
 ```
 ]
 
-
-
 ---
 
 ## Встроенные данные
@@ -283,6 +281,26 @@ View(wenergy)
 
 ---
 
+## Конфликты функций
+
+Поскольку функция `filter()` существует также в базовом пакете __stats__, необходимо ее как-то отличать от функции __dplyr__. Для этого есть 2 пути. Вы можете при вызове функции каждый указывать квалификатор пространства имен перед названием функции:
+
+
+```r
+dplyr::filter()
+stats::filter()
+```
+
+Другой вариант — это объявить в начале программы предпочтительную функцию, используя пакет __conflicted__ (устанавливается вместе с __tidyverse__):
+
+
+```r
+conflicted::conflicts_prefer(dplyr::filter)
+## [conflicted] Will prefer dplyr::filter over any other package.
+```
+
+---
+
 # Грамматика манипуляций
 
 Для начала переименуем столбцы с годами, чтобы их названия начинались с буквы `y`:
@@ -310,14 +328,6 @@ head(reforest)
 
 ```r
 library(dplyr)
-## 
-## Attaching package: 'dplyr'
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
 (rdf = select(reforest, Region, y2010, y2015))
 ## # A tibble: 89 × 3
 ##    Region                        y2010 y2015

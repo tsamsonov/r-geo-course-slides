@@ -226,8 +226,6 @@ regdf = filter(rdf, !flt) # применяем фильтр
 head(regdf)
 ```
 
-
-
 ---
 
 ## Сортировка
@@ -331,7 +329,6 @@ summarise(regdf_gr, total = sum(y2015, na.rm = TRUE))
 
 С помощью пайп-оператора код по нахождению региона-лидера можно записать так:
 ```{r, echo = FALSE}
-library(tidyr)
 regdf = rdf |> 
   mutate(okrug = if_else(flt2, Region, NA)) |> 
   fill(okrug) |> 
@@ -400,7 +397,6 @@ leaders = regdf |>
 
 `pivot_longer()`: широкая форма в длинную форму
 ```{r}
-library(tidyr)
 (reforest_tidy = reforest |>
     pivot_longer(cols = y2005:y2016,
                  names_to = 'year', 
@@ -489,14 +485,23 @@ reforest_tidy |>
 
 ---
 
-## Соединение
+## Соединение (старый стиль)
 
 `inner_join()`: соединяем лесозаготовки и лесовосстановление по региону и году
 ```{r}
 (compare = reforest_tidy |> 
-  inner_join(timber_tidy, 
-             by = c("Region" = "Region", 
-                    "year" = "year"))
+  inner_join(timber_tidy, by = c('Region' = 'Region', 'year' = 'year'))
+)
+```
+
+---
+
+## Соединение (новый стиль `join_by`)
+
+`inner_join()`: соединяем лесозаготовки и лесовосстановление по региону и году
+```{r}
+(compare = reforest_tidy |> 
+  inner_join(timber_tidy, by = join_by(Region, year))
 )
 ```
 
@@ -527,6 +532,24 @@ write_csv(compare, "../r-geo-course/data/output/timber_compare.csv")
 library(writexl)
 write_xlsx(compare, "../r-geo-course/data/output/timber_compare.xlsx")
 ```
+
+---
+
+## Подключение всех библиотек
+
+```{r, include=FALSE}
+detach("package:dplyr", unload=TRUE)
+detach("package:tidyr", unload=TRUE)
+detach("package:stringr", unload=TRUE)
+detach("package:readr", unload=TRUE)
+detach("package:tibble", unload=TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+Обратите внимание, что при подключении __tidyverse__ автоматически производится маскирование конфликтующих функций.
 
 ---
 

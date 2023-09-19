@@ -423,8 +423,6 @@ head(regdf)
 ## 6 Калужская область      2.3   3.2
 ```
 
-
-
 ---
 
 ## Сортировка
@@ -690,7 +688,6 @@ leaders = regdf |&gt;
 `pivot_longer()`: широкая форма в длинную форму
 
 ```r
-library(tidyr)
 (reforest_tidy = reforest |&gt;
     pivot_longer(cols = y2005:y2016,
                  names_to = 'year', 
@@ -858,15 +855,39 @@ reforest_tidy |&gt;
 
 ---
 
-## Соединение
+## Соединение (старый стиль)
 
 `inner_join()`: соединяем лесозаготовки и лесовосстановление по региону и году
 
 ```r
 (compare = reforest_tidy |&gt; 
-  inner_join(timber_tidy, 
-             by = c("Region" = "Region", 
-                    "year" = "year"))
+  inner_join(timber_tidy, by = c('Region' = 'Region', 'year' = 'year'))
+)
+## # A tibble: 511 × 4
+##    Region                year value harvest
+##    &lt;chr&gt;                &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Белгородская область  2010   0.1    30.4
+##  2 Белгородская область  2011   0.3    39.6
+##  3 Белгородская область  2012   0.3    27.7
+##  4 Белгородская область  2013   0.4    37.4
+##  5 Белгородская область  2014   0.4    34.1
+##  6 Белгородская область  2015   0.2    45.6
+##  7 Белгородская область  2016   0.2    30.4
+##  8 Брянская область      2010   2.8   614. 
+##  9 Брянская область      2011   3     616. 
+## 10 Брянская область      2012   3.2   824. 
+## # ℹ 501 more rows
+```
+
+---
+
+## Соединение (новый стиль `join_by`)
+
+`inner_join()`: соединяем лесозаготовки и лесовосстановление по региону и году
+
+```r
+(compare = reforest_tidy |&gt; 
+  inner_join(timber_tidy, by = join_by(Region, year))
 )
 ## # A tibble: 511 × 4
 ##    Region                year value harvest
@@ -928,6 +949,29 @@ write_csv(compare, "../r-geo-course/data/output/timber_compare.csv")
 library(writexl)
 write_xlsx(compare, "../r-geo-course/data/output/timber_compare.xlsx")
 ```
+
+---
+
+## Подключение всех библиотек
+
+
+
+
+```r
+library(tidyverse)
+## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.2     ✔ readr     2.1.4
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ ggplot2   3.4.2     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+## ✔ purrr     1.0.1     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+```
+
+Обратите внимание, что при подключении __tidyverse__ автоматически производится маскирование конфликтующих функций.
 
 ---
 

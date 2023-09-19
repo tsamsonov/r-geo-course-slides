@@ -204,7 +204,8 @@ filter(rdf, y2015 > 50)
 ## Выбор строк (фильтрация)
 
 ```{r}
-flt = stringr::str_detect(rdf$Region, 'Федерация|федеральный округ')
+library(stringr)
+flt = str_detect(rdf$Region, 'Федерация|федеральный округ')
 flt
 regdf = filter(rdf, !flt) # применяем фильтр
 head(regdf)
@@ -267,9 +268,10 @@ summarise(regdf,
 
 Исходные данные:
 ```{r, echo=FALSE}
-flt2 = stringr::str_detect(rdf$Region, 'федеральный округ') # ищем округа
-rdf2 = mutate(rdf, okrug = if_else(flt2, Region, NULL)) # перенесем названия округов в новый столбец
-rdf2 = tidyr::fill(rdf2, okrug) # заполним все пустые строчки предыдущим значением
+library(tidyr)
+flt2 = str_detect(rdf$Region, 'федеральный округ') # ищем округа
+rdf2 = mutate(rdf, okrug = if_else(flt2, Region, NA)) # перенесем названия округов в новый столбец
+rdf2 = fill(rdf2, okrug) # заполним все пустые строчки предыдущим значением
 (regdf = filter(rdf2, !flt)) # оставим только регионы
 ```
 
@@ -316,7 +318,7 @@ summarise(regdf_gr, total = sum(y2015, na.rm = TRUE))
 ```{r, echo = FALSE}
 library(tidyr)
 regdf = rdf |> 
-  mutate(okrug = if_else(flt2, Region, NULL)) |> 
+  mutate(okrug = if_else(flt2, Region, NA)) |> 
   fill(okrug) |> 
   filter(flt)
 ```
@@ -454,7 +456,7 @@ reforest_tidy |>
 ```{r}
 (timber = read_excel('../r-geo-course/data/timber.xlsx', 
                     col_types = c('text', rep('numeric', 8))) |>
-  filter(!stringr::str_detect(Регион, 'Федерация|федеральный округ')))
+  filter(!str_detect(Регион, 'Федерация|федеральный округ')))
 ```
 
 ---
@@ -476,7 +478,7 @@ reforest_tidy |>
 
 `inner_join()`: соединяем лесозаготовки и лесовосстановление по региону и году
 ```{r}
-(compare = reforest_tidy %>% 
+(compare = reforest_tidy |> 
   inner_join(timber_tidy, 
              by = c("Region" = "Region", 
                     "year" = "year"))
@@ -489,9 +491,9 @@ reforest_tidy |>
 
 Вычисляем соотношение:
 ```{r}
-(compare = compare %>% 
-   mutate(ratio = 1000 * value / harvest) %>% 
-   select(Region, year, ratio, value, harvest) %>% 
+(compare = compare |> 
+   mutate(ratio = 1000 * value / harvest) |> 
+   select(Region, year, ratio, value, harvest) |> 
    arrange(year, desc(ratio)))
 ```
 

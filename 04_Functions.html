@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Техники программирования</title>
+    <title>Функции</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2021-10-04" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <meta name="date" content="2023-09-26" />
+    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -13,11 +13,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Техники программирования
+.title[
+# Функции
+]
+.subtitle[
 ## Визуализация и анализ географических данных на языке R
+]
+.author[
 ### Тимофей Самсонов
+]
+.institute[
 ### МГУ имени Ломоносова, Географический факультет
-### 2021-10-04
+]
+.date[
+### 2023-09-26
+]
 
 ---
 
@@ -61,7 +71,7 @@ d23 = distance(x[2], y[2], x[3], y[3])
 d31 = distance(x[3], y[3], x[4], y[4])
 
 cat(d12, d23, d31)
-## 12.54351 13.82805 2.406496
+## 24.41829 30.26976 9.28823
 ```
 
 ---
@@ -79,14 +89,14 @@ distances = function(xy) {
 }
 
 (coords = cbind(x, y))
-##              x          y
-## [1,] 10.057869 -13.509258
-## [2,]  3.525228  -2.801124
-## [3,] -6.907366   6.274999
-## [4,] -9.112774   7.238014
+##               x         y
+## [1,] -0.2601101  1.239386
+## [2,]  2.5045296 25.500668
+## [3,] 10.1409592 -3.790000
+## [4,]  6.0966813  4.571521
 
 distances(coords)
-## [1] 12.543505 13.828052  2.406496
+## [1] 24.41829 30.26976  9.28823
 ```
 
 ---
@@ -101,7 +111,7 @@ line_length = function(xy) {
 }
 
 line_length(coords)
-## [1] 28.77805
+## [1] 63.97628
 ```
 
 Полученные функции образуют иерархию вызовов:
@@ -126,10 +136,10 @@ line_params = function(xy) {
 
 result = line_params(coords)
 result$length
-## [1] 28.77805
+## [1] 63.97628
 result$sinuosity
 ##        x 
-## 1.018756
+## 8.913846
 ```
 
 ---
@@ -173,15 +183,15 @@ __Функционал__ — это функция, которая приним�
 library(readxl)
 library(dplyr)
 ## 
-## Присоединяю пакет: 'dplyr'
-## Следующие объекты скрыты от 'package:stats':
+## Attaching package: 'dplyr'
+## The following objects are masked from 'package:stats':
 ## 
 ##     filter, lag
-## Следующие объекты скрыты от 'package:base':
+## The following objects are masked from 'package:base':
 ## 
 ##     intersect, setdiff, setequal, union
 (df = read_excel("../r-geo-course/data/sevzap.xlsx", col_types = c('text', rep('numeric', 17))))
-## # A tibble: 10 x 18
+## # A tibble: 10 × 18
 ##    city     pop birth death  labor salary livspace doctors  hosp assets business
 ##    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
 ##  1 Петр…  277.   13    12.3   72.3 36268.     24.4    75      17 2.47e5    15856
@@ -194,7 +204,7 @@ library(dplyr)
 ##  8 Вели…  222.   13.8  13.8   74.1 32377.     24.1    78.9    14 1.59e5     9583
 ##  9 Псков  208.   13.2  13.7   59.6 27405.     25      59      13 1.31e5     8752
 ## 10 Санк… 5226.   13.6  11.9 2055.  44187      23.6    73.8   112 4.10e6   374999
-## # … with 7 more variables: minerals &lt;dbl&gt;, manufact &lt;dbl&gt;, engaswat &lt;dbl&gt;,
+## # ℹ 7 more variables: minerals &lt;dbl&gt;, manufact &lt;dbl&gt;, engaswat &lt;dbl&gt;,
 ## #   construct &lt;dbl&gt;, apart &lt;dbl&gt;, retail &lt;dbl&gt;, invest &lt;dbl&gt;
 ```
 
@@ -238,7 +248,7 @@ sapply(df[-1], max)
 lapply(df[-1], function(X) { 
   round(X/mean(X,na.rm = TRUE),2) 
 }) |&gt; as_tibble()
-## # A tibble: 10 x 17
+## # A tibble: 10 × 17
 ##      pop birth death labor salary livspace doctors  hosp assets business
 ##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
 ##  1  0.36  0.93  1.04  0.26   0.89     1.01    1.05  0.67   0.35     0.31
@@ -251,7 +261,7 @@ lapply(df[-1], function(X) {
 ##  8  0.29  0.99  1.17  0.27   0.79     0.99    1.11  0.56   0.22     0.19
 ##  9  0.27  0.94  1.16  0.22   0.67     1.03    0.83  0.52   0.18     0.17
 ## 10  6.83  0.97  1.01  7.42   1.08     0.97    1.03  4.44   5.76     7.37
-## # … with 7 more variables: minerals &lt;dbl&gt;, manufact &lt;dbl&gt;, engaswat &lt;dbl&gt;,
+## # ℹ 7 more variables: minerals &lt;dbl&gt;, manufact &lt;dbl&gt;, engaswat &lt;dbl&gt;,
 ## #   construct &lt;dbl&gt;, apart &lt;dbl&gt;, retail &lt;dbl&gt;, invest &lt;dbl&gt;
 ```
 ]
@@ -264,7 +274,7 @@ lapply(df[-1], function(X) {
 *lapply(df[-1], \(X) {
   round(X/mean(X,na.rm = TRUE),2) 
 }) |&gt; as_tibble()
-## # A tibble: 10 x 17
+## # A tibble: 10 × 17
 ##      pop birth death labor salary livspace doctors  hosp assets business
 ##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
 ##  1  0.36  0.93  1.04  0.26   0.89     1.01    1.05  0.67   0.35     0.31
@@ -277,7 +287,7 @@ lapply(df[-1], function(X) {
 ##  8  0.29  0.99  1.17  0.27   0.79     0.99    1.11  0.56   0.22     0.19
 ##  9  0.27  0.94  1.16  0.22   0.67     1.03    0.83  0.52   0.18     0.17
 ## 10  6.83  0.97  1.01  7.42   1.08     0.97    1.03  4.44   5.76     7.37
-## # … with 7 more variables: minerals &lt;dbl&gt;, manufact &lt;dbl&gt;, engaswat &lt;dbl&gt;,
+## # ℹ 7 more variables: minerals &lt;dbl&gt;, manufact &lt;dbl&gt;, engaswat &lt;dbl&gt;,
 ## #   construct &lt;dbl&gt;, apart &lt;dbl&gt;, retail &lt;dbl&gt;, invest &lt;dbl&gt;
 ```
 ]
@@ -297,7 +307,7 @@ normalize = function(X) {
 }
 
 df |&gt; lapply(normalize) |&gt; as_tibble()
-## # A tibble: 10 x 18
+## # A tibble: 10 × 18
 ##    city      pop birth death labor salary livspace doctors  hosp assets business
 ##    &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
 ##  1 Петроз…  0.36  0.93  1.04  0.26   0.89     1.01    1.05  0.67   0.35     0.31
@@ -310,7 +320,7 @@ df |&gt; lapply(normalize) |&gt; as_tibble()
 ##  8 Велики…  0.29  0.99  1.17  0.27   0.79     0.99    1.11  0.56   0.22     0.19
 ##  9 Псков    0.27  0.94  1.16  0.22   0.67     1.03    0.83  0.52   0.18     0.17
 ## 10 Санкт-…  6.83  0.97  1.01  7.42   1.08     0.97    1.03  4.44   5.76     7.37
-## # … with 7 more variables: minerals &lt;dbl&gt;, manufact &lt;dbl&gt;, engaswat &lt;dbl&gt;,
+## # ℹ 7 more variables: minerals &lt;dbl&gt;, manufact &lt;dbl&gt;, engaswat &lt;dbl&gt;,
 ## #   construct &lt;dbl&gt;, apart &lt;dbl&gt;, retail &lt;dbl&gt;, invest &lt;dbl&gt;
 ```
 
@@ -384,6 +394,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

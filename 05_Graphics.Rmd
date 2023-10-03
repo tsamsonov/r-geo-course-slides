@@ -429,11 +429,11 @@ colors()[1:20]
 ]
 
 .pull-right[
-[Палитра](http://research.stowers-institute.org/efg/R/Color/Chart/ColorChart.pdf) предопределенных цветов:
+[Палитра](https://www.stat.auckland.ac.nz/~ihaka/downloads/R-colours-a4.pdf) предопределенных цветов:
 ```{r, echo = F}
-knitr::include_url("http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf")
+knitr::include_url("https://www.stat.auckland.ac.nz/~ihaka/downloads/R-colours-a4.pdf")
 ```
-.small[http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf]
+.small[https://www.stat.auckland.ac.nz/~ihaka/downloads/R-colours-a4.pdf]
 ]
 
 ---

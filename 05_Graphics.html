@@ -4,8 +4,8 @@
     <title>Основы графики</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2021-10-06" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <meta name="date" content="2023-10-03" />
+    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -13,11 +13,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Основы графики
+]
+.subtitle[
 ## Визуализация и анализ географических данных на языке R
+]
+.author[
 ### Тимофей Самсонов
+]
+.institute[
 ### МГУ имени Ломоносова, Географический факультет
-### 2021-10-06
+]
+.date[
+### 2023-10-03
+]
 
 ---
 
@@ -30,7 +40,7 @@ __Исходные данные:__ экспорт/импорт продукци�
 
 
 ```
-## # A tibble: 12 x 5
+## # A tibble: 12 × 5
 ##    Регион               ПродЭкспорт ПродИмпорт ТЭКЭкспорт ТЭКИмпорт
 ##    &lt;chr&gt;                      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
 ##  1 Белгородская область       222.       614.        64.7      24.1
@@ -129,7 +139,7 @@ plot(sub$МетЭкспорт, sub$МетИмпорт, col="red", xlab="Эксп
 
 ```
 ## ℹ Using "','" as decimal and "'.'" as grouping mark. Use `read_delim()` for more control.
-## # A tibble: 22 x 9
+## # A tibble: 22 × 9
 ##      Год Всего Балтийское Черное Азовское Каспийское Карское Белое Прочие
 ##    &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
 ##  1  1993  27.2        2.5    0.4      4.3       12.1     5.3   1      1.6
@@ -142,7 +152,7 @@ plot(sub$МетЭкспорт, sub$МетИмпорт, col="red", xlab="Эксп
 ##  8  2000  20.3        2.2    0.3      2          9.2     4.2   0.9    1.5
 ##  9  2001  19.8        2.1    0.3      1.9        8.9     4.2   0.9    1.5
 ## 10  2002  19.8        2      0.2      2          9.2     4.1   0.8    1.5
-## # … with 12 more rows
+## # ℹ 12 more rows
 ```
 
 ---
@@ -479,9 +489,9 @@ colors()[1:20]
 ]
 
 .pull-right[
-[Палитра](http://research.stowers-institute.org/efg/R/Color/Chart/ColorChart.pdf) предопределенных цветов:
-&lt;iframe src="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf" width="100%" height="400px"&gt;&lt;/iframe&gt;
-.small[http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf]
+[Палитра](https://www.stat.auckland.ac.nz/~ihaka/downloads/R-colours-a4.pdf) предопределенных цветов:
+&lt;iframe src="https://www.stat.auckland.ac.nz/~ihaka/downloads/R-colours-a4.pdf" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
+.small[https://www.stat.auckland.ac.nz/~ihaka/downloads/R-colours-a4.pdf]
 ]
 
 ---
@@ -705,7 +715,7 @@ pie(
 
 Широко используемый ресурс для построения цветовых палитр
 
-&lt;iframe src="https://colorbrewer2.org/" width="100%" height="400px"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://colorbrewer2.org/" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
 https://colorbrewer2.org/
 
 ---
@@ -1073,6 +1083,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

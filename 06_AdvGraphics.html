@@ -52,9 +52,9 @@ library(soilDB)
 
 ---
 
-## Коды Евростата {#advgraphics_eurostat}
+## Коды Евростата
 
-Например, [таблица данных по продуктам питания, напиткам и табаку](https://ec.europa.eu/eurostat/databrowser/view/tet00034/default/table?lang=en) имеет код __tet00034__:
+Например, [таблица по продуктам питания, напиткам и табаку](https://ec.europa.eu/eurostat/databrowser/view/tet00034/default/table?lang=en) имеет код __ext_lt_mainagri__:
 
 &lt;img src="img/eurostat.png" width="907" /&gt;
 
@@ -112,7 +112,21 @@ daily_single_ag &lt;- get_power(
   temporal_api = "daily"
 )
 
-daily_single_ag # посмотрим, что получилось
+as_tibble(daily_single_ag) # посмотрим, что получилось
+## # A tibble: 30 × 9
+##      LON   LAT  YEAR    MM    DD   DOY YYYYMMDD    RH2M   T2M
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt;
+##  1  60.6  56.8  1995     4     1    91 1995-04-01  81.7  5.65
+##  2  60.6  56.8  1995     4     2    92 1995-04-02  81.9  7.78
+##  3  60.6  56.8  1995     4     3    93 1995-04-03  78    8.31
+##  4  60.6  56.8  1995     4     4    94 1995-04-04  81.2  7.71
+##  5  60.6  56.8  1995     4     5    95 1995-04-05  92.4  5.1 
+##  6  60.6  56.8  1995     4     6    96 1995-04-06  90.2  6.31
+##  7  60.6  56.8  1995     4     7    97 1995-04-07  83.4  3.38
+##  8  60.6  56.8  1995     4     8    98 1995-04-08  79    2.46
+##  9  60.6  56.8  1995     4     9    99 1995-04-09  81.2  3.49
+## 10  60.6  56.8  1995     4    10   100 1995-04-10  76.9  4.4 
+## # ℹ 20 more rows
 ```
 
 ---
@@ -129,7 +143,13 @@ interannual_sse &lt;- get_power(
   pars = c("CLRSKY_SFC_SW_DWN",
            "ALLSKY_SFC_SW_DWN")
 )
-interannual_sse # посмотрим, что получилось
+as_tibble(interannual_sse) # посмотрим, что получилось
+## # A tibble: 2 × 16
+##     LON   LAT PARAMETER      JAN   FEB   MAR   APR   MAY   JUN   JUL   AUG   SEP
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  60.6  56.8 ALLSKY_SFC_…  2.59  6.03  11.0  14.8  18.7  20.0  19.4  14.8  9.78
+## 2  60.6  56.8 CLRSKY_SFC_…  3.37  7.41  13.8  20.2  26.0  28.4  26.4  21.2 15   
+## # ℹ 4 more variables: OCT &lt;dbl&gt;, NOV &lt;dbl&gt;, DEC &lt;dbl&gt;, ANN &lt;dbl&gt;
 ```
 
 ---
@@ -548,8 +568,7 @@ ggplot(trade_russia,  # а теперь и с точками
 Аналогичным образом работает параметр формы значка:
 
 ```r
-# один значок для графика
-ggplot(trades_total) + 
+ggplot(trades_total) + # один значок для графика
     geom_point(mapping = aes(x = time, y = export), shape = 15)
 ```
 
@@ -576,8 +595,7 @@ ggplot(trade_russia) +
 
 ```r
 ggplot(trades_total, mapping = aes(x = time, y = export)) + 
-    geom_point(size = 5) +
-    geom_line(linewidth = 2)
+    geom_point(size = 5) + geom_line(linewidth = 2)
 ```
 
 ![](06_AdvGraphics_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
@@ -586,12 +604,11 @@ ggplot(trades_total, mapping = aes(x = time, y = export)) +
 
 ## Графические переменные
 
-Группировка данных:
 
 ```r
 ggplot(trade_russia, aes(x = time, y = export)) + 
     geom_point(aes(shape = sitc06)) +
-    geom_line(aes(group = sitc06))
+    geom_line(aes(group = sitc06)) # Группировка данных
 ```
 
 ![](06_AdvGraphics_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
@@ -600,11 +617,10 @@ ggplot(trade_russia, aes(x = time, y = export)) +
 
 ## Графические переменные
 
-Управление цветом:
 
 ```r
 ggplot(df, mapping = aes(x = partner, y = export)) +
-  geom_col(fill = 'plum4', color = 'black', size = 0.2) +
+  geom_col(fill = 'plum4', color = 'black', linewidth = 0.2) + # цвет
   coord_flip()
 ```
 
@@ -620,8 +636,8 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 ```r
 df1 = trades |&gt; filter(time == as.Date('2022-01-01')) |&gt; 
   group_by(partner) |&gt; filter(sum(export) &gt; 50000)
-df1 |&gt; ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
-    geom_col(color = 'black', size = 0.2) + coord_flip()
+df1 |&gt; ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +  # цвет
+    geom_col(color = 'black', size = 0.2) + coord_flip() 
 ```
 
 ![](06_AdvGraphics_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
@@ -632,13 +648,12 @@ df1 |&gt; ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
 
 ## Графические переменные
 
-Процентное соотношение величин:
 .code-small[
 
 ```r
 df1 |&gt; 
   ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
-    geom_col(color = 'black', size = 0.2, position = 'fill') +
+    geom_col(color = 'black', size = 0.2, position = 'fill') + # проценты
     coord_flip()
 ```
 

@@ -37,9 +37,9 @@ library(soilDB)
 
 ---
 
-## Коды Евростата {#advgraphics_eurostat}
+## Коды Евростата
 
-Например, [таблица данных по продуктам питания, напиткам и табаку](https://ec.europa.eu/eurostat/databrowser/view/tet00034/default/table?lang=en) имеет код __tet00034__:
+Например, [таблица по продуктам питания, напиткам и табаку](https://ec.europa.eu/eurostat/databrowser/view/tet00034/default/table?lang=en) имеет код __ext_lt_mainagri__:
 
 ```{r, echo = FALSE}
 knitr::include_graphics('img/eurostat.png')
@@ -74,7 +74,7 @@ trades # посмотрим, что получилось
 
 ## Загрузка данных NASA POWER
 
-```{r, eval=FALSE}
+```{r, message = FALSE}
 daily_single_ag <- get_power(
   community = "ag",
   lonlat = c(60.59, 56.84),
@@ -83,14 +83,14 @@ daily_single_ag <- get_power(
   temporal_api = "daily"
 )
 
-daily_single_ag # посмотрим, что получилось
+as_tibble(daily_single_ag) # посмотрим, что получилось
 ```
 
 ---
 
 ## Загрузка данных NASA POWER
 
-```{r, eval = FALSE}
+```{r, message = FALSE}
 interannual_sse <- get_power(
   community = "ag",
   lonlat = c(60.59, 56.84),
@@ -99,7 +99,7 @@ interannual_sse <- get_power(
   pars = c("CLRSKY_SFC_SW_DWN",
            "ALLSKY_SFC_SW_DWN")
 )
-interannual_sse # посмотрим, что получилось
+as_tibble(interannual_sse) # посмотрим, что получилось
 ```
 
 ---
@@ -321,8 +321,7 @@ ggplot(trade_russia,  # а теперь и с точками
 
 Аналогичным образом работает параметр формы значка:
 ```{r, fig.height=2.5}
-# один значок для графика
-ggplot(trades_total) + 
+ggplot(trades_total) + # один значок для графика
     geom_point(mapping = aes(x = time, y = export), shape = 15)
 ```
 
@@ -343,29 +342,26 @@ ggplot(trade_russia) +
 Управление размером через `size` и `linewidth`:
 ```{r, fig.height=2.5}
 ggplot(trades_total, mapping = aes(x = time, y = export)) + 
-    geom_point(size = 5) +
-    geom_line(linewidth = 2)
+    geom_point(size = 5) + geom_line(linewidth = 2)
 ```
 
 ---
 
 ## Графические переменные
 
-Группировка данных:
 ```{r, fig.height=2.5}
 ggplot(trade_russia, aes(x = time, y = export)) + 
     geom_point(aes(shape = sitc06)) +
-    geom_line(aes(group = sitc06))
+    geom_line(aes(group = sitc06)) # Группировка данных
 ```
 
 ---
 
 ## Графические переменные
 
-Управление цветом:
 ```{r, fig.height=2.5}
 ggplot(df, mapping = aes(x = partner, y = export)) +
-  geom_col(fill = 'plum4', color = 'black', size = 0.2) +
+  geom_col(fill = 'plum4', color = 'black', linewidth = 0.2) + # цвет
   coord_flip()
 ```
 
@@ -378,8 +374,8 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 ```{r, fig.height=2.5}
 df1 = trades |> filter(time == as.Date('2022-01-01')) |> 
   group_by(partner) |> filter(sum(export) > 50000)
-df1 |> ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
-    geom_col(color = 'black', size = 0.2) + coord_flip()
+df1 |> ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +  # цвет
+    geom_col(color = 'black', size = 0.2) + coord_flip() 
 ```
 ]
 
@@ -388,12 +384,11 @@ df1 |> ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
 
 ## Графические переменные
 
-Процентное соотношение величин:
 .code-small[
 ```{r, fig.height=2.5}
 df1 |> 
   ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
-    geom_col(color = 'black', size = 0.2, position = 'fill') +
+    geom_col(color = 'black', size = 0.2, position = 'fill') + # проценты
     coord_flip()
 ```
 ]

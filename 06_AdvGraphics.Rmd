@@ -27,9 +27,7 @@ knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
 - __USDA NRCS Soil Data Access__ (https://sdmdataaccess.nrcs.usda.gov/)
 
 ```{r}
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(eurostat)
 library(nasapower)
 library(soilDB)
@@ -53,18 +51,22 @@ knitr::include_graphics('img/eurostat.png')
 
 .code-small[
 ```{r, cache = TRUE}
-tables = c('tet00034', 'tet00033', 'tet00032', 'tet00031','tet00030', 'tet00029')
-trades = lapply(tables, function(X) {
-  get_eurostat(X) |>  label_eurostat() #<<
+tables = c('ext_lt_mainagri', 'ext_lt_mainrawm', 'ext_lt_mainmine',
+           'ext_lt_mainchem','ext_lt_mainmanu', 'ext_lt_mainmach')
+countries = ISOcodes::ISO_3166_1$Alpha_2
+
+trades = lapply(tables, function(X) { # прочтем несколько таблиц в список
+  get_eurostat(X) |> filter(partner %in% countries) |> label_eurostat()
 }) |> 
-  bind_rows() |>  # объединим прочитанные таблицы в одну
-  select(-geo) |>  # убираем столбец с территорией торговли
-  filter(stringr::str_detect(indic_et, 'Exports in|Imports in')) |> 
-  pivot_wider(names_from = indic_et, values_from = values)  |>
-  rename(export = `Exports in million of ECU/EURO`,
+  bind_rows() |> 
+  select(-geo) |> # убираем столбец с территорией торговли, т.к. там только Евросоюз
+  filter(str_detect(indic_et, 'Exports in|Imports in')) |> 
+  pivot_wider(names_from = indic_et, values_from = values) |> 
+  rename(export = `Exports in million of ECU/EURO`, # дадим им краткие названия
          import = `Imports in million of ECU/EURO`) |> 
   mutate(partner = as.factor(partner))
-trades
+
+trades # посмотрим, что получилось
 ```
 ]
 
@@ -90,10 +92,10 @@ daily_single_ag # посмотрим, что получилось
 
 ```{r, eval = FALSE}
 interannual_sse <- get_power(
-  community = "SSE",
+  community = "ag",
   lonlat = c(60.59, 56.84),
   dates = 1995:2015,
-  temporal_average = "INTERANNUAL",
+  temporal_api = "climatology",
   pars = c("CLRSKY_SFC_SW_DWN",
            "ALLSKY_SFC_SW_DWN")
 )
@@ -238,7 +240,7 @@ ggplot(data = trades_total,
 
 ```{r}
 df = trades |> filter(sitc06 == 'Machinery and transport equipment', 
-                      time == as.Date('2017-01-01'))
+                      time == as.Date('2022-01-01'), export > 10000)
 ```
 
 .pull-left[
@@ -297,7 +299,7 @@ ggplot(trades_total) +
 ## Графические переменные
 
 ```{r, fig.height=2.5}
-trade_russia = trades |> dplyr::filter(partner == 'Russia')
+trade_russia = trades |> filter(partner == 'Russia')
 ggplot(trade_russia) + # у каждой группы данных свой цвет
   geom_line(mapping = aes(x = time, y = export, color = sitc06))
 ```
@@ -338,11 +340,11 @@ ggplot(trade_russia) +
 
 ## Графические переменные
 
-Управление размером через `size`:
+Управление размером через `size` и `linewidth`:
 ```{r, fig.height=2.5}
 ggplot(trades_total, mapping = aes(x = time, y = export)) + 
     geom_point(size = 5) +
-    geom_line(size = 2)
+    geom_line(linewidth = 2)
 ```
 
 ---
@@ -374,8 +376,9 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 Управление цветом:
 .code-small[
 ```{r, fig.height=2.5}
-filter(trades, time == as.Date('2017-01-01')) |> 
-  ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
+df1 = trades |> filter(time == as.Date('2022-01-01')) |> 
+  group_by(partner) |> filter(sum(export) > 50000)
+df1 |> ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
     geom_col(color = 'black', size = 0.2) + coord_flip()
 ```
 ]
@@ -388,7 +391,7 @@ filter(trades, time == as.Date('2017-01-01')) |>
 Процентное соотношение величин:
 .code-small[
 ```{r, fig.height=2.5}
-filter(trades, time == as.Date('2017-01-01')) |> 
+df1 |> 
   ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
     geom_col(color = 'black', size = 0.2, position = 'fill') +
     coord_flip()
@@ -528,11 +531,12 @@ ggplot(
     x = '', 
     y = export, 
     fill = partner
-  ),
-  color = 'black', 
-  size = 0.2
+  )
 ) +
-  geom_col() +
+  geom_col(
+    color = 'black', 
+    linewidth = 0.2
+  ) +
   coord_polar(theta = 'y')
 ```
 ]
@@ -627,9 +631,9 @@ ggplot(
   )
 ) + 
   geom_point(alpha = 0.5) +
-  lims(color = 'Machinery and transport equipment') +
+  lims(color = 'Food, drinks and tobacco') +
   xlim(0, 75000) +
-  ylim(0, 75000)
+  ylim(30000, 75000)
 ```
 ]
 
@@ -717,10 +721,22 @@ ggplot(trades_total,
 .left-40[
 Аннотирование регионов:
 ```{r anno2, eval=F}
-ggplot(trades_type, mapping = aes(x = export, y = import, color = sitc06, size = time)) + 
-  annotate("rect", xmin = 100000, xmax = 250000, ymin = 75000, ymax = 175000,  alpha = .2, color = 'black', size = 0.1) +
+ggplot(trades_type, 
+       mapping = aes(
+         x = export, y = import, 
+         color = sitc06, size = time
+       )) + 
+  annotate("rect", 
+           xmin = 100000, xmax = 500000, 
+           ymin = 50000, ymax = 300000,  
+           alpha = .2, 
+           color = 'black', 
+           size = 0.1) +
   geom_point(alpha = 0.5) +
-  annotate("text", x = 175000, y = 190000, label = "Chemicals", color = 'coral')
+  annotate("text", 
+           x = 175000, y = 190000, 
+           label = "Chemicals", 
+           color = 'coral')
 ```
 ]
 
@@ -736,14 +752,15 @@ ggplot(trades_type, mapping = aes(x = export, y = import, color = sitc06, size =
 ```{r facets, eval=F}
 brks = c(0, 50, 100, 150, 200)
 trades |> 
-  dplyr::filter(sitc06 == 'Machinery and transport equipment') |> 
+  filter(sitc06 == 'Machinery and transport equipment',
+         time > as.Date('2014-01-01'), import > 30000) |> 
   ggplot(mapping = aes(x = partner, y = import)) +
-  geom_col() +
-  scale_y_continuous(breaks = brks * 1e3, labels = brks) +
-  ggtitle('Импорт продукции машиностроения (мдрд долл. США)',
-        subtitle = 'Данные по ключевым партнерам') +
-  coord_flip() +
-  facet_wrap(~time)
+    geom_col() +
+    scale_y_continuous(breaks = brks * 1e3, labels = brks) +
+    ggtitle('Импорт продукции машиностроения (мдрд долл. США)',
+          subtitle = 'Данные по ключевым партнерам') +
+    coord_flip() +
+    facet_wrap(~time)
 ```
 
 ---

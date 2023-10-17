@@ -4,8 +4,8 @@
     <title>Основы статистики в R</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2021-10-19" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <meta name="date" content="2023-10-17" />
+    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -13,11 +13,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Основы статистики в R
+]
+.subtitle[
 ## Визуализация и анализ географических данных на языке R
+]
+.author[
 ### Тимофей Самсонов
+]
+.institute[
 ### МГУ имени Ломоносова, Географический факультет
-### 2021-10-19
+]
+.date[
+### 2023-10-17
+]
 
 ---
 
@@ -30,9 +40,7 @@ class: center, middle, inverse, title-slide
 
 
 ```r
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(googlesheets4)
 library(ggrepel)
 library(readxl)
@@ -188,7 +196,7 @@ gdpdf_tidy = gdpdf |&gt;
 ##  8 Angola                 2015  6512.
 ##  9 Anguilla               2015    NA 
 ## 10 Antigua and Barbuda    2015 14884.
-## # … with 250 more rows
+## # ℹ 250 more rows
 ```
 
 ---
@@ -366,7 +374,7 @@ tab = gdpdf_tidy |&gt;
 ##  8 Australia            2015 38085.   82.3 23968973
 ##  9 Austria              2015 37811.   81.3  8544586
 ## 10 Azerbaijan           2015 10475.   72.9  9753968
-## # … with 162 more rows
+## # ℹ 162 more rows
 ```
 ]
 
@@ -1023,6 +1031,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

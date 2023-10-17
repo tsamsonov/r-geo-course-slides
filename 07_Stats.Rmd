@@ -25,9 +25,7 @@ knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
 Используемые пакеты:
 
 ```{r}
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(googlesheets4)
 library(ggrepel)
 library(readxl)

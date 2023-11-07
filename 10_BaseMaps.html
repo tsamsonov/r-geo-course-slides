@@ -4,8 +4,8 @@
     <title>Основы картографии</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2022-11-08" />
-    <script src="libs/header-attrs-2.15/header-attrs.js"></script>
+    <meta name="date" content="2023-11-07" />
+    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2022-11-08
+### 2023-11-07
 ]
 
 ---
@@ -742,36 +742,38 @@ ggplot() +
 
 ![](10_BaseMaps_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
 
-&lt;!-- --- --&gt;
+---
 
-&lt;!-- ## Классификация --&gt;
+## Классификация
 
-&lt;!-- Для классификации объектов необходимо создать соответствующий атрибут, который ранжирует их по величине. Например, можно классифиципровать населенные пункты по численности населения: --&gt;
+Для классификации объектов необходимо создать соответствующий атрибут, который ранжирует их по величине. Например, по численности населения:
 
-&lt;!-- ```{r classes, eval = F} --&gt;
-&lt;!-- capitals = capitals |&gt;  --&gt;
-&lt;!--   mutate(RANK = cut(POP_MAX, c(0, 100000, 1000000, 15000000)), --&gt;
-&lt;!--          SIZE = as.numeric(RANK)) --&gt;
 
-&lt;!-- ggplot() + --&gt;
-&lt;!--   geom_sf(data = cnt_eu, size = 0.25) + --&gt;
-&lt;!--   geom_sf(data = capitals, mapping = aes(size = SIZE), colour = "black",  --&gt;
-&lt;!--           fill = "white", shape = 21,  stroke = 1) + --&gt;
-&lt;!--   geom_text_repel(data = capitals, stat = "sf_coordinates", --&gt;
-&lt;!--                 aes(label = NAME, geometry = geom, size = SIZE),  --&gt;
-&lt;!--                 fontface = 'bold') + --&gt;
-&lt;!--   labs(size = NULL) + --&gt;
-&lt;!--   scale_size(guide = 'none')+ --&gt;
-&lt;!--   theme_bw() --&gt;
-&lt;!-- ``` --&gt;
+```r
+capitals = capitals |&gt;
+  mutate(RANK = cut(POP_MAX, c(0, 100000, 1000000, 15000000)),
+         SIZE = as.numeric(RANK))
 
-&lt;!-- --- --&gt;
+ggplot() +
+  geom_sf(data = cnt_eu, size = 0.25) +
+  geom_sf(data = capitals, mapping = aes(size = SIZE), colour = "black",
+          fill = "white", shape = 21,  stroke = 0.5) +
+  scale_size(guide = 'none', range = c(1, 1.5)) +
+  ggnewscale::new_scale('size') +
+  geom_text_repel(data = capitals, stat = "sf_coordinates",
+                aes(label = NAME, geometry = geom, size = SIZE),
+                fontface = 'bold') +
+  scale_size(guide = 'none', range = c(1.5, 2))+
+  labs(size = NULL) +
+  
+  theme_bw()
+```
 
-&lt;!-- ## Классификация --&gt;
+---
 
-&lt;!-- ```{r, echo = F, ref.label='classes', fig.height=12, crop=T, out.height='1000px'} --&gt;
+## Классификация
 
-&lt;!-- ``` --&gt;
+![](10_BaseMaps_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
 
 
 

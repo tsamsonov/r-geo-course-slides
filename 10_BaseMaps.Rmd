@@ -16,7 +16,7 @@ output:
 
 ```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
 library(datasets)
-# knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
 knitr::opts_knit$set(global.par = TRUE)
 knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300)
 ```
@@ -706,36 +706,39 @@ ggplot() +
 ```{r, fig.height=3.5, ref.label='pts2', echo=F}
 ```
 
-<!-- --- -->
+---
 
-<!-- ## Классификация -->
+## Классификация
 
-<!-- Для классификации объектов необходимо создать соответствующий атрибут, который ранжирует их по величине. Например, можно классифиципровать населенные пункты по численности населения: -->
+Для классификации объектов необходимо создать соответствующий атрибут, который ранжирует их по величине. Например, по численности населения:
 
-<!-- ```{r classes, eval = F} -->
-<!-- capitals = capitals |>  -->
-<!--   mutate(RANK = cut(POP_MAX, c(0, 100000, 1000000, 15000000)), -->
-<!--          SIZE = as.numeric(RANK)) -->
+```{r classes, eval = F}
+capitals = capitals |>
+  mutate(RANK = cut(POP_MAX, c(0, 100000, 1000000, 15000000)),
+         SIZE = as.numeric(RANK))
 
-<!-- ggplot() + -->
-<!--   geom_sf(data = cnt_eu, size = 0.25) + -->
-<!--   geom_sf(data = capitals, mapping = aes(size = SIZE), colour = "black",  -->
-<!--           fill = "white", shape = 21,  stroke = 1) + -->
-<!--   geom_text_repel(data = capitals, stat = "sf_coordinates", -->
-<!--                 aes(label = NAME, geometry = geom, size = SIZE),  -->
-<!--                 fontface = 'bold') + -->
-<!--   labs(size = NULL) + -->
-<!--   scale_size(guide = 'none')+ -->
-<!--   theme_bw() -->
-<!-- ``` -->
+ggplot() +
+  geom_sf(data = cnt_eu, size = 0.25) +
+  geom_sf(data = capitals, mapping = aes(size = SIZE), colour = "black",
+          fill = "white", shape = 21,  stroke = 0.5) +
+  scale_size(guide = 'none', range = c(1, 1.5)) +
+  ggnewscale::new_scale('size') +
+  geom_text_repel(data = capitals, stat = "sf_coordinates",
+                aes(label = NAME, geometry = geom, size = SIZE),
+                fontface = 'bold') +
+  scale_size(guide = 'none', range = c(1.5, 2))+
+  labs(size = NULL) +
+  
+  theme_bw()
+```
 
-<!-- --- -->
+---
 
-<!-- ## Классификация -->
+## Классификация
 
-<!-- ```{r, echo = F, ref.label='classes', fig.height=12, crop=T, out.height='1000px'} -->
+```{r, echo = F, ref.label='classes', fig.height=3.5}
 
-<!-- ``` -->
+```
 
 
 

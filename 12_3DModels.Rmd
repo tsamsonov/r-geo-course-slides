@@ -1,0 +1,81 @@
+---
+title: "Тематические карты"
+subtitle: "Визуализация и анализ географических данных на языке R"
+author: "Тимофей Самсонов"
+institute: "МГУ имени Ломоносова, Географический факультет"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: [default, "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+---
+
+```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
+library(datasets)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
+knitr::opts_knit$set(global.par = TRUE)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300, crop = T)
+```
+
+## Пакеты
+
+Для выполнения кода данной лекции вам понадобятся следующие пакеты:
+```{r}
+library(sf)
+library(stars)
+library(dplyr)
+library(rayshader)
+
+dem = read_stars('../r-geo-course/data/dem_khibiny.tif')
+elev = dem[[1]]
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+```{r, out.height='400px'}
+elev |> height_shade() |> plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+```{r}
+elev |> sphere_shade(zscale = 10) |> plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+```{r colorshade, eval=FALSE}
+dem_colors = colorRampPalette(
+  c("darkolivegreen", 
+    "lightyellow", 
+    "orange", 
+    "firebrick", 
+    "white")
+)
+
+elev |> 
+  height_shade(texture = dem_colors(256)) |> 
+  add_overlay(
+    sphere_shade(elev, texture = 'bw', zscale = 10), 
+    alphalayer = 0.7
+  ) |> 
+  plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+```{r, echo=F, ref.label='colorshade'}
+```
+

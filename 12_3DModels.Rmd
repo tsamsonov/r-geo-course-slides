@@ -38,6 +38,8 @@ elev = dem[[1]]
 
 ## Визуализация цифровой модели рельефа
 
+Градиентная окраска по высоте
+
 ```{r, out.height='400px'}
 elev |> height_shade() |> plot_map()
 ```
@@ -46,13 +48,17 @@ elev |> height_shade() |> plot_map()
 
 ## Визуализация цифровой модели рельефа
 
-```{r}
+Аналитическая отмывка
+
+```{r, out.height='400px'}
 elev |> sphere_shade(zscale = 10) |> plot_map()
 ```
 
 ---
 
 ## Визуализация цифровой модели рельефа
+
+Комбинация способов
 
 ```{r colorshade, eval=FALSE}
 dem_colors = colorRampPalette(
@@ -76,6 +82,360 @@ elev |>
 
 ## Визуализация цифровой модели рельефа
 
-```{r, echo=F, ref.label='colorshade'}
+Комбинация способов
+
+```{r, echo=F, ref.label='colorshade', out.height='400px'}
 ```
 
+---
+
+## Визуализация цифровой модели рельефа
+
+Художественные палитры светотеневой отмывки
+
+```{r, out.height='400px'}
+elev |> sphere_shade(texture = 'desert', zscale=10) |> plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Художественные палитры светотеневой отмывки
+
+```{r, out.height='400px'}
+elev |> sphere_shade(texture = 'imhof1', zscale=10) |> plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Художественные палитры светотеневой отмывки
+
+```{r, out.height='400px'}
+elev |> sphere_shade(texture = 'imhof2', zscale=10) |> plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Художественные палитры светотеневой отмывки
+
+```{r, out.height='400px'}
+elev |> sphere_shade(texture = 'imhof3', zscale=10) |> plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Художественные палитры светотеневой отмывки
+
+```{r, out.height='400px'}
+elev |> sphere_shade(texture = 'imhof4', zscale=10) |> plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Художественные палитры светотеневой отмывки
+
+```{r, out.height='400px'}
+elev |> sphere_shade(texture = 'unicorn', zscale=10) |> plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Принудительно посчитанные тени
+
+```{r shades1, eval=FALSE}
+elev |> 
+  height_shade(texture = dem_colors(256)) |> 
+  add_overlay(
+    sphere_shade(elev, texture = 'bw', zscale=10), 
+    alphalayer=0.5
+  ) |>
+  add_shadow(
+    lamb_shade(elev, zscale = 20), 
+    0.1
+  ) |>
+  plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Принудительно посчитанные тени
+
+```{r, echo=F, ref.label='shades1', out.height='400px'}
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Рассеянный свет (ambient light) позволяет отделить долины от вершин хребтов
+
+```{r shades2, eval=FALSE}
+elev |> 
+  height_shade(texture = dem_colors(256)) |> 
+  add_overlay(
+    sphere_shade(elev, texture = 'bw', zscale=10), 
+    alphalayer=0.5
+  ) |> 
+  add_shadow(
+    lamb_shade(elev, zscale = 20), 
+    0.1
+  ) |> 
+  add_shadow(
+    ambient_shade(elev), 
+    0.1
+  ) |> 
+  plot_map()
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Рассеянный свет
+
+```{r, echo=F, ref.label='shades2', out.height='400px'}
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+Трехмерное отображение
+
+```{r}
+elev |> 
+  height_shade(texture = dem_colors(256)) |> 
+  add_overlay(sphere_shade(elev, texture = 'bw', zscale=10), 
+              alphalayer=0.5) |> 
+  add_shadow(lamb_shade(elev, zscale = 20), 0.1) |> 
+  add_shadow(ambient_shade(elev), 0.1) |> 
+  plot_3d(elev, zscale = 20, fov = 0,
+          theta = 135, zoom = 0.75, phi = 45, 
+          windowsize = c(1400, 800))
+```
+
+---
+
+## Визуализация цифровой модели рельефа
+
+```{r, out.height='400px'}
+render_snapshot()
+```
+
+```{r, echo=FALSE}
+rgl::rgl.close()
+```
+
+
+---
+
+## Векторные слои
+
+Чтение данных
+
+```{r}
+db = '../r-geo-course/data/khibiny.gpkg'
+rivers = read_sf(db, 'rivers', quiet = T)
+lakes = read_sf(db, 'lakes', quiet = T) |>
+  filter(CLASS_ID != 31300000)
+
+roads_all = read_sf(db, 'roads', quiet = T)
+roads = filter(roads_all, CLASS_ID <= 62131000)
+
+rails = read_sf(db, 'rails', quiet = T)
+forest = read_sf(db, 'veg', quiet = T)
+blocks = read_sf(db, 'blocks', quiet = T)
+poppol = read_sf(db, 'poppol', quiet = T)
+```
+
+---
+
+## Векторные данные
+
+Добавление в сцену
+
+```{r vec1, eval=FALSE}
+ext = st_bbox(dem)
+elev |>
+  height_shade(texture = dem_colors(256)) |>
+  add_overlay(sphere_shade(elev, texture = 'bw', zscale=10), 
+              alphalayer=0.5) |>
+  add_shadow(lamb_shade(elev, zscale = 20), 0.1) |>
+  add_overlay(generate_line_overlay(rivers, linewidth = 2, 
+                                    color="steelblue4",
+                                    extent = ext,
+                                    heightmap = elev)) |>
+  add_overlay(generate_polygon_overlay(lakes, linewidth = 1,
+                                       palette = 'azure',
+                                       linecolor = 'steelblue4',
+                                       extent = ext,
+                                       heightmap = elev)) |>
+  plot_map()
+```
+
+---
+
+## Векторные данные
+
+Добавление в сцену
+
+```{r, echo=F, ref.label='vec1', out.height='400px'}
+```
+
+---
+
+## Векторные слои
+
+Расширим состав объектов
+```{r}
+plt = elev |>
+  height_shade(texture = dem_colors(256)) |>
+  add_overlay(sphere_shade(elev, texture = 'bw', zscale=10), 
+              alphalayer=0.5) |>
+  add_shadow(lamb_shade(elev, zscale = 20), 0.1) |>
+  add_overlay(
+    generate_polygon_overlay(poppol, linewidth = 1,
+                             palette = 'orange',
+                             linecolor = 'black',
+                             extent = ext,
+                             heightmap = elev)
+  ) |>
+  add_overlay(
+    generate_line_overlay(rivers, linewidth = 2, 
+                          color="steelblue4",
+                          extent = ext,
+                          heightmap = elev)
+  )
+```
+
+--- 
+
+## Векторные слои
+
+Расширим состав объектов
+```{r}
+plt = plt |>
+  add_overlay(generate_polygon_overlay(lakes, linewidth = 1,
+                                       palette = 'azure',
+                                       linecolor = 'steelblue4',
+                                       extent = ext,
+                                       heightmap = elev)) |>
+  add_overlay(generate_line_overlay(roads, linewidth = 4, 
+                                    color="black",
+                                    extent = ext,
+                                    heightmap = elev)) |>
+  add_overlay(generate_line_overlay(roads, linewidth = 2, 
+                                    color="lightyellow",
+                                  extent = ext,
+                                  heightmap = elev)) |>
+  add_overlay(generate_line_overlay(rails, linewidth = 3, 
+                                    color="black",
+                                  extent = ext,
+                                  heightmap = elev))
+```
+
+---
+
+## Векторные данные
+
+Расширим состав объектов
+
+```{r, out.height='400px'}
+plot_map(plt)
+```
+
+---
+
+## Подписи
+
+Отфильтруем населенные пункты для подписей:
+
+```{r}
+popmajor = poppol |>
+  filter(CLASS_ID < 41300000) |>
+  st_centroid()
+
+popminor= poppol |>
+  filter(CLASS_ID == 41300000) |>
+  st_centroid()
+```
+
+--- 
+
+## Подписи
+
+Для размещения подписей следует использовать функцию `generate_label_overlay()`:
+
+```{r labs1, eval=FALSE}
+plt_lbl = plt |>
+  add_overlay(
+    generate_point_overlay(popmajor, size = 8, extent = ext, 
+                           color = "black", pch = 19,
+                                     heightmap = elev)) |>
+  add_overlay(
+    generate_point_overlay(popmajor, size = 3, extent = ext, 
+                           color = "white", pch = 19,
+                                     heightmap = elev)) |>
+  add_overlay(
+    generate_label_overlay(labels = popmajor,
+                           data_label_column = 'NAME',
+                           extent = ext, text_size = 2, color = "black", font=2,
+                           halo_color = "white", halo_expand = 2, point_size = 0,
+                           seed=1, heightmap = elev))
+plot_map(plt_lbl)
+```
+
+---
+
+## Векторные данные
+
+Добавление в сцену
+
+```{r, echo=F, ref.label='labs1', out.height='400px'}
+```
+
+---
+
+## Подписи
+
+Для размещения подписей следует использовать функцию `generate_label_overlay()`:
+
+```{r labs2, eval=FALSE}
+plot_3d(plt, elev, zscale = 30, fov = 0,
+        theta = -45, zoom = 0.5, phi = 35,
+        windowsize = c(1400, 800))
+for (name in popmajor$NAME) {
+  pop = filter(popmajor, NAME == name)
+  render_label(elev, lat = st_coordinates(pop)[, 2], 
+               lon = st_coordinates(pop)[, 1],
+               text = name, altitude = 1000, zscale=30, 
+               textsize = 1.75, linewidth = 4,
+               extent = ext, textcolor = "turquoise2", 
+               linecolor="turquoise2", relativez = TRUE)
+}
+Sys.sleep(0.2)
+render_snapshot()
+rgl::rgl.close()
+```
+
+---
+
+## Векторные данные
+
+Добавление в сцену
+
+```{r, echo=F, ref.label='labs2', out.height='400px'}
+```

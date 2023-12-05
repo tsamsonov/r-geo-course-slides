@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Растровый анализ</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Тимофей Самсонов" />
+    <meta name="date" content="2023-12-05" />
+    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Растровый анализ
+]
+.subtitle[
+## Визуализация и анализ географических данных на языке R
+]
+.author[
+### Тимофей Самсонов
+]
+.institute[
+### МГУ имени Ломоносова, Географический факультет
+]
+.date[
+### 2023-12-05
+]
+
+---
+
+
+
+
+## Пакеты
+
+Для выполнения кода данной лекции вам понадобятся следующие пакеты:
+
+```r
+library(sf)
+library(stars)
+library(geosphere)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(terra)
+library(tidyterra)
+library(ggnewscale)
+options(scipen = 999)
+```
+
+---
+
+## Исходные данные
+
+
+```r
+# Чтение данных
+(bed = rast('../r-geo-course/data/etopo1_bed.tif'))
+## class       : SpatRaster 
+## dimensions  : 360, 720, 1  (nrow, ncol, nlyr)
+## resolution  : 0.5, 0.5  (x, y)
+## extent      : -180, 180, -90, 90  (xmin, xmax, ymin, ymax)
+## coord. ref. : lon/lat WGS 84 (EPSG:4326) 
+## source      : etopo1_bed.tif 
+## name        : etopo1_bed
+(ice = rast('../r-geo-course/data/etopo1_ice.tif'))
+## class       : SpatRaster 
+## dimensions  : 360, 720, 1  (nrow, ncol, nlyr)
+## resolution  : 0.5, 0.5  (x, y)
+## extent      : -180, 180, -90, 90  (xmin, xmax, ymin, ymax)
+## coord. ref. : lon/lat WGS 84 (EPSG:4326) 
+## source      : etopo1_ice.tif 
+## name        : etopo1_ice
+countries = read_sf('../r-geo-course/data/countries.gpkg')
+```
+
+---
+
+## Исходные данные
+
+
+```r
+ggplot() +
+  geom_spatraster(data = bed) +
+  scale_fill_hypso_tint_c(palette = "gmt_globe") +
+  ggtitle('ETOPO Bedrock')
+```
+
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-3-1.png" height="350px" /&gt;
+
+---
+
+## Исходные данные
+
+
+```r
+ggplot() +
+  geom_spatraster(data = ice) +
+  scale_fill_hypso_tint_c(palette = "gmt_globe") +
+  ggtitle('ETOPO Ice surface')
+```
+
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-4-1.png" height="350px" /&gt;
+
+---
+
+## Растровая алгебра
+
+__Типы операций:__
+
+- _Локальные_ — анализируется одна ячейка растра или совпадающие в пространстве ячейки нескольких растров
+
+
+- _Фокальные_ — анализируются все ячейки в окрестности. Фокальные методы алгебры карт также называются _методами анализа соседства_.
+
+
+- _Зональные_ — анализируются все ячейки в пределах зон, определяемых извне (например, вторым растровым слоем).
+
+
+- _Глобальные_ — анализируются все ячейки растра.
+
+---
+
+## Локальные операции
+
+Вычисление мощности покровного оледенения
+
+.pull-left[
+.code-small[
+
+```r
+ice.depth = ice - bed
+ice.depth[ice.depth == 0] = NA
+
+ggplot() +
+  geom_spatraster(data = bed) +
+  scale_fill_gradient(low = 'black', 
+                      high = 'white',
+                      guide="none") +
+  new_scale_fill() +
+  geom_spatraster(data = ice.depth) +
+  scale_fill_gradient(low = 'white', 
+                      high = 'navyblue', 
+                      na.value = "transparent") +
+  geom_sf(data = countries, fill = NA) +
+  labs(title = 'Мощность покровного оледенения',
+         fill = '[м]')
+```
+]
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Фокальные операции
+
+В общем случае фиксированная окрестность может иметь различную форму, однако наиболее часто используется квадратная окрестность размером `\(3\times3\)`:
+
+&lt;div class="figure"&gt;
+&lt;img src="../r-geo-course/images/raster_neighborhoods.png" alt="Виды растровых окрестностей. Темной точкой выделена анализируемая ячейка" width="50%" /&gt;
+&lt;p class="caption"&gt;Виды растровых окрестностей. Темной точкой выделена анализируемая ячейка&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+## Сглаживание
+
+
+```r
+# Вырежем кусок из ЦМР
+dem = crop(ice, ext(-120, -75, 10, 40))
+
+# Среднее
+wgt = matrix(c(1, 1, 1,
+               1, 1, 1,
+               1, 1, 1) / 9, 
+              nrow = 3)
+# на самом деле проще написать так:
+# wgt = matrix(1/9, 3, 3), но полная форма записана для наглядности
+
+# выполним обработку ЦМР с помощью фокального фильтра
+filtered = focal(dem, w = wgt)
+```
+
+---
+
+## Сглаживание
+
+
+```r
+ggplot() +
+  geom_spatraster(data = c(dem, filtered)) +
+  scale_fill_hypso_tint_c(palette = "etopo1") + 
+  facet_wrap(~lyr)
+```
+
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-8-1.png" height="350px" /&gt;
+
+---
+
+## Гауссово сглаживание
+
+
+```r
+filtered = focal(dem, focalMat(dem, 0.5, "Gauss"))
+
+ggplot() +
+  geom_spatraster(data = c(dem, filtered)) +
+  scale_fill_hypso_tint_c(palette = "etopo1") + 
+  facet_wrap(~lyr)
+```
+
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-9-1.png" height="300px" /&gt;
+
+---
+
+## Распознавание границ
+
+.pull-left[
+
+```r
+# Матрица Собеля:
+wgt = matrix(c(1, 2, 1,
+                0, 0, 0,
+               -1,-2,-1) / 4, 
+              nrow=3)
+filtered = focal(dem, wgt)
+
+# Это поверхность производных:
+
+ggplot() +
+  geom_spatraster(data = filtered) +
+  scale_fill_gradient2(
+    low = 'navyblue', 
+     high = 'darkred'
+  ) +
+  ggtitle('Производная поверхности')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Распознавание границ
+
+.pull-left[
+
+```r
+# Отберем все ячейки, обладающие 
+# высокими значениями производных
+faults = abs(filtered) &gt; 1500
+faults[faults == 0] = NA
+
+ggplot() +
+  geom_spatraster(data = dem) +
+  scale_fill_hypso_tint_c(
+    palette = "etopo1"
+  ) + 
+  new_scale_fill() +
+  geom_spatraster(data = faults) +
+  scale_fill_discrete(
+    type = 'black', 
+    na.value = "transparent"
+  ) +
+  ggtitle('Уступы континента')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Морфометрия рельефа
+
+.pull-left[
+Высоты:
+
+```r
+dem = rast('../r-geo-course/data/dem_fergana.tif')
+
+ggplot() +
+  geom_spatraster(data = dem) +
+  scale_fill_hypso_c() +
+  labs(title = 'Ферганская долина', 
+       fill = 'Высота, [м]')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Морфометрия рельефа
+
+.pull-left[
+Углы наклона:
+
+```r
+slope = terrain(dem, 'slope', 
+                unit = 'degrees')
+
+ggplot() +
+  geom_spatraster(data = slope) +
+  scale_fill_gradient(
+    low = 'lightcyan', 
+    high = 'darkred'
+  ) +
+  labs(title = 'Углы наклона', 
+       fill = 'Градусы [°]')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Морфометрия рельефа
+
+.pull-left[
+Экспозиция:
+
+```r
+aspect = terrain(dem, 'aspect', 
+                 unit = 'degrees')
+
+ggplot() +
+  geom_spatraster(data = aspect) +
+  scale_fill_gradientn(
+    colors = rainbow(9), 
+    values = 0:8 / 8
+  ) +
+  labs(title = 'Экспозиция', 
+       fill = 'Градусы [°]')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Отмывка рельефа
+
+Отмывка рельефа средствами terra получается при комбинировании растров углов наклона и экспозиции склона. Для повышения контрастности можно предварительно умножить высоты на определенный масштабный коэффициент:
+
+
+```r
+# углы наклона для классической отмывки
+slope_rad10 = terrain(dem * 10, 'slope', unit = 'radians')
+
+# углы наклона для вертикальной отмывки
+slope_rad5 = terrain(dem * 5, 'slope', unit = 'radians')
+
+# экспозиция для любой отмывки
+aspect_rad = terrain(dem, 'aspect', unit = 'radians')
+```
+
+---
+
+## Отмывка рельефа
+
+.pull-left[
+Классическая отмывка при северо-западном освещении:
+
+```r
+hill = shade(
+  slope = slope_rad10, 
+  aspect = aspect_rad, 
+  angle = 45, 
+  direction = 315
+)
+
+ggplot() +
+  geom_spatraster(data = hill) +
+  scale_fill_gradient(
+    low = 'black', 
+    high = 'white'
+  ) +
+  ggtitle('Отмывка классическая')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Отмывка рельефа
+
+.pull-left[
+Отвесная отмывка при вертикальном освещении (подчеркивает линии хребтов):
+
+```r
+hill_vert = shade(
+  slope = slope_rad5, 
+  aspect = aspect_rad, 
+  angle = 90
+)
+
+ggplot() +
+  geom_spatraster(data = hill_vert) +
+  scale_fill_gradient(
+    low = 'black', 
+    high = 'white'
+  ) +
+  ggtitle('Отмывка отвесная')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Отмывка рельефа
+
+.pull-left[
+Кобинированная отмывка:
+
+```r
+hill_comb = hill * hill_vert
+
+ggplot() +
+  geom_spatraster(data = hill_comb) +
+  scale_fill_gradient(
+    low = 'black', 
+    high = 'white'
+  ) +
+  ggtitle('Отмывка комбинированная')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Анализ расстояний
+
+Доступность станций метро
+
+```r
+roads = read_sf("../r-geo-course/data/roads.gpkg") # Дороги
+poi = read_sf("../r-geo-course/data/poi_point.gpkg") # Точки интереса
+rayons = read_sf("../r-geo-course/data/boundary_polygon.gpkg") # Границы районов
+stations = read_sf("../r-geo-course/data/metro_stations.gpkg") # Станции метро
+water = read_sf("../r-geo-course/data/water_polygon.gpkg") # Водные объекты
+
+dist_grid = stations |&gt; 
+  rast(resolution = 25) |&gt; 
+  rasterize(stations, y = _) |&gt; 
+  gridDist(NA)
+```
+
+---
+
+## Анализ расстояний
+
+.pull-left[
+.code-small[
+
+```r
+ggplot() +
+  geom_spatraster_contour_filled(
+    data = dist_grid
+  ) +
+  geom_spatraster_contour(
+    data = dist_grid, 
+    linewidth = 0.25, 
+    color = 'black') +
+  geom_sf(data = water, 
+          linewidth = 0.1) +
+  geom_sf(data = roads, 
+          linewidth = 0.1) +
+  geom_sf(data = stations, 
+          color = 'darkviolet') +
+  labs(title = 'Расстояние до ближайшей станции метро',
+       fill = 'м') +
+  theme_bw()
+```
+]
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Зональные операции
+
+
+```r
+files = list.files('/Volumes/Data/Spatial/WorldClim/2.1/tavg',
+                   full.names = TRUE)
+temp = rast(files)
+
+data(land, package = 'tmap')
+terraland = rast(land['cover'])
+
+pal = c("#003200", "#3C9600", "#006E00", "#556E19", "#00C800", 
+        "#8CBE8C", "#467864", "#B4E664", "#9BC832", "#EBFF64", 
+        "#F06432", "#9132E6", "#E664E6", "#9B82E6", "#B4FEF0", 
+        "#646464", "#C8C8C8", "#FF0000", "#FFFFFF", "#5ADCDC")
+ggplot() +
+  geom_spatraster(data = terraland) +
+  scale_fill_manual(values = pal, 
+                    guide = guide_legend(ncol = 3), 
+                    name = NULL) + 
+  theme(legend.position = 'bottom')
+```
+
+---
+
+## Зональные операции
+
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-21-1.png" height="500px" /&gt;
+
+---
+
+## Зональные операции
+
+Необходимо привести растры к общей сетке
+
+```r
+(cover = project(terraland, temp, method = 'near'))
+## class       : SpatRaster 
+## dimensions  : 1080, 2160, 1  (nrow, ncol, nlyr)
+## resolution  : 0.1666667, 0.1666667  (x, y)
+## extent      : -180, 180, -90, 90  (xmin, xmax, ymin, ymax)
+## coord. ref. : lon/lat WGS 84 (EPSG:4326) 
+## source(s)   : memory
+## categories  : label 
+## name        :                      cover 
+## min value   : Broadleaf Evergreen Forest 
+## max value   :               Water bodies
+```
+
+---
+
+## Зональные операции
+
+.pull-left[
+.code-small[
+
+```r
+cover_north = crop(
+  cover, ext(-180, 180, 0, 90)
+)
+temp_north = crop(
+  temp, ext(-180, 180, 0, 90)
+)
+stats = zonal(temp_north, cover_north, 
+              mean, na.rm = TRUE)
+
+zonal_stats = stats |&gt; 
+  rename(cover = 1) |&gt; 
+  pivot_longer(
+    -cover, 
+    names_to = 'month', 
+    values_to = 'tavg', 
+    names_prefix = 'wc2.1_10m_tavg_', 
+    names_transform = as.integer
+  ) |&gt; 
+  mutate(month = ordered(month, 1:12, 
+                         month.abb))
+```
+]
+]
+
+.pull-right[
+.code-vsmall[
+
+```r
+head(zonal_stats, 20)
+## # A tibble: 20 × 3
+##    cover                      month   tavg
+##    &lt;chr&gt;                      &lt;ord&gt;  &lt;dbl&gt;
+##  1 Broadleaf Evergreen Forest Jan   22.5  
+##  2 Broadleaf Evergreen Forest Feb   23.1  
+##  3 Broadleaf Evergreen Forest Mar   24.0  
+##  4 Broadleaf Evergreen Forest Apr   24.7  
+##  5 Broadleaf Evergreen Forest May   24.9  
+##  6 Broadleaf Evergreen Forest Jun   24.7  
+##  7 Broadleaf Evergreen Forest Jul   24.5  
+##  8 Broadleaf Evergreen Forest Aug   24.6  
+##  9 Broadleaf Evergreen Forest Sep   24.6  
+## 10 Broadleaf Evergreen Forest Oct   24.3  
+## 11 Broadleaf Evergreen Forest Nov   23.5  
+## 12 Broadleaf Evergreen Forest Dec   22.7  
+## 13 Broadleaf Deciduous Forest Jan   -7.22 
+## 14 Broadleaf Deciduous Forest Feb   -5.11 
+## 15 Broadleaf Deciduous Forest Mar    0.246
+## 16 Broadleaf Deciduous Forest Apr    7.19 
+## 17 Broadleaf Deciduous Forest May   13.1  
+## 18 Broadleaf Deciduous Forest Jun   17.6  
+## 19 Broadleaf Deciduous Forest Jul   19.6  
+## 20 Broadleaf Deciduous Forest Aug   18.4
+```
+]
+]
+
+---
+
+## Зональные операции
+
+.left-40[
+Климатограммы:
+
+```r
+ggplot(zonal_stats) +
+  geom_line(
+    aes(x = month, 
+        y = tavg, 
+        color = cover, 
+        group = cover), 
+    size = 1
+  ) +
+  scale_color_manual(
+    values = pal
+  )
+```
+]
+
+.right-60[
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-25-1.png" height="500px" /&gt;
+]
+
+---
+
+## Глобальные операции
+
+.pull-left[
+
+```r
+global(temp, max, na.rm = T) 
+##                        max
+## wc2.1_10m_tavg_01 34.00950
+## wc2.1_10m_tavg_02 32.82425
+## wc2.1_10m_tavg_03 32.90950
+## wc2.1_10m_tavg_04 34.19375
+## wc2.1_10m_tavg_05 36.25325
+## wc2.1_10m_tavg_06 38.35550
+## wc2.1_10m_tavg_07 39.54950
+## wc2.1_10m_tavg_08 38.43275
+## wc2.1_10m_tavg_09 35.79000
+## wc2.1_10m_tavg_10 32.65125
+## wc2.1_10m_tavg_11 32.78800
+## wc2.1_10m_tavg_12 32.82525
+```
+]
+
+.pull-right[
+
+```r
+global(temp, min, na.rm = T) 
+##                         min
+## wc2.1_10m_tavg_01 -45.88400
+## wc2.1_10m_tavg_02 -44.80000
+## wc2.1_10m_tavg_03 -57.92575
+## wc2.1_10m_tavg_04 -64.19250
+## wc2.1_10m_tavg_05 -64.81150
+## wc2.1_10m_tavg_06 -64.35825
+## wc2.1_10m_tavg_07 -68.46075
+## wc2.1_10m_tavg_08 -66.52250
+## wc2.1_10m_tavg_09 -64.56325
+## wc2.1_10m_tavg_10 -55.90000
+## wc2.1_10m_tavg_11 -43.43475
+## wc2.1_10m_tavg_12 -45.32700
+```
+]
+
+---
+
+## Извлечение данных
+
+Данные можно извлекать посредством `extract` по объектам различной размерности. Например, в точке:
+
+.pull-left[
+.code-vsmall[
+
+```r
+pnt = tibble::tibble(
+  x = -45, y = 70,
+  z = terra::extract(ice.depth, 
+                     bind_cols(x,y))[, 2]
+)
+
+ggplot() +
+  geom_spatraster(data = ice.depth) +
+  scale_fill_gradient(low = 'white', 
+                      high = 'navyblue', 
+                      na.value = "transparent") +
+  geom_point(aes(x, y), pnt, 
+             size = 3, color = 'red') +
+  geom_text(aes(x, y, label = z), 
+            pnt, fontface = 'bold', size = 5,
+            vjust = 'bottom', hjust = 'left',
+            nudge_x = 1, nudge_y = 1) +
+  coord_sf(xlim = c(-80, -10), ylim = c(58, 85)) +
+  labs(title = 'Мощность покровного оледенения',
+       fill = '[м]', x = NULL, y = NULL)
+```
+]
+]
+
+.pull-right[
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-28-1.png" height="450px" /&gt;
+]
+
+
+---
+
+## Извлечение данных
+
+Одна из наиболее распространенных задач по извлечению растровых данных — это построение профиля вдоль заданной линии. Воспользуемся интерактивным редактором для проведения линии профиля
+
+```r
+mp = mapview(temp$tmean6)
+profile = mapedit::drawFeatures(mp)
+```
+
+&lt;img src="../r-geo-course/images/mapedit_profile.png" width="490" /&gt;
+
+
+
+---
+
+## Извлечение данных
+
+Сначала извлекаются данные вместе с координатами, затем необходимо вычислить кумулятивное расстояние от начала профиля:
+
+
+```r
+temprof = terra::extract(temp, profile, cells = TRUE, xy = TRUE)
+
+tempdf = temprof %&gt;%
+  mutate(dist = 0.001 * c(0, dplyr::select(., x, y) |&gt;  
+                             geosphere::distGeo() |&gt; 
+                             cumsum() |&gt; 
+                             head(-1))) |&gt;  
+  select(-c(x, y, cell, ID)) |&gt; 
+  pivot_longer(-dist, 
+               names_to = 'month', values_to = 'tavg', 
+               names_prefix = 'wc2.1_10m_tavg_', 
+               names_transform = as.integer)
+```
+
+---
+
+## Извлечение данных
+
+.pull-left[
+
+```r
+ggplot(tempdf, 
+       aes(x = dist, y = tavg)) +
+  geom_line() +
+  geom_smooth(span = 0.1) +
+  annotate('text', x = 0, 
+           y = 10, label = 'A') +
+  annotate('text', x = max(tempdf$dist), 
+           y = 10, label = 'B') +
+  ggtitle('Профиль среднемесячной 
+          температуры июня по линии A—B') +
+  facet_wrap(~month)
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+]
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

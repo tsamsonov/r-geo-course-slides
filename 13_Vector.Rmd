@@ -29,6 +29,10 @@ library(sf)
 library(dplyr)
 library(classInt)
 library(mapsf) # Удобное построение тематических карт средствами plot()
+
+library(circular) # статистика направлений
+library(NPCirc) # статистика направлений
+library(pracma)
 options(scipen = 999)
 ```
 
@@ -512,4 +516,13 @@ mf_init(frame)
 ```
 ]
 
+---
+
+## Дирекционные данные
+
+Среднемесячные значения метеопараметров в пограничном слое атмосферы по полярным аэрологическим обсерваториям России (ВНИИГМИ-МЦД)
+
+```{r}
+(obs = readxl::read_excel('../r-geo-course/data/bound/scheme.xlsx', 2))
+```
 

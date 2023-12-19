@@ -152,4 +152,129 @@ mf_base(psel |> st_geometry(),
 ```
 ]
 
+---
+
+## Кратчайшие маршруты
+
+```{r}
+# Выбираем и проецируем начальную точку
+origin = poi |> filter(NAME == 'Молодая Гвардия')
+origin_wgs = st_transform(origin, WGS84)
+  
+# Выбираем и проецируем конечную точку
+destination = poi |> filter(NAME == 'Чебуречная "Дружба"')
+destination_wgs = st_transform(destination, WGS84)
+
+# Строим маршрут
+route = osrmRoute(origin_wgs, 
+                  destination_wgs, 
+                  overview = "full") # без генерализации
+# Преобразуем результат обратно в UTM
+route_utm = st_transform(route, UTM)
+origin$label = 'O'
+destination$label = 'D'
+```
+
+---
+
+## Кратчайшие маршруты
+
+.pull-left[
+.code-small[
+```{r route, eval = F}
+basemap()
+mf_base(route_utm, lwd = 3,
+     col = "orange", add = TRUE)
+mf_base(origin, col = "tomato3", 
+     pch = 20, cex = 4, add = TRUE)
+mf_base(destination, col = "tomato", 
+     pch = 20, cex = 4, add = TRUE)
+mf_label(origin, var = "label",
+     col = "tomato4", cex = 0.5, 
+     add = TRUE)
+mf_label(destination, var = "label",
+     col = "tomato4", cex = 0.7)
+```
+]
+]
+
+.pull-right[
+```{r, echo=FALSE, ref.label='route'}
+```
+]
+
+---
+
+## Структурный анализ
+
+```{r}
+lines = roads |> 
+  st_cast('LINESTRING')
+
+twoway = lines |>
+  filter(is.na(ONEWAY) | ONEWAY != 'yes') |>
+  st_reverse() |>
+  bind_rows(lines)
+
+net = twoway |>
+  st_geometry() |>
+  lapply(function(x) round(x, 0)) |>
+  st_sfc(crs = st_crs(roads)) |>
+  as_sfnetwork()
+```
+
+---
+
+## Структурный анализ
+
+Результирующий граф
+
+```{r}
+net
+```
+
+---
+
+## Структурный анализ
+
+.pull-left[
+Визуализируем
+
+```{r autopl, eval=F}
+autoplot(net)
+```
+]
+
+.pull-right[
+```{r, ref.label='autopl', echo=F}
+```
+]
+
+
+---
+
+## Структурный анализ
+
+Активация компонент и вычисления
+
+.pull-left[
+```{r betw, eval = F}
+net = net |> 
+  activate("edges") |> 
+  mutate(weight = edge_length(),
+   bc = centrality_edge_betweenness())
+
+ggplot() +
+  geom_sf(data = st_as_sf(net, "edges"), 
+          aes(col = bc, linewidth = bc)) +
+  scale_color_viridis_c() +
+  ggtitle("Центральность по промежуточности")
+```
+]
+
+.pull-right[
+```{r, echo=FALSE, message=FALSE, warning = FALSE, ref.label='betw'}
+```
+]
+
 

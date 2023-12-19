@@ -151,8 +151,8 @@ selected_poi = poi_food[service_area_utm, ]
 ```r
 basemap()
 mf_base(service_area_utm,
-     col = adjustcolor("violetred3", 
-                       alpha.f = 0.2),
+     col = adjustcolor(
+       "violetred3", alpha.f = 0.2),
      border = "violetred3",
      add = TRUE)
 mf_base(selected_poi , 
@@ -170,6 +170,158 @@ mf_base(psel |&gt; st_geometry(),
 
 .pull-right[
 ![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Кратчайшие маршруты
+
+
+```r
+# Выбираем и проецируем начальную точку
+origin = poi |&gt; filter(NAME == 'Молодая Гвардия')
+origin_wgs = st_transform(origin, WGS84)
+  
+# Выбираем и проецируем конечную точку
+destination = poi |&gt; filter(NAME == 'Чебуречная "Дружба"')
+destination_wgs = st_transform(destination, WGS84)
+
+# Строим маршрут
+route = osrmRoute(origin_wgs, 
+                  destination_wgs, 
+                  overview = "full") # без генерализации
+# Преобразуем результат обратно в UTM
+route_utm = st_transform(route, UTM)
+origin$label = 'O'
+destination$label = 'D'
+```
+
+---
+
+## Кратчайшие маршруты
+
+.pull-left[
+.code-small[
+
+```r
+basemap()
+mf_base(route_utm, lwd = 3,
+     col = "orange", add = TRUE)
+mf_base(origin, col = "tomato3", 
+     pch = 20, cex = 4, add = TRUE)
+mf_base(destination, col = "tomato", 
+     pch = 20, cex = 4, add = TRUE)
+mf_label(origin, var = "label",
+     col = "tomato4", cex = 0.5, 
+     add = TRUE)
+mf_label(destination, var = "label",
+     col = "tomato4", cex = 0.7)
+```
+]
+]
+
+.pull-right[
+![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Структурный анализ
+
+
+```r
+lines = roads |&gt; 
+  st_cast('LINESTRING')
+
+twoway = lines |&gt;
+  filter(is.na(ONEWAY) | ONEWAY != 'yes') |&gt;
+  st_reverse() |&gt;
+  bind_rows(lines)
+
+net = twoway |&gt;
+  st_geometry() |&gt;
+  lapply(function(x) round(x, 0)) |&gt;
+  st_sfc(crs = st_crs(roads)) |&gt;
+  as_sfnetwork()
+```
+
+---
+
+## Структурный анализ
+
+Результирующий граф
+
+
+```r
+net
+## # A sfnetwork with 2133 nodes and 2825 edges
+## #
+## # CRS:  WGS 84 / UTM zone 37N 
+## #
+## # A directed multigraph with 223 components with spatially explicit edges
+## #
+## # A tibble: 2,133 × 1
+##                  x
+##        &lt;POINT [m]&gt;
+## 1 (410948 6177750)
+## 2 (410947 6177750)
+## 3 (411054 6177640)
+## 4 (410947 6177557)
+## 5 (410978 6179110)
+## 6 (410947 6179112)
+## # ℹ 2,127 more rows
+## #
+## # A tibble: 2,825 × 3
+##    from    to                                                                  x
+##   &lt;int&gt; &lt;int&gt;                                                   &lt;LINESTRING [m]&gt;
+## 1     1     2                                   (410948 6177750, 410947 6177750)
+## 2     3     4 (411054 6177640, 411046 6177634, 411011 6177606, 410957 6177564, …
+## 3     5     6                   (410978 6179110, 410948 6179112, 410947 6179112)
+## # ℹ 2,822 more rows
+```
+
+---
+
+## Структурный анализ
+
+.pull-left[
+Визуализируем
+
+
+```r
+autoplot(net)
+```
+]
+
+.pull-right[
+![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+]
+
+
+---
+
+## Структурный анализ
+
+Активация компонент и вычисления
+
+.pull-left[
+
+```r
+net = net |&gt; 
+  activate("edges") |&gt; 
+  mutate(weight = edge_length(),
+   bc = centrality_edge_betweenness())
+
+ggplot() +
+  geom_sf(data = st_as_sf(net, "edges"), 
+          aes(col = bc, linewidth = bc)) +
+  scale_color_viridis_c() +
+  ggtitle("Центральность по промежуточности")
+```
+]
+
+.pull-right[
+![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 ]
 
 

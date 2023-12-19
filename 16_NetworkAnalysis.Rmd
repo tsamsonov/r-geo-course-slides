@@ -1,0 +1,155 @@
+---
+title: "Сетевой анализ"
+subtitle: "Визуализация и анализ географических данных на языке R"
+author: "Тимофей Самсонов"
+institute: "МГУ имени Ломоносова, Географический факультет"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: [default, "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+---
+
+```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
+library(datasets)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
+knitr::opts_knit$set(global.par = TRUE)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300, crop = T)
+```
+
+## Пакеты
+
+Для выполнения кода данной лекции вам понадобятся следующие пакеты:
+```{r}
+library(sf)
+library(tidyverse)
+library(classInt)
+library(osrm)
+library(mapsf)
+library(sfnetworks)
+library(tidygraph)
+options(scipen = 999)
+```
+
+
+---
+
+## Исходные данные
+
+```{r}
+db = '../r-geo-course/data/moscow.gpkg'
+roads = read_sf(db, "roads") # Дороги
+poi = read_sf(db, "poi") # Точки интереса
+rayons = read_sf(db, "districts") # Границы районов
+stations = read_sf(db, "metro_stations") # Станции метро
+water = read_sf(db, "water") # Водные объекты
+
+frame = roads |>  
+  st_bbox() |>
+  st_as_sfc() |> 
+  st_geometry()
+
+poi_food = poi |>  
+    select(NAME, AMENITY) |> 
+    filter(AMENITY %in% c("restaurant", "bar", "cafe", "pub", "fast_food"))
+```
+
+
+---
+
+## Картографическая основа
+
+.pull-left[
+.code-small[
+```{r}
+stations$label = 'M'
+basemap = function(add = FALSE) {
+  if (add == FALSE) 
+    mf_init(frame)
+  mf_base(water, col = 'steelblue3', 
+         add = TRUE)
+  mf_base(roads, col = 'black', 
+         add = T)
+  mf_base(poi_food, cex = 0.5, 
+         col = "deepskyblue4", 
+         add = TRUE)
+  mf_base(stations, 
+       col = "slategray4", 
+       pch = 20, 
+       cex = 3, 
+       add = TRUE)
+  mf_label(stations,
+   var = 'label',
+   col = "white",
+   cex = 0.7)
+}
+```
+]
+]
+.pull-right[
+```{r}
+basemap()
+```
+]
+
+---
+
+## Зоны транспортной доступности
+
+```{r}
+WGS84 = st_crs(4326) # Инициализируем WGS84, используемую в OSRM
+
+UTM = st_crs(poi) # Система координат исходных точек
+
+# Выбираем целевой объект
+psel = poi |>  
+  filter(NAME == "Центральный детский магазин" & SHOP == "toys")
+
+psel_wgs = st_transform(psel, WGS84) # Преобразуем в WGS84
+
+# Получаем 5-минутную зону транспортной доступности
+service_area = osrmIsochrone(psel_wgs, breaks = 3)
+
+# Преобразуем зону обратно в UTM для дальнейших операций
+service_area_utm = st_transform(st_as_sf(service_area), UTM)
+
+# Отбираем точки
+selected_poi = poi_food[service_area_utm, ]
+```
+
+
+---
+
+## Зоны транспортной доступности
+
+.pull-left[
+```{r sarea, eval = FALSE}
+basemap()
+mf_base(service_area_utm,
+     col = adjustcolor(
+       "violetred3", alpha.f = 0.2),
+     border = "violetred3",
+     add = TRUE)
+mf_base(selected_poi , 
+     col = "violetred3", 
+     pch = 20, 
+     cex = 0.5, 
+     add = TRUE)
+mf_base(psel |> st_geometry(), 
+     col = "violetred4", 
+     pch = 20, 
+     cex = 4, 
+     add = TRUE)
+```
+]
+
+.pull-right[
+```{r, echo=FALSE, ref.label='sarea'}
+```
+]
+
+

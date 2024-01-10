@@ -205,6 +205,123 @@ mf_label(destination, var = "label",
 
 ---
 
+## Задача коммивояжёра
+
+**Задача коммивояжера** --- определение оптимального маршрута объезда заданного множества точек
+
+```{r}
+sber = poi |>  
+  filter(OSM_ID %in% c(2298789061, 1705988219, 
+                       1531266598, 916076946, 2043705976)) %>% 
+  bind_cols(st_coordinates(x = .))
+
+sber_wgs = st_transform(sber, WGS84)
+
+route = osrmTrip(sber, overview = "full")[[1]]$trip |> 
+  mutate(order = ordered(row_number()))
+```
+
+---
+
+## Задача коммивояжёра
+
+.pull-left[
+.code-small[
+```{r sber, eval=F}
+ggplot() + 
+  geom_sf(data = roads, 
+          color = 'grey', linewidth = 0.25) +
+  geom_sf(data = route, 
+          mapping = aes(color = order), 
+          linewidth = 2, alpha = 0.85) +
+  geom_sf(data = sber, size = 5, 
+          color = 'darkgreen', alpha = 0.85) +
+  ggrepel::geom_label_repel(
+    data = sber, 
+    box.padding = 1,
+    mapping = aes(X,Y, label = NAME), 
+    size = 5
+  ) +
+  theme_void()
+```
+]
+]
+
+.pull-right[
+```{r, ref.label='sber', echo=F}
+```
+]
+
+---
+
+## Ближайший пункт обслуживания
+
+Задача данного класса позволяет находить для каждой точки клиента ближайший к ней пункт обслуживания.
+
+.pull-left[
+```{r}
+bars = poi_food |> 
+ filter(AMENITY %in% c('bar', 'pub')) %>% 
+  bind_cols(st_coordinates(x = .)) |> 
+  dplyr::sample_n(100)
+
+bars_wgs = st_transform(bars, WGS84)
+
+odmatrix = osrmTable(src = bars_wgs, 
+                     dst = sber_wgs, 
+        osrm.profile	= 'foot')$durations
+        # пешеходы
+best = apply(odmatrix, 1, which.min)
+
+```
+]
+
+.pull-right[
+```{r}
+connects = st_sfc(
+  lapply(seq_along(best), \(i) {
+    st_linestring(
+      rbind(
+        c(bars$X[i], bars$Y[i]),
+        c(sber$X[best[i]], sber$Y[best[i]])
+      )
+    )
+  }),
+  crs = UTM
+)
+```
+]
+
+---
+
+## Ближайший пункт обслуживания
+
+.pull-left[
+```{r closefa, eval = F}
+ggplot() + 
+  geom_sf(data = roads, color = 'grey', 
+          linewidth = 0.25) +
+  geom_sf(data = connects, linewidth = 1, 
+          alpha = 0.85) +
+  geom_sf(data = sber, size = 5, 
+          color = 'darkgreen', 
+          alpha = 0.85) +
+  ggrepel::geom_label_repel(
+    data = sber, box.padding = 1,
+    mapping = aes(X,Y, label = NAME), 
+    size = 5) +
+  theme_void()
+```
+]
+
+.pull-right[
+```{r, ref.label='closefa', echo=F}
+```
+]
+
+
+---
+
 ## Структурный анализ
 
 ```{r}
@@ -255,7 +372,7 @@ autoplot(net)
 
 ## Структурный анализ
 
-Активация компонент и вычисления
+**Центральность по промежуточности** показывает количество маршрутов, проходящих через узел/ребро.
 
 .pull-left[
 ```{r betw, eval = F}
@@ -274,6 +391,40 @@ ggplot() +
 
 .pull-right[
 ```{r, echo=FALSE, message=FALSE, warning = FALSE, ref.label='betw'}
+```
+]
+
+---
+
+## Структурный анализ
+
+**Центральность по близости** обратно пропорциональна сумме расстояний от вершины до остальных вершин.
+
+.pull-left[
+.code-small[
+```{r clos, eval = F}
+net = as_sfnetwork(roxel)
+net = net |> 
+  activate("nodes") |> 
+  mutate(cc = 
+   centrality_closeness(mode = 'all'))
+nodes = st_as_sf(net, "nodes") |> 
+  filter(cc < 1)
+ggplot() +
+  geom_sf(data = st_as_sf(net, "edges"), 
+          col = "grey50") +
+  geom_sf(data = nodes, 
+          aes(fill = cc, size = cc), shape = 21) +
+  scale_fill_viridis_c(option="magma") +
+  scale_size(range = c(1.5, 4)) +
+  guides(size = guide_legend(reverse=T)) +
+  ggtitle("Центральность по промежуточности")
+```
+]
+]
+
+.pull-right[
+```{r, echo=FALSE, message=FALSE, warning = FALSE, ref.label='clos'}
 ```
 ]
 

@@ -332,7 +332,7 @@ summarise(regdf_gr, total = sum(y2015, na.rm = TRUE))
 regdf = rdf |> 
   mutate(okrug = if_else(flt2, Region, NA)) |> 
   fill(okrug) |> 
-  filter(flt)
+  filter(!flt)
 ```
 ```{r, collapse=TRUE}
 leaders = regdf |>

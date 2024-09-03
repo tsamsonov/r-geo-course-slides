@@ -65,47 +65,21 @@ class: center, middle, inverse, title-slide
 
 С начала 2010-х гг профессия "дата сайнтиста" стала одной из наиболее востребованных и популярных в мире IT. В качестве инструментов часто используются такие языки программирования как __Python__, __R__, __Julia__, __JavaScript__.
 &lt;br&gt;&lt;br&gt;
-Наука о пространственных данных (.green[spatial data science]) — междисциплинарная область на стыке геоинформатики и науки о данных. 
-
-&lt;!-- # Stackoverflow --&gt;
-
-&lt;!-- Доля вопросов, касающихся R, существенно выросла за последние 10 лет. --&gt;
-
-&lt;!-- ```{r, echo=F, out.width = '60%'} --&gt;
-&lt;!-- knitr::include_graphics('img/stacktrends.png') --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- https://insights.stackoverflow.com/trends --&gt;
-
-&lt;!-- --- --&gt;
-
-&lt;!-- # Рейтинг популярности TIOBE --&gt;
-
-&lt;!-- ```{r setup, include=FALSE} --&gt;
-&lt;!-- knitr::opts_chunk$set(fig.dim=c(4.8, 4.5), fig.retina=2, out.width="100%", collapse=T) --&gt;
-&lt;!-- library(dplyr) --&gt;
-&lt;!-- library(kableExtra) --&gt;
-&lt;!-- ``` --&gt;
-
-&lt;!-- .code-vsmall[ --&gt;
-&lt;!-- ```{r} --&gt;
-&lt;!-- library(tiobeindexr) --&gt;
-&lt;!-- top_20() --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ] --&gt;
-
+Наука о пространственных данных (.green[spatial data science]) — междисциплинарная область на стыке геоинформатики и науки о данных.
 
 ---
 
 # Рейтинг популярности PYPL
 
-.left-40[ __PYPL__ _(PopularitY of Programming Language Index)_ — показывает, насколько часто люди ищут обучающие материалы по языкам программирования на _Google_
+.left-40[
+__PYPL__ _(PopularitY of Programming Language Index)_ — показывает, насколько часто люди ищут обучающие материалы по языкам программирования на _Google_
 
 &lt;img src="img/pypl.png" width="70%" /&gt;
 https://pypl.github.io/PYPL.html
 ]
 
 .right-60[
-&lt;img src="img/pypl2024.png" width="100%" /&gt;
+&lt;img src="img/pypl2024.png" width="90%" /&gt;
 ]
 
 ---
@@ -121,23 +95,6 @@ https://pypl.github.io/PYPL.html
 R устойчиво находится в верхней квартили GitHub как по количеству репозиториев, так и по числу тегов, которые имеют к нему отношение
 ]
 
-&lt;!-- --- --&gt;
-
-&lt;!-- # Использование в индустрии --&gt;
-
-&lt;!-- .pull-left[ --&gt;
-&lt;!-- ```{r, echo=F, out.width = '100%'} --&gt;
-&lt;!-- knitr::include_graphics('https://149351115.v2.pressablecdn.com/wp-content/uploads/2017/10/industry_growth_plot-1-768x768.png') --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ] --&gt;
-
-&lt;!-- .pull-right[ --&gt;
-&lt;!-- Особенностью R является высокая популярность в академической среде и здравоохранении (для США и Канады). --&gt;
-
-
-&lt;!-- .small[https://stackoverflow.blog/2017/10/10/impressive-growth-r/] --&gt;
-&lt;!-- ] --&gt;
-
 ---
 
 # Основные свойства языка R
@@ -147,7 +104,7 @@ R устойчиво находится в верхней квартили GitHu
 ]
 
 .right-column[
-- .small[Несмотря на то, что __R__ изначально создавался для задач анализа данных, он .red[__является универсальным языком программирования__], на котором можно решать произвольные компьютерные задачи.]
+- .small[Язык __R__ является .red[специализированным языком для __анализа данных__], хотя при этом на нем можно решать произвольные  задачи, вплоть до системного программирования]
 
 
 - .small[__R__ является .red[__интерпретируемым__] языком. Программы на нём не компилируются, а выполняются построчно (интерпретируются), точно так же как это делается в _Python_ и _Matlab._]
@@ -158,152 +115,6 @@ R устойчиво находится в верхней квартили GitHu
 
 - .small[Программы на __R__ пишутся в парадигме .red[__функционального программирования__]. Вместе с тем __R__ обладает развитыми системами классов, которые используются при создании пакетов (библиотек)]
 ]
-
-
-&lt;!-- --- --&gt;
-
-&lt;!-- # Присваивание --&gt;
-
-&lt;!-- .pull-left[ --&gt;
-&lt;!-- Присваивание делается через `&lt;-`: --&gt;
-
-&lt;!-- ```{r} --&gt;
-&lt;!-- a &lt;- 4 --&gt;
-&lt;!-- b &lt;- a + 7 --&gt;
-&lt;!-- b --&gt;
-&lt;!-- ``` --&gt;
-
-&lt;!-- Может быть заменено на `=`: --&gt;
-&lt;!-- ```{r} --&gt;
-&lt;!-- x = b / a --&gt;
-&lt;!-- x --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ] --&gt;
-
-&lt;!-- .pull-right[ --&gt;
-&lt;!-- Глобальное присваивание через `&lt;&lt;-` --&gt;
-
-&lt;!-- .small[ --&gt;
-&lt;!-- ```{r} --&gt;
-&lt;!-- a = 4 --&gt;
-&lt;!-- b = 5 --&gt;
-&lt;!-- proc = function(x) { --&gt;
-&lt;!--   a = 2 # в пределах функции --&gt;
-&lt;!--   b &lt;&lt;- 2 # везде --&gt;
-&lt;!--   round(x / a, b) --&gt;
-&lt;!-- } --&gt;
-&lt;!-- proc(3.1415926) --&gt;
-&lt;!-- a --&gt;
-&lt;!-- b --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ] --&gt;
-&lt;!-- ] --&gt;
-
-&lt;!-- --- --&gt;
-
-&lt;!-- # Функциональное программирование --&gt;
-
-&lt;!-- .pull-left[ --&gt;
-&lt;!-- Каждый оператор в R реализован в виде функции: --&gt;
-&lt;!-- ```{r} --&gt;
-&lt;!-- a = 7 --&gt;
-&lt;!-- `=`(b, -2) --&gt;
-&lt;!-- a + b --&gt;
-&lt;!-- `+`(a, b) --&gt;
-&lt;!-- ``` --&gt;
-
-&lt;!-- Извлечение элементов: --&gt;
-&lt;!-- ```{r} --&gt;
-&lt;!-- samples = c(2, 4, 7, 9, 22) --&gt;
-&lt;!-- samples[2:3] --&gt;
-&lt;!-- `[`(samples, 2:3) --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ]] --&gt;
-
-&lt;!-- .pull-right[ --&gt;
-&lt;!-- Функционалы и векторизованные вычисления: --&gt;
-&lt;!-- .code-small[ --&gt;
-&lt;!-- ```{r} --&gt;
-&lt;!-- library(microbenchmark) --&gt;
-
-&lt;!-- # 3 способа создать вектор квадратных --&gt;
-&lt;!-- # корней от 1 до 1000 --&gt;
-&lt;!-- microbenchmark( --&gt;
-&lt;!--   for (i in 1:1000) { # цикл --&gt;
-&lt;!--     a[i] = sqrt(i) --&gt;
-&lt;!--   }, --&gt;
-&lt;!--   b = sapply(1:1000, sqrt), # функционал --&gt;
-&lt;!--   c = sqrt(1:1000) # векторизация функции --&gt;
-&lt;!-- ) |&gt;  --&gt;
-&lt;!--   summary() |&gt;  --&gt;
-&lt;!--   pull(mean) --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ] --&gt;
-&lt;!-- ] --&gt;
-
-&lt;!-- --- --&gt;
-
-&lt;!-- # Квотация аргументов функций --&gt;
-
-&lt;!-- __Квотация__ _(quotation)_ — это использование имени переменной как обычной строки --&gt;
-
-&lt;!-- .code-small[ --&gt;
-&lt;!-- ```{r} --&gt;
-&lt;!-- data(starwars, package='dplyr') --&gt;
-&lt;!-- colnames(starwars) --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ] --&gt;
-
-&lt;!-- .pull-left[ --&gt;
-&lt;!-- Обычный вызов функции: --&gt;
-&lt;!-- .code-small[ --&gt;
-&lt;!-- ```{r} --&gt;
-&lt;!-- select(starwars, 'name', 'mass') --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ]] --&gt;
-
-&lt;!-- .pull-right[ --&gt;
-&lt;!-- Вызов с квотацией аргументов: --&gt;
-&lt;!-- .code-small[ --&gt;
-&lt;!-- ```{r} --&gt;
-&lt;!-- select(starwars, name, mass) --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ]] --&gt;
-
-&lt;!-- --- --&gt;
-
-&lt;!-- # Конвейер передачи аргументов --&gt;
-
-&lt;!-- __Пайп-оператор__ `|&gt;` позволяет вставлять значения переменных в аргументы функций. --&gt;
-
-&lt;!--  - `x |&gt; f` эквивалентно `f(x)` --&gt;
-&lt;!--  - `x |&gt; f(y)` эквивалентно `f(x, y)` --&gt;
-&lt;!--  - `x |&gt; f |&gt; g |&gt; h` эквивалентно `h(g(f(x)))` --&gt;
-
-&lt;!-- Это чрезвычайно удобно при выполнении последовательности преобразований: --&gt;
-
-&lt;!-- .pull-left[ --&gt;
-&lt;!-- ```{r select, eval = FALSE} --&gt;
-&lt;!-- starwars |&gt; --&gt;
-&lt;!--   select(name, mass, sex) |&gt;  --&gt;
-&lt;!--   filter(mass &gt; 100) |&gt; --&gt;
-&lt;!--   arrange(desc(mass)) |&gt; --&gt;
-&lt;!--   head(5) --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ] --&gt;
-
-&lt;!-- .pull-right[ --&gt;
-&lt;!-- .small-pre[ --&gt;
-&lt;!-- ```{r select-out, ref.label="select", echo=FALSE} --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ] --&gt;
-&lt;!-- ] --&gt;
-
-&lt;!-- .code-small[ --&gt;
-&lt;!-- ```{r, eval = FALSE} --&gt;
-&lt;!-- head(arrange(filter(select(starwars, name, mass), mass &gt; 100), desc(mass)) # То же --&gt;
-&lt;!-- ``` --&gt;
-&lt;!-- ] --&gt;
 
 ---
 

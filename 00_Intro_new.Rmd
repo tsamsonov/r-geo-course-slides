@@ -188,7 +188,7 @@ knitr::include_graphics("https://d33wubrfki0l68.cloudfront.net/eea112c862c6881ff
 
 # The R Journal
 
-Высокорейтинговый журнал (.red[__Q1__] WoS, JCR 2020 = .green[3.984]) о развитии R и его библиотек
+Специализированный журнал (.red[__Q2__] WoS, JCR 2022 = .green[2.1]) о развитии R и его библиотек
 
 ```{r, echo = F}
 knitr::include_url("https://journal.r-project.org/")
@@ -199,7 +199,7 @@ https://journal.r-project.org/
 
 # Journal of Statistical Software
 
-Высокорейтинговый журнал (.red[__Q1__] WoS, JCR 2019 = .green[13.642]) о разработке статистического программного обеспечения (большинство разработок сделано на .blue[__R__])
+Высокорейтинговый журнал (.red[__Q1__] WoS, JCR 2023 = .green[5.400]) о разработке статистического программного обеспечения (большинство разработок сделано на .blue[__R__])
 
 ```{r, echo = F}
 knitr::include_url("https://www.jstatsoft.org/index")

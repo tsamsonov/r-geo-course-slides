@@ -51,14 +51,30 @@ __forcats__ | Автоматизация работы с факторами
 
 ---
 
-## Тибблы
-
-__Тиббл__ представляет собой фрейм данных с более строгим поведением
+# Подключение
 
 
 ``` r
-library(tibble)
+library(tidyverse)
+## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+## ✔ purrr     1.0.2     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
 ```
+
+Обратите внимание, что при подключении __tidyverse__ автоматически производится маскирование конфликтующих функций.
+
+---
+
+## Тибблы
+
+__Тиббл__ представляет собой фрейм данных с более строгим поведением
 
 .pull-left[
 
@@ -138,7 +154,6 @@ starwars
 
 
 ``` r
-library(readr)
 (okruga = read_csv('../r-geo-course/data/okruga.csv'))
 ## Rows: 8 Columns: 7
 ## ── Column specification ────────────────────────────────────────────────────────
@@ -329,7 +344,6 @@ head(reforest)
 
 
 ``` r
-library(dplyr)
 (rdf = select(reforest, Region, y2010, y2015))
 ## # A tibble: 89 × 3
 ##    Region                        y2010 y2015
@@ -401,7 +415,6 @@ filter(rdf, y2015 &gt; 50)
 
 
 ``` r
-library(stringr)
 flt = str_detect(rdf$Region, 'Федерация|федеральный округ')
 flt
 ##  [1]  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
@@ -952,28 +965,6 @@ library(writexl)
 write_xlsx(compare, "../r-geo-course/data/output/timber_compare.xlsx")
 ```
 
----
-
-## Подключение всех библиотек
-
-
-
-
-``` r
-library(tidyverse)
-## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
-## ✔ purrr     1.0.2     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
-```
-
-Обратите внимание, что при подключении __tidyverse__ автоматически производится маскирование конфликтующих функций.
 
 ---
 

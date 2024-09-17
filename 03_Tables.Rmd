@@ -35,13 +35,19 @@ __forcats__ | Автоматизация работы с факторами
 
 ---
 
+# Подключение
+
+```{r}
+library(tidyverse)
+```
+
+Обратите внимание, что при подключении __tidyverse__ автоматически производится маскирование конфликтующих функций.
+
+---
+
 ## Тибблы
 
 __Тиббл__ представляет собой фрейм данных с более строгим поведением
-
-```{r}
-library(tibble)
-```
 
 .pull-left[
 ```{r}
@@ -90,7 +96,6 @@ starwars
 ## Файлы с разделителем
 
 ```{r}
-library(readr)
 (okruga = read_csv('../r-geo-course/data/okruga.csv'))
 ```
 
@@ -194,7 +199,6 @@ head(reforest)
 ## Выбор переменных
 
 ```{r}
-library(dplyr)
 (rdf = select(reforest, Region, y2010, y2015))
 ```
 
@@ -221,7 +225,6 @@ filter(rdf, y2015 > 50)
 ## Выбор строк (фильтрация)
 
 ```{r}
-library(stringr)
 flt = str_detect(rdf$Region, 'Федерация|федеральный округ')
 flt
 regdf = filter(rdf, !flt) # применяем фильтр
@@ -283,7 +286,6 @@ summarise(regdf,
 
 Исходные данные:
 ```{r, echo=FALSE}
-library(tidyr)
 flt2 = str_detect(rdf$Region, 'федеральный округ') # ищем округа
 rdf2 = mutate(rdf, okrug = if_else(flt2, Region, NA)) # перенесем названия округов в новый столбец
 rdf2 = fill(rdf2, okrug) # заполним все пустые строчки предыдущим значением
@@ -535,23 +537,6 @@ library(writexl)
 write_xlsx(compare, "../r-geo-course/data/output/timber_compare.xlsx")
 ```
 
----
-
-## Подключение всех библиотек
-
-```{r, include=FALSE}
-detach("package:dplyr", unload=TRUE)
-detach("package:tidyr", unload=TRUE)
-detach("package:stringr", unload=TRUE)
-detach("package:readr", unload=TRUE)
-detach("package:tibble", unload=TRUE)
-```
-
-```{r}
-library(tidyverse)
-```
-
-Обратите внимание, что при подключении __tidyverse__ автоматически производится маскирование конфликтующих функций.
 
 ---
 

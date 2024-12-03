@@ -4,8 +4,8 @@
     <title>Векторный анализ</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2023-11-28" />
-    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2024-11-26" />
+    <script src="libs/header-attrs-2.27/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2023-11-28
+### 2024-11-26
 ]
 
 ---
@@ -38,7 +38,7 @@ class: center, middle, inverse, title-slide
 
 Для выполнения кода данной лекции вам понадобятся следующие пакеты:
 
-```r
+``` r
 library(sf)
 library(dplyr)
 library(classInt)
@@ -80,7 +80,7 @@ __Пространственные запросы__ связаны с поиск
 
 .code-small[
 
-```r
+``` r
 # Чтение данных
 roads = read_sf("../r-geo-course/data/roads.gpkg") # Дороги
 rayons = read_sf("../r-geo-course/data/boundary_polygon.gpkg") # Границы районов
@@ -113,7 +113,7 @@ frame = roads |&gt;
 __Задача__: подсчитать сколько заведений общепита на каждой улице.
 
 
-```r
+``` r
 # Визуализируем входные данные
 plot(frame)
 plot(water, 
@@ -142,7 +142,7 @@ plot(poi_food,
 Для этого вычислим матрицу попарных расстояний между дорогами и точками и найдем ближайшую улицу к каждой точке:
 
 
-```r
+``` r
 dist_matrix = st_distance(roads, poi_food)
 print(dist_matrix[1:5,1:5])
 ## Units: [m]
@@ -166,7 +166,7 @@ head(id)
 Результаты необходимо проагрегировать:
 
 
-```r
+``` r
 stats = table(id) |&gt; 
   as_tibble() |&gt; 
   mutate(id = as.integer(id))
@@ -187,7 +187,7 @@ print(stats, n = 5)
 .pull-right[
 И далее присоединить к линиям дорог:
 
-```r
+``` r
 roads_stats = roads |&gt; 
   mutate(id = row_number()) |&gt; 
   left_join(stats, by = 'id') |&gt; 
@@ -196,7 +196,7 @@ roads_stats = roads |&gt;
 ```
 
 
-```r
+``` r
 roads_stats |&gt; select(NAME, n) |&gt;  
   tail(5) |&gt; st_drop_geometry()
 ## # A tibble: 5 × 2
@@ -218,7 +218,7 @@ roads_stats |&gt; select(NAME, n) |&gt;
 Визуализируем результаты с помощью __mapsf__:
 
 
-```r
+``` r
 mf_init(frame)
   mf_map(water, col = 'steelblue3', 
          add = TRUE)
@@ -280,7 +280,7 @@ mf_init(frame)
 .pull-left[
 .code-small[
 
-```r
+``` r
 countries = st_read(
   '../r-geo-course/data/ne/countries.gpkg',
   quiet = T
@@ -314,7 +314,7 @@ plot(cities, col = 'black',
 .pull-left[
 .code-small[
 
-```r
+``` r
 # отключаем s2 чтобы не было ошибок 
 # при выборке
 sf::sf_use_s2(FALSE)
@@ -349,7 +349,7 @@ plot(sel, pch = 20, col = 'black',
 .pull-left[
 .code-small[
 
-```r
+``` r
 cz = countries |&gt; 
   filter(sovereignt == 'Czechia')
 
@@ -375,7 +375,7 @@ plot(cz, col = 'darkgray', add = TRUE)
 Количественное агрегирование по районам:
 .code-small[
 
-```r
+``` r
 poi_food = poi_food |&gt; mutate(count = 1)
 rayons_poi = aggregate(
   poi_food['count'], 
@@ -407,7 +407,7 @@ mf_init(frame)
 .pull-left[
 .code-small[
 
-```r
+``` r
 # Выберем станцию метро и построим буферную зону
 krop = stations |&gt; 
   filter(NAME == "Кропоткинская")
@@ -442,7 +442,7 @@ mf_init(frame)
 
 .pull-left[
 
-```r
+``` r
 zones = stations |&gt; 
   as('Spatial') |&gt; 
   dismo::voronoi() |&gt;  
@@ -468,7 +468,7 @@ plot(stations, add = TRUE,
 
 .code-small[
 
-```r
+``` r
 zones_poi = aggregate(poi_food['count'], zones, sum)
 
 mf_init(frame)
@@ -499,7 +499,7 @@ mf_init(frame)
 Среднемесячные значения метеопараметров в пограничном слое атмосферы по полярным аэрологическим обсерваториям России (ВНИИГМИ-МЦД)
 
 
-```r
+``` r
 (obs = readxl::read_excel('../r-geo-course/data/bound/scheme.xlsx', 2))
 ## # A tibble: 13 × 4
 ##    Индекс Название        Широта Долгота

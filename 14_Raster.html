@@ -4,8 +4,8 @@
     <title>Растровый анализ</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2023-12-05" />
-    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2024-12-03" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2023-12-05
+### 2024-12-03
 ]
 
 ---
@@ -38,15 +38,14 @@ class: center, middle, inverse, title-slide
 
 Для выполнения кода данной лекции вам понадобятся следующие пакеты:
 
-```r
+``` r
 library(sf)
 library(stars)
 library(geosphere)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(terra)
 library(tidyterra)
+library(whitebox)
 library(ggnewscale)
 options(scipen = 999)
 ```
@@ -56,7 +55,7 @@ options(scipen = 999)
 ## Исходные данные
 
 
-```r
+``` r
 # Чтение данных
 (bed = rast('../r-geo-course/data/etopo1_bed.tif'))
 ## class       : SpatRaster 
@@ -82,7 +81,7 @@ countries = read_sf('../r-geo-course/data/countries.gpkg')
 ## Исходные данные
 
 
-```r
+``` r
 ggplot() +
   geom_spatraster(data = bed) +
   scale_fill_hypso_tint_c(palette = "gmt_globe") +
@@ -96,7 +95,7 @@ ggplot() +
 ## Исходные данные
 
 
-```r
+``` r
 ggplot() +
   geom_spatraster(data = ice) +
   scale_fill_hypso_tint_c(palette = "gmt_globe") +
@@ -131,7 +130,7 @@ __Типы операций:__
 .pull-left[
 .code-small[
 
-```r
+``` r
 ice.depth = ice - bed
 ice.depth[ice.depth == 0] = NA
 
@@ -172,7 +171,7 @@ ggplot() +
 ## Сглаживание
 
 
-```r
+``` r
 # Вырежем кусок из ЦМР
 dem = crop(ice, ext(-120, -75, 10, 40))
 
@@ -193,7 +192,7 @@ filtered = focal(dem, w = wgt)
 ## Сглаживание
 
 
-```r
+``` r
 ggplot() +
   geom_spatraster(data = c(dem, filtered)) +
   scale_fill_hypso_tint_c(palette = "etopo1") + 
@@ -207,7 +206,7 @@ ggplot() +
 ## Гауссово сглаживание
 
 
-```r
+``` r
 filtered = focal(dem, focalMat(dem, 0.5, "Gauss"))
 
 ggplot() +
@@ -224,7 +223,7 @@ ggplot() +
 
 .pull-left[
 
-```r
+``` r
 # Матрица Собеля:
 wgt = matrix(c(1, 2, 1,
                 0, 0, 0,
@@ -254,7 +253,7 @@ ggplot() +
 
 .pull-left[
 
-```r
+``` r
 # Отберем все ячейки, обладающие 
 # высокими значениями производных
 faults = abs(filtered) &gt; 1500
@@ -286,8 +285,9 @@ ggplot() +
 .pull-left[
 Высоты:
 
-```r
-dem = rast('../r-geo-course/data/dem_fergana.tif')
+``` r
+setwd('/Users/tsamsonov/GitHub/r-geo-course/data')
+dem = rast('dem_fergana.tif')
 
 ggplot() +
   geom_spatraster(data = dem) +
@@ -308,7 +308,7 @@ ggplot() +
 .pull-left[
 Углы наклона:
 
-```r
+``` r
 slope = terrain(dem, 'slope', 
                 unit = 'degrees')
 
@@ -334,7 +334,7 @@ ggplot() +
 .pull-left[
 Экспозиция:
 
-```r
+``` r
 aspect = terrain(dem, 'aspect', 
                  unit = 'degrees')
 
@@ -360,7 +360,7 @@ ggplot() +
 Отмывка рельефа средствами terra получается при комбинировании растров углов наклона и экспозиции склона. Для повышения контрастности можно предварительно умножить высоты на определенный масштабный коэффициент:
 
 
-```r
+``` r
 # углы наклона для классической отмывки
 slope_rad10 = terrain(dem * 10, 'slope', unit = 'radians')
 
@@ -378,7 +378,7 @@ aspect_rad = terrain(dem, 'aspect', unit = 'radians')
 .pull-left[
 Классическая отмывка при северо-западном освещении:
 
-```r
+``` r
 hill = shade(
   slope = slope_rad10, 
   aspect = aspect_rad, 
@@ -407,7 +407,7 @@ ggplot() +
 .pull-left[
 Отвесная отмывка при вертикальном освещении (подчеркивает линии хребтов):
 
-```r
+``` r
 hill_vert = shade(
   slope = slope_rad5, 
   aspect = aspect_rad, 
@@ -435,7 +435,7 @@ ggplot() +
 .pull-left[
 Кобинированная отмывка:
 
-```r
+``` r
 hill_comb = hill * hill_vert
 
 ggplot() +
@@ -454,11 +454,188 @@ ggplot() +
 
 ---
 
+## Гидрологический анализ ЦМР
+
+**Гидрологический анализ ЦМР** --- совокупность методов обработки ЦМР, связанных с анализом и моделированием геометрических условий распределения поверхностного стока.
+
+Распространенные задачи гидрологического анализа включают:
+
+1.  Определение направлений стока.
+2.  Вычисление площади водосбора.
+3.  Построение сети потенциальных водотоков.
+4.  Построение границ бассейнов.
+
+&gt; Для гидрологического анализа играют очень важную роль процедуры предварительной подготовки ЦМР, такие как *устранение ошибочных замкнутых локальных понижений*.
+
+---
+
+## Направление и аккумуляция стока
+
+
+``` r
+setwd('/Users/tsamsonov/GitHub/r-geo-course/data')
+wbt_flow_accumulation_full_workflow(
+  dem       = 'dem_fergana.tif',
+  out_dem   = 'fill.tif', # ЦМР без замкнутых понижений
+  out_pntr  = 'dir.tif',  # Направления стока по D8
+  out_accum = 'acc.tif',  # Аккумуляция стока
+  out_type = 'ca'         # Тип аккумуляции: площадь водосбора
+)
+
+fill = rast('fill.tif')
+dir = rast('dir.tif')
+acc = rast('acc.tif')
+```
+
+---
+
+## Направление и аккумуляция стока
+
+.pull-left[
+
+``` r
+levels(dir) = data.frame(
+  value = c(0, 2^(0:7)), 
+  desc = c('NA', 'NE', 'E', 'SE', 
+           'S', 'SW', 'W', 'NW', 'N')
+)
+
+ggplot() +
+  geom_spatraster(data = dir) +
+  scale_fill_manual(values = rev(rainbow(9))) +
+  labs(title = 'Направление стока', 
+       fill = '')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Направление и аккумуляция стока
+
+.pull-left[
+
+``` r
+ggplot() +
+  geom_spatraster(data = acc / 10^9) +
+  scale_fill_gradient(low = 'white', high = 'black', trans = 'log') +
+  labs(title = 'Аккумуляция стока (площадь)', 
+       fill = expression(Тыс.~км^2))
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Потенциальные водотоки
+
+Выделяются по растрам направления и аккумуляции стока
+
+``` r
+setwd('/Users/tsamsonov/GitHub/r-geo-course/data')
+wbt_extract_streams(
+  flow_accum = 'acc.tif',
+  output = 'str.tif',
+  threshold = 1e8 ## 100 кв.км.
+)
+wbt_raster_streams_to_vector(
+  streams = 'str.tif',
+  d8_pntr = 'dir.tif',
+  output = 'streams.shp',
+)
+streams = read_sf('streams.shp') |&gt; 
+  st_set_crs(crs(dem, proj=TRUE))
+```
+
+---
+
+## Потенциальные водотоки
+
+.pull-left[
+
+``` r
+ggplot() +
+  geom_spatraster(data = dem) +
+  geom_sf(data = streams, 
+          color = 'deepskyblue4') +
+  scale_fill_hypso_c() +
+  labs(title = expression(Потенциальные~водотоки~(A~`&gt;`~100~км^2)), 
+       fill = 'Высота, [м]')
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Водосборные бассейны
+
+Генрируются для указанных точек по растру направлений стока
+
+``` r
+setwd('/Users/tsamsonov/GitHub/r-geo-course/data')
+wbt_watershed(
+ d8_pntr = 'dir.tif',
+ pour_pts = 'pour_pts.shp',
+ output = 'wsh.tif'
+)
+wbt_raster_to_vector_polygons(
+ input = 'wsh.tif', 
+ output = 'watersheds.shp'
+)
+
+watersheds = read_sf('watersheds.shp') |&gt; 
+  st_set_crs(crs(dem, proj=TRUE))
+
+pour_pts = read_sf('pour_pts.shp') |&gt; 
+  st_set_crs(crs(dem, proj=TRUE))
+```
+
+---
+
+## Водосборные бассейны
+
+.pull-left[
+
+``` r
+ggplot() +
+  geom_spatraster(data = dem) +
+  scale_fill_hypso_c() +
+  labs(title = 'Бассейны', 
+       fill = 'Высота, [м]') +
+  ggnewscale::new_scale_fill() +
+  geom_sf(data = watersheds, 
+          mapping = aes(fill = factor(FID)), 
+          linewidth = 1, color = 'black', 
+          alpha = 0.5, show.legend = FALSE) +
+  geom_sf(data = streams, 
+          color = 'deepskyblue4') +
+  geom_sf(data = pour_pts, size = 2, 
+          fill = 'white', shape = 21,
+          stroke = 1.5)
+```
+]
+
+.pull-right[
+![](14_Raster_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+]
+
+
+---
+
 ## Анализ расстояний
 
 Доступность станций метро
 
-```r
+``` r
 roads = read_sf("../r-geo-course/data/roads.gpkg") # Дороги
 poi = read_sf("../r-geo-course/data/poi_point.gpkg") # Точки интереса
 rayons = read_sf("../r-geo-course/data/boundary_polygon.gpkg") # Границы районов
@@ -478,7 +655,7 @@ dist_grid = stations |&gt;
 .pull-left[
 .code-small[
 
-```r
+``` r
 ggplot() +
   geom_spatraster_contour_filled(
     data = dist_grid
@@ -501,7 +678,7 @@ ggplot() +
 ]
 
 .pull-right[
-![](14_Raster_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+![](14_Raster_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -509,7 +686,7 @@ ggplot() +
 ## Зональные операции
 
 
-```r
+``` r
 files = list.files('/Volumes/Data/Spatial/WorldClim/2.1/tavg',
                    full.names = TRUE)
 temp = rast(files)
@@ -533,7 +710,7 @@ ggplot() +
 
 ## Зональные операции
 
-&lt;img src="14_Raster_files/figure-html/unnamed-chunk-21-1.png" height="500px" /&gt;
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-28-1.png" height="500px" /&gt;
 
 ---
 
@@ -541,7 +718,7 @@ ggplot() +
 
 Необходимо привести растры к общей сетке
 
-```r
+``` r
 (cover = project(terraland, temp, method = 'near'))
 ## class       : SpatRaster 
 ## dimensions  : 1080, 2160, 1  (nrow, ncol, nlyr)
@@ -562,7 +739,7 @@ ggplot() +
 .pull-left[
 .code-small[
 
-```r
+``` r
 cover_north = crop(
   cover, ext(-180, 180, 0, 90)
 )
@@ -590,7 +767,7 @@ zonal_stats = stats |&gt;
 .pull-right[
 .code-vsmall[
 
-```r
+``` r
 head(zonal_stats, 20)
 ## # A tibble: 20 × 3
 ##    cover                      month   tavg
@@ -626,7 +803,7 @@ head(zonal_stats, 20)
 .left-40[
 Климатограммы:
 
-```r
+``` r
 ggplot(zonal_stats) +
   geom_line(
     aes(x = month, 
@@ -642,7 +819,7 @@ ggplot(zonal_stats) +
 ]
 
 .right-60[
-&lt;img src="14_Raster_files/figure-html/unnamed-chunk-25-1.png" height="500px" /&gt;
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-32-1.png" height="500px" /&gt;
 ]
 
 ---
@@ -651,7 +828,7 @@ ggplot(zonal_stats) +
 
 .pull-left[
 
-```r
+``` r
 global(temp, max, na.rm = T) 
 ##                        max
 ## wc2.1_10m_tavg_01 34.00950
@@ -671,7 +848,7 @@ global(temp, max, na.rm = T)
 
 .pull-right[
 
-```r
+``` r
 global(temp, min, na.rm = T) 
 ##                         min
 ## wc2.1_10m_tavg_01 -45.88400
@@ -698,7 +875,7 @@ global(temp, min, na.rm = T)
 .pull-left[
 .code-vsmall[
 
-```r
+``` r
 pnt = tibble::tibble(
   x = -45, y = 70,
   z = terra::extract(ice.depth, 
@@ -724,7 +901,7 @@ ggplot() +
 ]
 
 .pull-right[
-&lt;img src="14_Raster_files/figure-html/unnamed-chunk-28-1.png" height="450px" /&gt;
+&lt;img src="14_Raster_files/figure-html/unnamed-chunk-35-1.png" height="450px" /&gt;
 ]
 
 
@@ -734,7 +911,7 @@ ggplot() +
 
 Одна из наиболее распространенных задач по извлечению растровых данных — это построение профиля вдоль заданной линии. Воспользуемся интерактивным редактором для проведения линии профиля
 
-```r
+``` r
 mp = mapview(temp$tmean6)
 profile = mapedit::drawFeatures(mp)
 ```
@@ -750,7 +927,7 @@ profile = mapedit::drawFeatures(mp)
 Сначала извлекаются данные вместе с координатами, затем необходимо вычислить кумулятивное расстояние от начала профиля:
 
 
-```r
+``` r
 temprof = terra::extract(temp, profile, cells = TRUE, xy = TRUE)
 
 tempdf = temprof %&gt;%
@@ -771,7 +948,7 @@ tempdf = temprof %&gt;%
 
 .pull-left[
 
-```r
+``` r
 ggplot(tempdf, 
        aes(x = dist, y = tavg)) +
   geom_line() +
@@ -787,7 +964,7 @@ ggplot(tempdf,
 ]
 
 .pull-right[
-![](14_Raster_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+![](14_Raster_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
 ]
 
 

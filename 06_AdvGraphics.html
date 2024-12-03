@@ -4,8 +4,8 @@
     <title>Продвинутая графика</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2023-10-10" />
-    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2024-10-08" />
+    <script src="libs/header-attrs-2.27/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2023-10-10
+### 2024-10-08
 ]
 
 ---
@@ -41,7 +41,7 @@ class: center, middle, inverse, title-slide
 - __USDA NRCS Soil Data Access__ (https://sdmdataaccess.nrcs.usda.gov/)
 
 
-```r
+``` r
 library(tidyverse)
 library(eurostat)
 library(nasapower)
@@ -64,7 +64,7 @@ library(soilDB)
 
 .code-small[
 
-```r
+``` r
 tables = c('ext_lt_mainagri', 'ext_lt_mainrawm', 'ext_lt_mainmine',
            'ext_lt_mainchem','ext_lt_mainmanu', 'ext_lt_mainmach')
 countries = ISOcodes::ISO_3166_1$Alpha_2
@@ -77,24 +77,25 @@ trades = lapply(tables, function(X) { # прочтем несколько таб
   filter(str_detect(indic_et, 'Exports in|Imports in')) |&gt; 
   pivot_wider(names_from = indic_et, values_from = values) |&gt; 
   rename(export = `Exports in million of ECU/EURO`, # дадим им краткие названия
-         import = `Imports in million of ECU/EURO`) |&gt; 
+         import = `Imports in million of ECU/EURO`,
+         time = TIME_PERIOD) |&gt; 
   mutate(partner = as.factor(partner))
 
 trades # посмотрим, что получилось
-## # A tibble: 25,710 × 5
-##    sitc06                   partner              time       export import
-##    &lt;chr&gt;                    &lt;fct&gt;                &lt;date&gt;      &lt;dbl&gt;  &lt;dbl&gt;
-##  1 Food, drinks and tobacco Andorra              2022-01-01  340.     0.8
-##  2 Food, drinks and tobacco United Arab Emirates 2022-01-01 3113.    64.3
-##  3 Food, drinks and tobacco Afghanistan          2022-01-01   67.2   15.2
-##  4 Food, drinks and tobacco Antigua and Barbuda  2022-01-01   17.2    0.7
-##  5 Food, drinks and tobacco Anguilla (UK)        2022-01-01    1.3    0  
-##  6 Food, drinks and tobacco Albania              2022-01-01  734.   234. 
-##  7 Food, drinks and tobacco Armenia              2022-01-01  171.    18.6
-##  8 Food, drinks and tobacco Angola               2022-01-01  642.    50.4
-##  9 Food, drinks and tobacco Antarctica           2022-01-01    0.3    0  
-## 10 Food, drinks and tobacco Argentina            2022-01-01  191.  6230. 
-## # ℹ 25,700 more rows
+## # A tibble: 26,952 × 6
+##    freq   sitc06                   partner time       export import
+##    &lt;chr&gt;  &lt;chr&gt;                    &lt;fct&gt;   &lt;date&gt;      &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Annual Food, drinks and tobacco Andorra 2002-01-01   168.    2  
+##  2 Annual Food, drinks and tobacco Andorra 2003-01-01   166.    5  
+##  3 Annual Food, drinks and tobacco Andorra 2004-01-01   173.   11.4
+##  4 Annual Food, drinks and tobacco Andorra 2005-01-01   197.   32.8
+##  5 Annual Food, drinks and tobacco Andorra 2006-01-01   196.   41.1
+##  6 Annual Food, drinks and tobacco Andorra 2007-01-01   178.    2.2
+##  7 Annual Food, drinks and tobacco Andorra 2008-01-01   182.   13.6
+##  8 Annual Food, drinks and tobacco Andorra 2009-01-01   167.    7.6
+##  9 Annual Food, drinks and tobacco Andorra 2010-01-01   173.    0.5
+## 10 Annual Food, drinks and tobacco Andorra 2011-01-01   232.    0.6
+## # ℹ 26,942 more rows
 ```
 ]
 
@@ -103,7 +104,7 @@ trades # посмотрим, что получилось
 ## Загрузка данных NASA POWER
 
 
-```r
+``` r
 daily_single_ag &lt;- get_power(
   community = "ag",
   lonlat = c(60.59, 56.84),
@@ -134,7 +135,7 @@ as_tibble(daily_single_ag) # посмотрим, что получилось
 ## Загрузка данных NASA POWER
 
 
-```r
+``` r
 interannual_sse &lt;- get_power(
   community = "ag",
   lonlat = c(60.59, 56.84),
@@ -158,11 +159,11 @@ as_tibble(interannual_sse) # посмотрим, что получилось
 
 Результирющий объект представляет собой список со множеством таблиц, которые характеризуют как почвенную серию в целом, так и отдельные ее разрезы:
 
-```r
+``` r
 soils = c('wilkes',  'chewacla', 'congaree')
 series = fetchOSD(soils, extended = TRUE)
 str(series)
-## List of 14
+## List of 18
 ##  $ SPC             :Formal class 'SoilProfileCollection' [package "aqp"] with 9 slots
 ##   .. ..@ idcol       : chr "id"
 ##   .. ..@ hzidcol     : chr "hzID"
@@ -174,14 +175,14 @@ str(series)
 ##   .. .. ..$ aqp_hztexcl     : chr "texture_class"
 ##   .. .. ..$ depth_units     : chr "cm"
 ##   .. .. ..$ stringsAsFactors: logi FALSE
-##   .. .. ..$ original.order  : int [1:22] 1 2 3 4 5 6 7 8 9 10 ...
 ##   .. .. ..$ origin          : chr "OSD via Soilweb / fetchOSD"
-##   .. ..@ horizons    :'data.frame':	22 obs. of  21 variables:
+##   .. .. ..$ created         : POSIXct[1:1], format: "2024-10-08 11:52:33"
+##   .. ..@ horizons    :'data.frame':	22 obs. of  22 variables:
 ##   .. .. ..$ id                   : chr [1:22] "CHEWACLA" "CHEWACLA" "CHEWACLA" "CHEWACLA" ...
 ##   .. .. ..$ top                  : int [1:22] 0 10 36 66 97 119 152 0 20 46 ...
 ##   .. .. ..$ bottom               : int [1:22] 10 36 66 97 119 152 203 20 46 56 ...
 ##   .. .. ..$ hzname               : chr [1:22] "Ap" "Bw1" "Bw2" "Bw3" ...
-##   .. .. ..$ soil_color           : chr [1:22] "#7E5A3BFF" "#7A5C37FF" "#7A5C37FF" "#7E5A3BFF" ...
+##   .. .. ..$ soil_color           : chr [1:22] "#7D593AFF" "#795B36FF" "#795B36FF" "#7D593AFF" ...
 ##   .. .. ..$ hue                  : chr [1:22] "7.5YR" "10YR" "10YR" "7.5YR" ...
 ##   .. .. ..$ value                : int [1:22] 4 4 4 4 5 5 4 4 4 3 ...
 ##   .. .. ..$ chroma               : int [1:22] 4 4 4 4 8 1 4 4 3 3 ...
@@ -198,11 +199,14 @@ str(series)
 ##   .. .. ..$ moist_color_estimated: logi [1:22] FALSE FALSE FALSE FALSE FALSE FALSE ...
 ##   .. .. ..$ narrative            : chr [1:22] "Ap--0 to 4 inches; brown (7.5YR 4/4) loam; weak medium granular structure; friable; common very fine, fine, and"| __truncated__ "Bw1--4 to 14 inches; dark yellowish brown (10YR 4/4) silty clay loam; weak medium subangular blocky structure; "| __truncated__ "Bw2--14 to 26 inches; dark yellowish brown (10YR 4/4) clay loam; weak medium subangular blocky structure; friab"| __truncated__ "Bw3--26 to 38 inches; brown (7.5YR 4/4) loam; weak medium subangular blocky structure; friable; common fine roo"| __truncated__ ...
 ##   .. .. ..$ hzID                 : chr [1:22] "1" "2" "3" "4" ...
-##   .. ..@ site        :'data.frame':	3 obs. of  33 variables:
+##   .. .. ..$ hzd                  : num [1:22] 2.5 7.5 7.5 7.5 7.5 7.5 0 2.5 7.5 2.5 ...
+##   .. ..@ site        :'data.frame':	3 obs. of  31 variables:
 ##   .. .. ..$ id                     : chr [1:3] "CHEWACLA" "CONGAREE" "WILKES"
-##   .. .. ..$ soiltaxclasslastupdated: chr [1:3] "2010-02-11 00:00:00+00" "2002-07-18 00:00:00+00" "1997-06-06 00:00:00+00"
-##   .. .. ..$ mlraoffice             : chr [1:3] "raleigh, nc" "raleigh, nc" "raleigh, nc"
+##   .. .. ..$ soilseriesiid          : int [1:3] 24628 1057 23800
 ##   .. .. ..$ series_status          : chr [1:3] "established" "established" "established"
+##   .. .. ..$ benchmarksoilflag      : chr [1:3] "TRUE" "FALSE" "FALSE"
+##   .. .. ..$ soiltaxclasslastupdated: chr [1:3] "2010-02-11 00:00:00" "2002-07-18 00:00:00" "1997-06-06 00:00:00"
+##   .. .. ..$ mlraoffice             : chr [1:3] "raleigh, nc" "raleigh, nc" "raleigh, nc"
 ##   .. .. ..$ family                 : chr [1:3] "fine-loamy, mixed, active, thermic fluvaquentic dystrudepts" "fine-loamy, mixed, active, nonacid, thermic oxyaquic udifluvents" "loamy, mixed, active, thermic, shallow typic hapludalfs"
 ##   .. .. ..$ soilorder              : chr [1:3] "inceptisols" "entisols" "alfisols"
 ##   .. .. ..$ suborder               : chr [1:3] "udepts" "fluvents" "udalfs"
@@ -213,25 +217,21 @@ str(series)
 ##   .. .. ..$ tax_ceactcl            : chr [1:3] "active" "active" "active"
 ##   .. .. ..$ tax_reaction           : chr [1:3] NA "nonacid" NA
 ##   .. .. ..$ tax_tempcl             : chr [1:3] "thermic" "thermic" "thermic"
+##   .. .. ..$ tax_minclass           : chr [1:3] "mixed" "mixed" "mixed"
+##   .. .. ..$ taxfamhahatmatcl       : logi [1:3] NA NA NA
 ##   .. .. ..$ originyear             : logi [1:3] NA NA NA
 ##   .. .. ..$ establishedyear        : int [1:3] 1937 1904 1916
 ##   .. .. ..$ descriptiondateinitial : chr [1:3] "2010-02-11 00:00:00+00" "2002-07-18 00:00:00+00" "2007-09-06 00:00:00+00"
-##   .. .. ..$ descriptiondateupdated : chr [1:3] "2010-02-11 00:00:00+00" "2002-07-18 00:00:00+00" "2021-01-27 16:02:50+00"
-##   .. .. ..$ benchmarksoilflag      : int [1:3] 1 0 0
-##   .. .. ..$ statsgoflag            : int [1:3] 1 1 1
-##   .. .. ..$ objwlupdated           : chr [1:3] "2012-08-01 14:06:37+00" "2012-08-01 14:06:37+00" "2021-01-27 16:02:50+00"
-##   .. .. ..$ recwlupdated           : chr [1:3] "2012-08-01 14:06:37+00" "2012-08-01 14:06:37+00" "2021-01-27 16:02:50+00"
-##   .. .. ..$ typelocstareaiidref    : int [1:3] 6691 6706 6691
-##   .. .. ..$ typelocstareatypeiidref: int [1:3] 3 3 3
-##   .. .. ..$ soilseriesiid          : int [1:3] 24628 1057 23800
-##   .. .. ..$ soilseriesdbiidref     : int [1:3] 122 122 122
-##   .. .. ..$ grpiidref              : int [1:3] 15801 15801 15801
-##   .. .. ..$ tax_minclass           : chr [1:3] "mixed" "mixed" "mixed"
+##   .. .. ..$ descriptiondateupdated : chr [1:3] "2010-02-11 00:00:00+00" "2002-07-18 00:00:00+00" "2021-01-27 16:02:50.637+00"
+##   .. .. ..$ statsgoflag            : chr [1:3] "TRUE" "TRUE" "TRUE"
+##   .. .. ..$ areasymbol             : chr [1:3] "NC" "SC" "NC"
+##   .. .. ..$ areaname               : chr [1:3] "North Carolina" "South Carolina" "North Carolina"
+##   .. .. ..$ areatypename           : chr [1:3] "State or Territory" "State or Territory" "State or Territory"
 ##   .. .. ..$ subgroup_mod           : chr [1:3] "fluvaquentic" "oxyaquic" "typic"
 ##   .. .. ..$ greatgroup_mod         : chr [1:3] "dystr" "udi" "hapl"
 ##   .. .. ..$ drainagecl             : chr [1:3] "somewhat poorly" "well to moderately well" "well"
-##   .. .. ..$ ac                     : int [1:3] 1256820 216072 614614
-##   .. .. ..$ n_polygons             : int [1:3] 39164 10384 34815
+##   .. .. ..$ ac                     : int [1:3] 1254622 215993 614348
+##   .. .. ..$ n_polygons             : int [1:3] 38657 10260 34850
 ##   .. ..@ sp          :Formal class 'SpatialPoints' [package "sp"] with 3 slots
 ##   .. .. .. ..@ coords     : num [1, 1] 0
 ##   .. .. .. ..@ bbox       : logi [1, 1] NA
@@ -243,35 +243,35 @@ str(series)
 ##   ..$ series   : chr "CHEWACLA"
 ##   ..$ competing: chr "OAKBORO"
 ##   ..$ family   : chr "fine-loamy, mixed, active, thermic fluvaquentic dystrudepts"
-##  $ geog_assoc_soils:'data.frame':	22 obs. of  2 variables:
-##   ..$ series: chr [1:22] "CONGAREE" "CONGAREE" "CONGAREE" "CONGAREE" ...
-##   ..$ gas   : chr [1:22] "ALTAVISTA" "AUGUSTA" "BUNCOMBE" "CARTECAY" ...
-##  $ geomcomp        :'data.frame':	3 obs. of  9 variables:
-##   ..$ series         : chr [1:3] "CHEWACLA" "CONGAREE" "WILKES"
-##   ..$ Interfluve     : num [1:3] 1 0 0.178
-##   ..$ Crest          : num [1:3] 0 0 0.027
-##   ..$ Head Slope     : int [1:3] 0 0 0
-##   ..$ Nose Slope     : int [1:3] 0 0 0
-##   ..$ Side Slope     : num [1:3] 0 0 0.795
-##   ..$ Base Slope     : int [1:3] 0 1 0
-##   ..$ n              : int [1:3] 3 1 185
-##   ..$ shannon_entropy: num [1:3] 0 0 0.365
+##  $ geog_assoc_soils:'data.frame':	45 obs. of  2 variables:
+##   ..$ series: chr [1:45] "CHEWACLA" "CHEWACLA" "CHEWACLA" "CHEWACLA" ...
+##   ..$ gas   : chr [1:45] "ALTAVISTA" "AUGUSTA" "BIBB" "BUNCOMBE" ...
+##  $ geomcomp        :'data.frame':	2 obs. of  9 variables:
+##   ..$ series         : chr [1:2] "CHEWACLA" "WILKES"
+##   ..$ Interfluve     : num [1:2] 1 0.178
+##   ..$ Crest          : num [1:2] 0 0.027
+##   ..$ Head Slope     : int [1:2] 0 0
+##   ..$ Nose Slope     : int [1:2] 0 0
+##   ..$ Side Slope     : num [1:2] 0 0.795
+##   ..$ Base Slope     : int [1:2] 0 0
+##   ..$ n              : int [1:2] 3 185
+##   ..$ shannon_entropy: num [1:2] 0 0.848
 ##  $ hillpos         :'data.frame':	3 obs. of  8 variables:
 ##   ..$ series         : chr [1:3] "CHEWACLA" "CONGAREE" "WILKES"
-##   ..$ Toeslope       : num [1:3] 0.963 0.786 0
-##   ..$ Footslope      : num [1:3] 0.0366 0.2143 0
+##   ..$ Toeslope       : num [1:3] 1 0.846 0
+##   ..$ Footslope      : num [1:3] 0 0.154 0
 ##   ..$ Backslope      : num [1:3] 0 0 0.637
 ##   ..$ Shoulder       : num [1:3] 0 0 0.225
 ##   ..$ Summit         : num [1:3] 0 0 0.139
-##   ..$ n              : int [1:3] 82 14 245
-##   ..$ shannon_entropy: num [1:3] 0.0975 0.3228 0.5573
+##   ..$ n              : int [1:3] 75 13 245
+##   ..$ shannon_entropy: num [1:3] 0 0.619 1.294
 ##  $ mtnpos          : logi FALSE
 ##  $ terrace         :'data.frame':	2 obs. of  5 variables:
 ##   ..$ series         : chr [1:2] "CHEWACLA" "CONGAREE"
 ##   ..$ Tread          : num [1:2] 0.977 1
-##   ..$ Riser          : num [1:2] 0.023 0
-##   ..$ n              : int [1:2] 87 36
-##   ..$ shannon_entropy: num [1:2] 0.068 0
+##   ..$ Riser          : num [1:2] 0.0233 0
+##   ..$ n              : int [1:2] 86 35
+##   ..$ shannon_entropy: num [1:2] 0.16 0
 ##  $ flats           :'data.frame':	2 obs. of  7 variables:
 ##   ..$ series         : chr [1:2] "CHEWACLA" "CONGAREE"
 ##   ..$ Dip            : num [1:2] 0.1455 0.0667
@@ -279,55 +279,96 @@ str(series)
 ##   ..$ Flat           : int [1:2] 0 0
 ##   ..$ Rise           : num [1:2] 0 0.0667
 ##   ..$ n              : int [1:2] 55 15
-##   ..$ shannon_entropy: num [1:2] 0.258 0.301
+##   ..$ shannon_entropy: num [1:2] 0.598 0.7
+##  $ shape_across    :'data.frame':	3 obs. of  8 variables:
+##   ..$ series         : chr [1:3] "CHEWACLA" "CONGAREE" "WILKES"
+##   ..$ Concave        : num [1:3] 0.0364 0.0213 0
+##   ..$ Linear         : num [1:3] 0.953 0.957 0.359
+##   ..$ Convex         : num [1:3] 0.0109 0.0213 0.641
+##   ..$ Complex        : int [1:3] 0 0 0
+##   ..$ Undulating     : int [1:3] 0 0 0
+##   ..$ n              : int [1:3] 275 94 195
+##   ..$ shannon_entropy: num [1:3] 0.312 0.297 0.942
+##  $ shape_down      :'data.frame':	3 obs. of  8 variables:
+##   ..$ series         : chr [1:3] "CHEWACLA" "CONGAREE" "WILKES"
+##   ..$ Concave        : num [1:3] 0.3309 0.0217 0
+##   ..$ Linear         : num [1:3] 0.658 0.946 0.636
+##   ..$ Convex         : num [1:3] 0.0109 0.0326 0.3641
+##   ..$ Complex        : int [1:3] 0 0 0
+##   ..$ Undulating     : int [1:3] 0 0 0
+##   ..$ n              : int [1:3] 275 92 195
+##   ..$ shannon_entropy: num [1:3] 0.996 0.357 0.946
 ##  $ pmkind          :'data.frame':	6 obs. of  5 variables:
 ##   ..$ series: chr [1:6] "CHEWACLA" "CHEWACLA" "CONGAREE" "CONGAREE" ...
 ##   ..$ pmkind: chr [1:6] "Alluvium" "Residuum" "Alluvium" "Fluviomarine deposits" ...
-##   ..$ n     : int [1:6] 206 1 72 13 1 262
-##   ..$ total : int [1:6] 207 207 86 86 86 262
-##   ..$ P     : num [1:6] 0.9952 0.0048 0.8372 0.1512 0.0116 ...
+##   ..$ n     : int [1:6] 205 1 72 13 1 262
+##   ..$ total : int [1:6] 206 206 86 86 86 262
+##   ..$ P     : num [1:6] 0.9951 0.0049 0.8372 0.1512 0.0116 ...
 ##  $ pmorigin        :'data.frame':	24 obs. of  5 variables:
 ##   ..$ series  : chr [1:24] "CHEWACLA" "CHEWACLA" "CHEWACLA" "CHEWACLA" ...
-##   ..$ pmorigin: chr [1:24] "Igneous and metamorphic rock" "Sedimentary rock" "Mixed" "Granite and gneiss" ...
+##   ..$ pmorigin: chr [1:24] "Igneous and metamorphic rock" "Sedimentary rock" "Granite and gneiss" "Mixed" ...
 ##   ..$ n       : int [1:24] 29 11 2 2 1 1 1 1 1 1 ...
 ##   ..$ total   : int [1:24] 51 51 51 51 51 51 51 51 51 51 ...
 ##   ..$ P       : num [1:24] 0.5686 0.2157 0.0392 0.0392 0.0196 ...
-##  $ mlra            :'data.frame':	19 obs. of  4 variables:
-##   ..$ series    : chr [1:19] "CHEWACLA" "CHEWACLA" "CHEWACLA" "CHEWACLA" ...
-##   ..$ mlra      : chr [1:19] "129" "135A" "136" "133A" ...
-##   ..$ area_ac   : int [1:19] 6166 3878 927251 128381 78428 60214 29004 13536 9495 2126 ...
-##   ..$ membership: num [1:19] 0.005 0.003 0.738 0.102 0.062 0.048 0.023 0.011 0.008 0.01 ...
+##  $ mlra            :'data.frame':	21 obs. of  4 variables:
+##   ..$ series    : chr [1:21] "CHEWACLA" "CHEWACLA" "CHEWACLA" "CHEWACLA" ...
+##   ..$ mlra      : chr [1:21] "148" "135A" "136" "133A" ...
+##   ..$ area_ac   : int [1:21] 7911 4245 920965 105979 85493 55614 30799 19434 14232 9855 ...
+##   ..$ membership: num [1:21] 0.006 0.003 0.734 0.084 0.068 0.044 0.025 0.015 0.011 0.008 ...
+##  $ ecoclassid      :'data.frame':	18 obs. of  5 variables:
+##   ..$ series      : chr [1:18] "CHEWACLA" "CHEWACLA" "CHEWACLA" "CHEWACLA" ...
+##   ..$ ecoclassid  : chr [1:18] "F133CA999AL" "F136XY100VA" "F136XY610GA" "F133AY003NC" ...
+##   ..$ n_components: int [1:18] 2 2 139 4 3 4 5 6 1 4 ...
+##   ..$ area_ac     : int [1:18] 6589 5976 936606 43345 37459 29783 24850 19003 13987 8008 ...
+##   ..$ proportion  : num [1:18] 0.0059 0.0053 0.8319 0.0385 0.0333 ...
 ##  $ climate.annual  :'data.frame':	24 obs. of  12 variables:
 ##   ..$ series     : chr [1:24] "CHEWACLA" "CHEWACLA" "CHEWACLA" "CHEWACLA" ...
 ##   ..$ climate_var: chr [1:24] "Elevation (m)" "Effective Precipitation (mm)" "Frost-Free Days" "Mean Annual Air Temperature (degrees C)" ...
-##   ..$ minimum    : num [1:24] 0 128.8 177 11.3 986 ...
-##   ..$ q01        : num [1:24] 7 216.4 188 12.9 1069 ...
-##   ..$ q05        : num [1:24] 34 247.4 196 13.5 1093 ...
-##   ..$ q25        : num [1:24] 125 312.2 208 14.9 1136 ...
-##   ..$ q50        : num [1:24] 192 349.8 218 15.7 1178 ...
-##   ..$ q75        : num [1:24] 248 441.2 227 16.4 1276 ...
-##   ..$ q95        : num [1:24] 348 568.8 235 17.3 1392 ...
-##   ..$ q99        : num [1:24] 480 740.8 243 17.8 1575 ...
+##   ..$ minimum    : num [1:24] 0 128.8 177 12.1 986 ...
+##   ..$ q01        : num [1:24] 7 216 188 13 1069 ...
+##   ..$ q05        : num [1:24] 33 245.9 196 13.5 1094 ...
+##   ..$ q25        : num [1:24] 125 310.2 208 14.9 1136 ...
+##   ..$ q50        : num [1:24] 191 348.8 218 15.7 1175 ...
+##   ..$ q75        : num [1:24] 247 442.9 227 16.4 1277 ...
+##   ..$ q95        : num [1:24] 347 569.2 235 17.3 1394 ...
+##   ..$ q99        : num [1:24] 479 740.4 244 17.8 1575.1 ...
 ##   ..$ maximum    : num [1:24] 919 1382.8 300 19.7 2202 ...
-##   ..$ n          : int [1:24] 32689 32689 32689 32689 32689 32689 32689 32689 8392 8392 ...
+##   ..$ n          : int [1:24] 29784 29784 29784 29784 29784 29784 29784 29784 7547 7547 ...
 ##  $ climate.monthly :'data.frame':	72 obs. of  14 variables:
 ##   ..$ series     : chr [1:72] "CHEWACLA" "CHEWACLA" "CHEWACLA" "CHEWACLA" ...
 ##   ..$ climate_var: chr [1:72] "ppt1" "ppt2" "ppt3" "ppt4" ...
 ##   ..$ minimum    : num [1:72] 61 64 81 63 60 78 83 74 68 53 ...
-##   ..$ q01        : num [1:72] 74 71 92 71 69 83 92 85 81 72 ...
-##   ..$ q05        : num [1:72] 82 73 98 75 72 89 100 89 86 76 ...
-##   ..$ q25        : num [1:72] 93 83 105 83 81 96 108 96 91 82 ...
-##   ..$ q50        : num [1:72] 105 107 120 88 92 101 116 102 98 86 ...
-##   ..$ q75        : num [1:72] 115 121 128 95 101 106 123 110 105 91 ...
-##   ..$ q95        : num [1:72] 131 135 137 111 111 117 133 129 118 100 ...
-##   ..$ q99        : num [1:72] 149 144 147 122 125 133 143 142 137 109 ...
+##   ..$ q01        : num [1:72] 75 71 93 71 69 83 92 85 81 72 ...
+##   ..$ q05        : num [1:72] 83 73 99 75 72 ...
+##   ..$ q25        : num [1:72] 93 83 105 82 81 96 108 96 91 82 ...
+##   ..$ q50        : num [1:72] 105 106 119 88 92 101 115 102 98 86 ...
+##   ..$ q75        : num [1:72] 116 121 128 95 101 106 123 110 105 91 ...
+##   ..$ q95        : num [1:72] 131 135 137 111 112 117 133 129 118 100 ...
+##   ..$ q99        : num [1:72] 150 144 147 122 125 133 143 142 137 109 ...
 ##   ..$ maximum    : num [1:72] 248 227 239 150 167 198 220 207 192 158 ...
-##   ..$ n          : int [1:72] 32689 32689 32689 32689 32689 32689 32689 32689 32689 32689 ...
+##   ..$ n          : int [1:72] 29784 29784 29784 29784 29784 29784 29784 29784 29784 29784 ...
 ##   ..$ month      : Factor w/ 12 levels "1","2","3","4",..: 1 2 3 4 5 6 7 8 9 10 ...
 ##   ..$ variable   : Factor w/ 2 levels "Potential ET (mm)",..: 2 2 2 2 2 2 2 2 2 2 ...
-##  $ soilweb.metadata:'data.frame':	18 obs. of  2 variables:
-##   ..$ product    : chr [1:18] "block diagram archive" "cached sketches" "component pedons" "KSSL snapshot" ...
-##   ..$ last_update: chr [1:18] "2019-12-17" "2021-10-07" "2020-12-08" "2020-03-18" ...
+##  $ NCCPI           :'data.frame':	3 obs. of  16 variables:
+##   ..$ series             : chr [1:3] "CHEWACLA" "CONGAREE" "WILKES"
+##   ..$ n                  : int [1:3] 266 94 158
+##   ..$ nccpi_irrigated_q01: num [1:3] 0.188 0.816 0.268
+##   ..$ nccpi_irrigated_q05: num [1:3] 0.346 0.825 0.269
+##   ..$ nccpi_irrigated_q25: num [1:3] 0.564 0.861 0.32
+##   ..$ nccpi_irrigated_q50: num [1:3] 0.597 0.907 0.361
+##   ..$ nccpi_irrigated_q75: num [1:3] 0.654 0.925 0.419
+##   ..$ nccpi_irrigated_q95: num [1:3] 0.849 0.979 0.561
+##   ..$ nccpi_irrigated_q99: num [1:3] 0.93 0.984 0.614
+##   ..$ nccpi_q01          : num [1:3] 0.347 0.5926 0.0426
+##   ..$ nccpi_q05          : num [1:3] 0.56 0.651 0.0564
+##   ..$ nccpi_q25          : num [1:3] 0.624 0.76 0.146
+##   ..$ nccpi_q50          : num [1:3] 0.685 0.813 0.231
+##   ..$ nccpi_q75          : num [1:3] 0.711 0.852 0.268
+##   ..$ nccpi_q95          : num [1:3] 0.837 0.936 0.379
+##   ..$ nccpi_q99          : num [1:3] 0.84 0.947 0.57
+##  $ soilweb.metadata:'data.frame':	24 obs. of  2 variables:
+##   ..$ product    : chr [1:24] "block diagram archive" "cached sketches" "component pedons" "ESID-series cross-tabulation" ...
+##   ..$ last_update: chr [1:24] "2019-12-17" "2023-10-12" "2023-10-09" "2023-11-06" ...
 ```
 
 ---
@@ -337,7 +378,7 @@ str(series)
 .pull-left[
 Суммарный экспорт через `qplot()`:
 
-```r
+``` r
 trades_total = trades |&gt; 
   group_by(time) |&gt; 
   summarise(export = sum(export),
@@ -360,7 +401,7 @@ qplot(time, export,
 
 Базовый шаблон __ggplot__:
 
-```r
+``` r
 ggplot(data = &lt;DATA&gt;) + 
   &lt;GEOM_FUNCTION&gt;(mapping = aes(&lt;MAPPINGS&gt;))
 ```
@@ -378,7 +419,7 @@ ggplot(data = &lt;DATA&gt;) +
 Точки `geom_point()`:
 .code-small[
 
-```r
+``` r
 ggplot(data = trades_total) +
   geom_point(mapping = aes(x = time, 
                           y = export))
@@ -392,7 +433,7 @@ ggplot(data = trades_total) +
 Линии `geom_line()`:
 .code-small[
 
-```r
+``` r
 ggplot(data = trades_total) +
   geom_line(mapping = aes(x = time, 
                           y = export))
@@ -411,7 +452,7 @@ ggplot(data = trades_total) +
 Ступенчатые кривые`geom_step()`:
 .code-small[
 
-```r
+``` r
 ggplot(data = trades_total) +
   geom_step(mapping = aes(x = time, 
                           y = export))
@@ -425,7 +466,7 @@ ggplot(data = trades_total) +
 Совмещение геометрий:
 .code-small[
 
-```r
+``` r
 ggplot(data = trades_total) +
   geom_line(mapping = aes(x = time, y = export)) +
   geom_point(mapping = aes(x = time, y = export))
@@ -443,7 +484,7 @@ ggplot(data = trades_total) +
 Вынос общих данных:
 .code-small[
 
-```r
+``` r
 ggplot(data = trades_total, 
        mapping = aes(x = time, y = export)) +
   geom_line() +
@@ -458,7 +499,7 @@ ggplot(data = trades_total,
 Заливка `geom_area()`:
 .code-small[
 
-```r
+``` r
 ggplot(data = trades_total, 
        mapping = aes(x = time, y = export)) +
   geom_area(alpha = 0.5) + # полигон с прозрачностью 0,5
@@ -475,7 +516,7 @@ ggplot(data = trades_total,
 ## Геометрические типы
 
 
-```r
+``` r
 df = trades |&gt; filter(sitc06 == 'Machinery and transport equipment', 
                       time == as.Date('2022-01-01'), export &gt; 10000)
 ```
@@ -483,7 +524,7 @@ df = trades |&gt; filter(sitc06 == 'Machinery and transport equipment',
 .pull-left[
 Столбчатая диаграмма:
 
-```r
+``` r
 ggplot(
   df, 
   mapping = aes(
@@ -506,7 +547,7 @@ ggplot(
 .pull-left[
 Перестановка осей через `coord_flip()`:
 
-```r
+``` r
 ggplot(df, 
        mapping = aes(x = partner, 
                      y = export)) +
@@ -525,7 +566,7 @@ ggplot(df,
 
 Функция `aes(...)` отображает переменные данных на графические переменные 
 
-```r
+``` r
 # один цвет для графика (параметр за пределами aes)
 ggplot(trades_total) + 
     geom_line(mapping = aes(x = time, y = export), color = 'blue')
@@ -539,7 +580,7 @@ ggplot(trades_total) +
 ## Графические переменные
 
 
-```r
+``` r
 trade_russia = trades |&gt; filter(partner == 'Russia')
 ggplot(trade_russia) + # у каждой группы данных свой цвет
   geom_line(mapping = aes(x = time, y = export, color = sitc06))
@@ -552,7 +593,7 @@ ggplot(trade_russia) + # у каждой группы данных свой цв
 ## Графические переменные
 
 
-```r
+``` r
 ggplot(trade_russia,  # а теперь и с точками
        mapping = aes(x = time, y = export, color = sitc06)) +
   geom_line() +
@@ -567,7 +608,7 @@ ggplot(trade_russia,  # а теперь и с точками
 
 Аналогичным образом работает параметр формы значка:
 
-```r
+``` r
 ggplot(trades_total) + # один значок для графика
     geom_point(mapping = aes(x = time, y = export), shape = 15)
 ```
@@ -580,7 +621,7 @@ ggplot(trades_total) + # один значок для графика
 
 У каждой группы данных свой значок
 
-```r
+``` r
 ggplot(trade_russia) + 
     geom_point(mapping = aes(x = time, y = export, shape = sitc06))
 ```
@@ -593,7 +634,7 @@ ggplot(trade_russia) +
 
 Управление размером через `size` и `linewidth`:
 
-```r
+``` r
 ggplot(trades_total, mapping = aes(x = time, y = export)) + 
     geom_point(size = 5) + geom_line(linewidth = 2)
 ```
@@ -605,7 +646,7 @@ ggplot(trades_total, mapping = aes(x = time, y = export)) +
 ## Графические переменные
 
 
-```r
+``` r
 ggplot(trade_russia, aes(x = time, y = export)) + 
     geom_point(aes(shape = sitc06)) +
     geom_line(aes(group = sitc06)) # Группировка данных
@@ -618,7 +659,7 @@ ggplot(trade_russia, aes(x = time, y = export)) +
 ## Графические переменные
 
 
-```r
+``` r
 ggplot(df, mapping = aes(x = partner, y = export)) +
   geom_col(fill = 'plum4', color = 'black', linewidth = 0.2) + # цвет
   coord_flip()
@@ -633,7 +674,7 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 Управление цветом:
 .code-small[
 
-```r
+``` r
 df1 = trades |&gt; filter(time == as.Date('2022-01-01')) |&gt; 
   group_by(partner) |&gt; filter(sum(export) &gt; 50000)
 df1 |&gt; ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +  # цвет
@@ -650,7 +691,7 @@ df1 |&gt; ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +  # ц�
 
 .code-small[
 
-```r
+``` r
 df1 |&gt; 
   ggplot(mapping = aes(x = partner, y = export, fill = sitc06)) +
     geom_col(color = 'black', size = 0.2, position = 'fill') + # проценты
@@ -667,7 +708,7 @@ df1 |&gt;
 Группировка по соседству:
 .code-small[
 
-```r
+``` r
 filter(trade_russia, time &gt;= as.Date('2013-01-01')) |&gt; 
   ggplot(mapping = aes(x = time, y = export, fill = sitc06)) +
     geom_col(color = 'black', size = 0.2, position = 'dodge')
@@ -683,11 +724,12 @@ filter(trade_russia, time &gt;= as.Date('2013-01-01')) |&gt;
 .pull-left[
 Перестановка осей через `coord_flip()`:
 
-```r
+``` r
 trades_type = trades |&gt; 
   group_by(sitc06, time) |&gt; 
   summarise(export = sum(export),
-            import = sum(import))
+            import = sum(import)) |&gt; 
+  arrange(sitc06, time)
 
 ggplot(trades_type) + 
     geom_point(mapping = aes(
@@ -697,6 +739,9 @@ ggplot(trades_type) +
       ), 
       alpha = 0.5
     ) +
+    geom_path(mapping = aes(
+      x = export,  y = import, group = sitc06
+    )) +
     coord_flip()
 ```
 ]
@@ -712,17 +757,16 @@ ggplot(trades_type) +
 .left-40[
 Логарифмирование:
 
-```r
-ggplot(
-  trades_type, 
-  mapping = aes(
-    x = export, 
-    y = import, 
+``` r
+ggplot(trades_type) + 
+  geom_point(mapping = aes(
+    x = export, y = import, 
     color = sitc06, 
     size = time
-  )
-) + 
-  geom_point(alpha = 0.5) +
+  ), alpha = 0.5) +
+  geom_path(mapping = aes(
+      x = export,  y = import, group = sitc06
+  )) +
   scale_x_log10() +
   scale_y_log10()
 ```
@@ -739,7 +783,7 @@ ggplot(
 .left-40[
 Полярная система координат:
 
-```r
+``` r
 ggplot(
   df, 
   mapping = aes(
@@ -764,7 +808,7 @@ ggplot(
 .left-40[
 Преобразование квадратного корня:
 
-```r
+``` r
 ggplot(
   df, 
   mapping = aes(
@@ -790,7 +834,7 @@ ggplot(
 .pull-left[
 Классическая секторная диаграмма:
 
-```r
+``` r
 ggplot(
   df, 
   mapping = aes(
@@ -818,17 +862,18 @@ ggplot(
 .pull-left[
 .code-small[
 
-```r
+``` r
 options(scipen = 999)
 ggplot(trades_type) + 
   geom_point(
     mapping = aes(
-      x = export, 
-      y = import, 
+      x = export, y = import, 
       color = sitc06, 
       size = time
-    ),
-    alpha = 0.5
+    ),alpha = 0.5
+  ) + 
+  geom_path(mapping = aes(
+    x = export,  y = import, group = sitc06)
   ) +
   labs(color = "Вид продукции", 
        size = 'Год') +
@@ -851,18 +896,16 @@ ggplot(trades_type) +
 .left-40[
 .code-small[
 
-```r
+``` r
 brks = seq(0, 500000, 100000)
-ggplot(
-  trades_type, 
-  mapping = aes(
-    x = export, 
-    y = import, 
-    color = sitc06, 
-    size = time
-  )
-) + 
-  geom_point(alpha = 0.5) +
+ggplot(trades_type) + 
+  geom_point(mapping = aes(
+    x = export, y = import, 
+    color = sitc06, size = time
+  ), alpha = 0.5) +
+  geom_path(mapping = aes(
+    x = export,  y = import, group = sitc06)
+  ) +
   scale_x_log10(
     breaks = brks,
     labels = brks / 1000
@@ -886,17 +929,15 @@ ggplot(
 .left-40[
 Диапазоны по осям и выделение
 
-```r
-ggplot(
-  trades_type, 
-  mapping = aes(
-    x = export, 
-    y = import, 
-    color = sitc06, 
-    size = time
-  )
-) + 
-  geom_point(alpha = 0.5) +
+``` r
+ggplot(trades_type) + 
+  geom_point(mapping = aes(
+    x = export, y = import, 
+    color = sitc06, size = time
+  ), alpha = 0.5) +
+  geom_path(mapping = aes(
+    x = export,  y = import, group = sitc06)
+  ) +
   lims(color = 'Food, drinks and tobacco') +
   xlim(0, 75000) +
   ylim(30000, 75000)
@@ -914,7 +955,7 @@ ggplot(
 .pull-left[
 Подписи:
 
-```r
+``` r
 ggplot(
   data = trades_total, 
   mapping = aes(x = time, 
@@ -940,7 +981,7 @@ ggplot(
 .left-40[
 Подписи с фоновой плашкой:
 
-```r
+``` r
 ggplot(df, mapping = aes(x = partner, y = export)) +
   geom_col(fill = 'plum4', color = 'black', size = 0.2) +
   coord_flip() +
@@ -959,7 +1000,7 @@ ggplot(df, mapping = aes(x = partner, y = export)) +
 .pull-left[
 __Аннотации__ представляют собой объекты, размещаемые на графике вручную:
 
-```r
+``` r
 ggplot(trades_total, 
        mapping = aes(x = time, y = export)) +
   geom_area(alpha = 0.5) + # полигон с прозрачностью 0,5
@@ -986,7 +1027,7 @@ ggplot(trades_total,
 .left-40[
 Аннотирование регионов:
 
-```r
+``` r
 ggplot(trades_type, 
        mapping = aes(
          x = export, y = import, 
@@ -1000,7 +1041,7 @@ ggplot(trades_type,
            size = 0.1) +
   geom_point(alpha = 0.5) +
   annotate("text", 
-           x = 175000, y = 190000, 
+           x = 350000, y = 80000, 
            label = "Chemicals", 
            color = 'coral')
 ```
@@ -1015,7 +1056,7 @@ ggplot(trades_type,
 ## Фасеты
 
 
-```r
+``` r
 brks = c(0, 50, 100, 150, 200)
 trades |&gt; 
   filter(sitc06 == 'Machinery and transport equipment',
@@ -1041,7 +1082,7 @@ trades |&gt;
 
 .pull-left[
 
-```r
+``` r
 ggplot(data = trades_total, mapping = aes(x = time, y = export)) +
   geom_area(alpha = 0.5) + # полигон с прозрачностью 0,5
   geom_line() +

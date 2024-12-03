@@ -340,7 +340,7 @@ autoplot(tsbl, level, size = 1) +
 Визуализируем результат:
 ```{r, fig.height=2.2}
 autoplot(tsbl_int, level_interp, color = 'red', size = 1) +
-  geom_line(aes(Date, level), tsbl, size = 1) +
+  geom_line(aes(Date, level), tsbl, linewidth = 1) +
   scale_x_date(limits = c(ymd(19320101), ymd(19360101)))
 ```
 
@@ -356,6 +356,14 @@ tsbl_int2 = tsbl |>
   interpolate(tsbl)
 ```
 
+$$\triangle^d X_t=c+\sum_{i=1}^p a_i\triangle^d X_{t-i}+\sum_{j=1}^q b_j\varepsilon_{t-j}+\varepsilon_t$$
+
+- $X_t$ — исходный нестационарный временной ряд
+- $c, a_i, b_j$ — параметры модели
+- $\triangle^d$ — оператор разности порядка $d$ (применение оператора `diff` $d$ раз)
+- $\epsilon_t$ — ошибка (стационарный временной ряд)
+- `pdq` — постоянная компонента, `PDQ` — сезонная компонента. 
+
 ---
 
 ## Интерполяция по времени (с авторегрессией)
@@ -364,7 +372,7 @@ tsbl_int2 = tsbl |>
 
 ```{r, fig.height=2.2}
 autoplot(tsbl_int2, level, color = 'magenta', size = 1) +
-  geom_line(aes(Date, level), tsbl, size = 1) +
+  geom_line(mapping = aes(Date, level), tsbl, linewidth = 1) +
   scale_x_date(limits = c(ymd(19320101), ymd(19360101)))
 ```
 ---
@@ -405,7 +413,7 @@ tsbl_int_met = tsbl_all |>
 
 ```{r, fig.height=2.2}
 autoplot(tsbl_int_met, level_interp, color = 'green', size = 1) +
-  geom_line(aes(Date, level_interp), tsbl_all, size = 1) +
+  geom_line(aes(Date, level_interp), tsbl_all, linewidth = 1) +
   scale_x_date(limits = c(ymd(19320101), ymd(19360101)))
 ```
 

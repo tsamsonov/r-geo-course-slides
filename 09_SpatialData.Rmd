@@ -234,7 +234,7 @@ knitr::include_graphics('img/sf_architecture_new.svg')
 
 Для чтения данных средствами __sf__ необходимо использовать функцию `st_read()`:
 ```{r, collapse = TRUE}
-countries = st_read('../r-geo-course/data/ne/countries.gpkg')
+countries = st_read('../r-geo-course/data/ne.gpkg', layer = 'admin_0_map_units_fix')
 ```
 
 - Коллекция из 183 пространственных объектов с 72 атрибутами
@@ -248,13 +248,14 @@ countries = st_read('../r-geo-course/data/ne/countries.gpkg')
 
 Подгрузим также для работы данные по другим типам объектов:
 ```{r}
-oceans = st_read('../r-geo-course/data/ne/oceans.gpkg', quiet = TRUE)
-rivers = st_read('../r-geo-course/data/ne/rivers.gpkg', quiet = TRUE)
-lakes = st_read('../r-geo-course/data/ne/lakes.gpkg', quiet = TRUE)
-cities = st_read('../r-geo-course/data/ne/cities.gpkg', quiet = TRUE)
+db = '../r-geo-course/data/ne.gpkg'
+oceans = st_read(db, 'ocean')
+rivers = st_read(db, 'rivers_lake_centerlines', quiet = TRUE)
+lakes = read_sf(db, 'lakes')
+cities = read_sf(db, 'populated_places')
 ```
 
-> Параметр `quiet = TRUE` отключает вывод информации о загруженных данных.
+> Параметр `quiet = TRUE` отключает вывод информации о загруженных данных. Функция `read_sf()` делает это по умолчанию.
 
 ---
 
@@ -279,7 +280,7 @@ class(countries)
 
 Геометрия пространственных объектов хранится в одном из столбцов. В данном случае он имеет название `geometry`:
 ```{r, collapse = TRUE}
-head(countries['geometry'])
+head(countries['geom'])
 ```
 
 ---
@@ -472,7 +473,8 @@ __Валовой региональный продукт по континент
 
 ```{r grp, eval = F}
 continents = countries %>%
-  filter(., st_is_valid(.)) |>
+  # filter(., st_is_valid(.)) |>
+  # st_make_valid() |> 
   group_by(continent) |>  
   summarise(gdp = sum(gdp_md_est))
 plot(continents['gdp'])
@@ -1388,6 +1390,8 @@ write_stars(greenland, 'data/world/greenland.tif')
 ---
 
 class: center, middle
+
+# Пространственная привязка
 
 ---
 

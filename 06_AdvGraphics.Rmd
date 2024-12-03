@@ -63,7 +63,8 @@ trades = lapply(tables, function(X) { # прочтем несколько таб
   filter(str_detect(indic_et, 'Exports in|Imports in')) |> 
   pivot_wider(names_from = indic_et, values_from = values) |> 
   rename(export = `Exports in million of ECU/EURO`, # дадим им краткие названия
-         import = `Imports in million of ECU/EURO`) |> 
+         import = `Imports in million of ECU/EURO`,
+         time = TIME_PERIOD) |> 
   mutate(partner = as.factor(partner))
 
 trades # посмотрим, что получилось
@@ -416,7 +417,8 @@ filter(trade_russia, time >= as.Date('2013-01-01')) |>
 trades_type = trades |> 
   group_by(sitc06, time) |> 
   summarise(export = sum(export),
-            import = sum(import))
+            import = sum(import)) |> 
+  arrange(sitc06, time)
 
 ggplot(trades_type) + 
     geom_point(mapping = aes(
@@ -426,6 +428,9 @@ ggplot(trades_type) +
       ), 
       alpha = 0.5
     ) +
+    geom_path(mapping = aes(
+      x = export,  y = import, group = sitc06
+    )) +
     coord_flip()
 ```
 ]
@@ -442,16 +447,15 @@ ggplot(trades_type) +
 .left-40[
 Логарифмирование:
 ```{r log, eval=F}
-ggplot(
-  trades_type, 
-  mapping = aes(
-    x = export, 
-    y = import, 
+ggplot(trades_type) + 
+  geom_point(mapping = aes(
+    x = export, y = import, 
     color = sitc06, 
     size = time
-  )
-) + 
-  geom_point(alpha = 0.5) +
+  ), alpha = 0.5) +
+  geom_path(mapping = aes(
+      x = export,  y = import, group = sitc06
+  )) +
   scale_x_log10() +
   scale_y_log10()
 ```
@@ -552,12 +556,13 @@ options(scipen = 999)
 ggplot(trades_type) + 
   geom_point(
     mapping = aes(
-      x = export, 
-      y = import, 
+      x = export, y = import, 
       color = sitc06, 
       size = time
-    ),
-    alpha = 0.5
+    ),alpha = 0.5
+  ) + 
+  geom_path(mapping = aes(
+    x = export,  y = import, group = sitc06)
   ) +
   labs(color = "Вид продукции", 
        size = 'Год') +
@@ -582,16 +587,14 @@ ggplot(trades_type) +
 .code-small[
 ```{r axes2, eval=F}
 brks = seq(0, 500000, 100000)
-ggplot(
-  trades_type, 
-  mapping = aes(
-    x = export, 
-    y = import, 
-    color = sitc06, 
-    size = time
-  )
-) + 
-  geom_point(alpha = 0.5) +
+ggplot(trades_type) + 
+  geom_point(mapping = aes(
+    x = export, y = import, 
+    color = sitc06, size = time
+  ), alpha = 0.5) +
+  geom_path(mapping = aes(
+    x = export,  y = import, group = sitc06)
+  ) +
   scale_x_log10(
     breaks = brks,
     labels = brks / 1000
@@ -616,16 +619,14 @@ ggplot(
 .left-40[
 Диапазоны по осям и выделение
 ```{r ranges, eval=F}
-ggplot(
-  trades_type, 
-  mapping = aes(
-    x = export, 
-    y = import, 
-    color = sitc06, 
-    size = time
-  )
-) + 
-  geom_point(alpha = 0.5) +
+ggplot(trades_type) + 
+  geom_point(mapping = aes(
+    x = export, y = import, 
+    color = sitc06, size = time
+  ), alpha = 0.5) +
+  geom_path(mapping = aes(
+    x = export,  y = import, group = sitc06)
+  ) +
   lims(color = 'Food, drinks and tobacco') +
   xlim(0, 75000) +
   ylim(30000, 75000)
@@ -729,7 +730,7 @@ ggplot(trades_type,
            size = 0.1) +
   geom_point(alpha = 0.5) +
   annotate("text", 
-           x = 175000, y = 190000, 
+           x = 350000, y = 80000, 
            label = "Chemicals", 
            color = 'coral')
 ```

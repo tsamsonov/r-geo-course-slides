@@ -4,8 +4,8 @@
     <title>Основы статистики в R</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2023-10-17" />
-    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2024-10-15" />
+    <script src="libs/header-attrs-2.27/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2023-10-17
+### 2024-10-15
 ]
 
 ---
@@ -39,7 +39,7 @@ class: center, middle, inverse, title-slide
 Используемые пакеты:
 
 
-```r
+``` r
 library(tidyverse)
 library(googlesheets4)
 library(ggrepel)
@@ -176,7 +176,7 @@ head(countdf)
 
 Приведем выгруженные ранее данные ВВП к аккуратному виду, избавившись от множества столбцов с годом измерения. Сразу получим данные за 2015 год для анализа:
 
-```r
+``` r
 gdpdf_tidy = gdpdf |&gt; 
    pivot_longer(cols = `1764`:`2018`, names_to = 'year', values_to = 'gdp',
                 names_transform = list(year = as.integer)) |&gt; 
@@ -206,7 +206,7 @@ gdpdf_tidy = gdpdf |&gt;
 .pull-left[
 Строится через `geom_histogram()`:
 
-```r
+``` r
 ggplot(gdpdf15, aes(x = gdp)) + 
   geom_histogram()
 ```
@@ -218,7 +218,7 @@ ggplot(gdpdf15, aes(x = gdp)) +
 Ширина кармана через `binwidth`:
 .code-small[
 
-```r
+``` r
 ggplot(gdpdf15, aes(x = gdp)) + 
   geom_histogram(
     binwidth = 5000, size = 0.2,
@@ -237,7 +237,7 @@ ggplot(gdpdf15, aes(x = gdp)) +
 .pull-left[
 Данные по продолжительности жизни:
 
-```r
+``` r
 lifedf_tidy = lifedf |&gt; 
   pivot_longer(
     cols = `1800`:`2016`, 
@@ -257,7 +257,7 @@ lifedf15 = filter(lifedf_tidy,
 .pull-right[
 .code-small[
 
-```r
+``` r
 ggplot(lifedf15, aes(x = lifexp)) + 
   geom_histogram(
     binwidth = 2, color = 'black', 
@@ -277,7 +277,7 @@ ggplot(lifedf15, aes(x = lifexp)) +
 
 .pull-left[
 
-```r
+``` r
 ggplot(gdpdf15, aes(x = gdp)) + 
   geom_density(color = 'black', 
     fill = 'steelblue', alpha = 0.5)
@@ -288,7 +288,7 @@ ggplot(gdpdf15, aes(x = gdp)) +
 
 .pull-right[
 
-```r
+``` r
 ggplot(lifedf15, aes(x = lifexp)) + 
   geom_density(color = 'black', 
     fill = 'olivedrab', alpha = 0.5)
@@ -306,7 +306,7 @@ ggplot(lifedf15, aes(x = lifexp)) +
 .pull-left[
 .code-small[
 
-```r
+``` r
 ggplot(gdpdf15, aes(x = gdp)) + 
   geom_histogram(aes(y = stat(density)), fill = 'grey', color = 'black', size = 0.1) +
   geom_density(color = 'black', fill = 'steelblue', alpha = 0.5)
@@ -319,7 +319,7 @@ ggplot(gdpdf15, aes(x = gdp)) +
 .pull-right[
 .code-small[
 
-```r
+``` r
 ggplot(lifedf15, aes(x = lifexp)) + 
   geom_histogram(aes(y = stat(density)), fill = 'grey', color = 'black', size = 0.1) +
   geom_density(color = 'black', fill = 'olivedrab', alpha = 0.5)
@@ -357,7 +357,7 @@ tab = gdpdf_tidy |&gt;
 
 .pull-right[
 
-```r
+``` r
 (tab15 = tab |&gt;  
   filter(year == 2015) |&gt; 
   drop_na())
@@ -387,7 +387,7 @@ tab = gdpdf_tidy |&gt;
 .pull-left[
 .code-small[
 
-```r
+``` r
 ggplot(tab15, 
        aes(x = gdp, y = stat(density), weight = pop/sum(pop))) + 
   geom_histogram(binwidth = 5000, fill = 'grey', color = 'black', size = 0.1) +
@@ -401,7 +401,7 @@ ggplot(tab15,
 .pull-right[
 .code-small[
 
-```r
+``` r
 ggplot(tab15, 
        aes(x = lifexp, y = stat(density), weight = pop/sum(pop))) + 
   geom_histogram(binwidth = 2.5, fill = 'grey', color = 'black', size = 0.1) +
@@ -420,7 +420,7 @@ ggplot(tab15,
 Для комбинации по цвету можно задать `fill ` в эстетике:
 .code-small[
 
-```r
+``` r
 tab85 = tab |&gt; filter(year %in%  c(1965, 2015)) |&gt; drop_na()
 ```
 ]
@@ -428,7 +428,7 @@ tab85 = tab |&gt; filter(year %in%  c(1965, 2015)) |&gt; drop_na()
 .pull-left[
 .code-small[
 
-```r
+``` r
 ggplot(tab85, aes(x = gdp, 
            fill = factor(year), 
            weight = pop/sum(pop))) + 
@@ -442,7 +442,7 @@ ggplot(tab85, aes(x = gdp,
 .pull-right[
 .code-small[
 
-```r
+``` r
 ggplot(tab85, aes(x = lifexp, 
            fill = factor(year), 
            weight = pop/sum(pop))) + 
@@ -491,7 +491,7 @@ countries = countdf |&gt;
 
 .pull-left[
 
-```r
+``` r
 ggplot(tabreg, 
        aes(x = Region, y = gdp)) +
   geom_boxplot() + coord_flip()
@@ -502,7 +502,7 @@ ggplot(tabreg,
 
 .pull-right[
 
-```r
+``` r
 ggplot(tabreg, 
        aes(x = Region, y = lifexp)) +
   geom_boxplot() + coord_flip()
@@ -517,7 +517,7 @@ ggplot(tabreg,
 ## Агрегированные статистики
 
 
-```r
+``` r
 (tabreg |&gt; 
   group_by(Region) |&gt; 
   summarise(gdp_mean = mean(gdp),
@@ -544,7 +544,7 @@ ggplot(tabreg,
 Проверка на равенство средних
 .code-small[
 
-```r
+``` r
 t.test(tabreg |&gt; dplyr::filter(Region == 'africa_sub_saharan') |&gt; pull(gdp),
        tabreg |&gt; dplyr::filter(Region == 'europe_west') |&gt; pull(gdp))
 ## 
@@ -568,7 +568,7 @@ t.test(tabreg |&gt; dplyr::filter(Region == 'africa_sub_saharan') |&gt; pull(gdp
 Проверка на равенство средних
 .code-small[
 
-```r
+``` r
 t.test(tabreg |&gt; dplyr::filter(Region == 'africa_sub_saharan') |&gt; pull(lifexp),
        tabreg |&gt; dplyr::filter(Region == 'europe_west') |&gt; pull(lifexp))
 ## 
@@ -592,7 +592,7 @@ t.test(tabreg |&gt; dplyr::filter(Region == 'africa_sub_saharan') |&gt; pull(lif
 Проверка на равенство средних
 .code-small[
 
-```r
+``` r
 t.test(tabreg |&gt; dplyr::filter(Region == 'america_north') |&gt; pull(gdp),
        tabreg |&gt; dplyr::filter(Region == 'america_south') |&gt; pull(gdp))
 ## 
@@ -616,7 +616,7 @@ t.test(tabreg |&gt; dplyr::filter(Region == 'america_north') |&gt; pull(gdp),
 Проверка на равенство средних
 .code-small[
 
-```r
+``` r
 t.test(tabreg |&gt; dplyr::filter(Region == 'america_north') |&gt; pull(lifexp),
        tabreg |&gt; dplyr::filter(Region == 'america_south') |&gt; pull(lifexp))
 ## 
@@ -640,7 +640,7 @@ t.test(tabreg |&gt; dplyr::filter(Region == 'america_north') |&gt; pull(lifexp),
 Проверка на равенство дисперсий:
 .code-small[
 
-```r
+``` r
 var.test(tabreg |&gt; dplyr::filter(Region == 'europe_east') |&gt; pull(gdp),
        tabreg |&gt; dplyr::filter(Region == 'europe_west') |&gt; pull(gdp))
 ## 
@@ -664,7 +664,7 @@ var.test(tabreg |&gt; dplyr::filter(Region == 'europe_east') |&gt; pull(gdp),
 Проверка на равенство дисперсий:
 .code-small[
 
-```r
+``` r
 var.test(tabreg |&gt; dplyr::filter(Region == 'europe_east') |&gt; pull(lifexp),
        tabreg |&gt; dplyr::filter(Region == 'europe_west') |&gt; pull(lifexp))
 ## 
@@ -687,7 +687,7 @@ var.test(tabreg |&gt; dplyr::filter(Region == 'europe_east') |&gt; pull(lifexp),
 
 .pull-left[
 
-```r
+``` r
 ggplot(tabreg, 
        aes(gdp, lifexp)) +
   geom_point()
@@ -705,7 +705,7 @@ ggplot(tabreg,
 
 .pull-left[
 
-```r
+``` r
 options(scipen = 999)
 ggplot(tabreg, 
        aes(gdp, lifexp)) +
@@ -724,7 +724,7 @@ ggplot(tabreg,
 
 .pull-left[
 
-```r
+``` r
 options(scipen = 999)
 ggplot(tabreg, 
        aes(gdp, lifexp, 
@@ -747,7 +747,7 @@ ggplot(tabreg,
 .pull-left[
 .code-small[
 
-```r
+``` r
 tablab = tabreg |&gt; # табличка для подписей
   filter(pop &gt; 1e8 | 
     gdp == min(gdp) | 
@@ -783,7 +783,7 @@ ggplot(tabreg, aes(gdp, lifexp,
 Строится через `geom_density_2d()`:
 .code-small[
 
-```r
+``` r
 ggplot(tabreg, aes(gdp, lifexp)) +
   geom_point(alpha = 0.5) +
   geom_density_2d()+
@@ -805,7 +805,7 @@ ggplot(tabreg, aes(gdp, lifexp)) +
 Строится через `geom_density_2d()`:
 .code-small[
 
-```r
+``` r
 ggplot(tabreg, aes(gdp, lifexp)) +
   stat_density_2d(
     geom = "raster", 
@@ -835,7 +835,7 @@ ggplot(tabreg, aes(gdp, lifexp)) +
 .pull-left[
 .code-small[
 
-```r
+``` r
 ggplot(tabreg, aes(gdp, lifexp)) +
   geom_bin2d(bins = 10)+
   geom_point(alpha = 0.5) +
@@ -851,7 +851,7 @@ ggplot(tabreg, aes(gdp, lifexp)) +
 .pull-right[
 .code-small[
 
-```r
+``` r
 ggplot(tabreg, aes(gdp, lifexp)) +
   geom_hex(bins = 10) +
   geom_point(alpha = 0.5) +
@@ -871,7 +871,7 @@ ggplot(tabreg, aes(gdp, lifexp)) +
 
 Коэффициент корреляции Пирсона через `cor.test()`:
 
-```r
+``` r
 cor.test(tabreg$gdp, tabreg$lifexp)
 ## 
 ## 	Pearson's product-moment correlation
@@ -892,7 +892,7 @@ cor.test(tabreg$gdp, tabreg$lifexp)
 
 Предварительное логарифмирование:
 
-```r
+``` r
 cor.test(log(tabreg$gdp), tabreg$lifexp)
 ## 
 ## 	Pearson's product-moment correlation
@@ -913,7 +913,7 @@ cor.test(log(tabreg$gdp), tabreg$lifexp)
 
 Оценка параметров линейных моделей осуществляется с помощью функции `lm()`:
 
-```r
+``` r
 model = lm(lifexp ~ log(gdp), data = tabreg)
 summary(model)
 ## 
@@ -944,7 +944,7 @@ summary(model)
 
 .pull-left[
 
-```r
+``` r
 df = tibble(lifexp = fitted(model),
             gdp = tabreg$gdp)
               
@@ -970,7 +970,7 @@ ggplot(tabreg, aes(gdp, lifexp)) +
 .pull-left[
 __ggplot__ содержит геометрию `geom_smooth()`:
 
-```r
+``` r
 ggplot(tabreg, aes(gdp, lifexp)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = 'lm',

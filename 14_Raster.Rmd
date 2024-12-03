@@ -28,11 +28,10 @@ knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300, cr
 library(sf)
 library(stars)
 library(geosphere)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(terra)
 library(tidyterra)
+library(whitebox)
 library(ggnewscale)
 options(scipen = 999)
 ```
@@ -243,7 +242,8 @@ ggplot() +
 .pull-left[
 Высоты:
 ```{r dem1, eval=F}
-dem = rast('../r-geo-course/data/dem_fergana.tif')
+setwd('/Users/tsamsonov/GitHub/r-geo-course/data')
+dem = rast('dem_fergana.tif')
 
 ggplot() +
   geom_spatraster(data = dem) +
@@ -407,6 +407,180 @@ ggplot() +
 ```{r, ref.label='shade3', echo=F}
 ```
 ]
+
+---
+
+## Гидрологический анализ ЦМР
+
+**Гидрологический анализ ЦМР** --- совокупность методов обработки ЦМР, связанных с анализом и моделированием геометрических условий распределения поверхностного стока.
+
+Распространенные задачи гидрологического анализа включают:
+
+1.  Определение направлений стока.
+2.  Вычисление площади водосбора.
+3.  Построение сети потенциальных водотоков.
+4.  Построение границ бассейнов.
+
+> Для гидрологического анализа играют очень важную роль процедуры предварительной подготовки ЦМР, такие как *устранение ошибочных замкнутых локальных понижений*.
+
+---
+
+## Направление и аккумуляция стока
+
+```{r}
+setwd('/Users/tsamsonov/GitHub/r-geo-course/data')
+wbt_flow_accumulation_full_workflow(
+  dem       = 'dem_fergana.tif',
+  out_dem   = 'fill.tif', # ЦМР без замкнутых понижений
+  out_pntr  = 'dir.tif',  # Направления стока по D8
+  out_accum = 'acc.tif',  # Аккумуляция стока
+  out_type = 'ca'         # Тип аккумуляции: площадь водосбора
+)
+
+fill = rast('fill.tif')
+dir = rast('dir.tif')
+acc = rast('acc.tif')
+```
+
+---
+
+## Направление и аккумуляция стока
+
+.pull-left[
+```{r flowdir, eval=F}
+levels(dir) = data.frame(
+  value = c(0, 2^(0:7)), 
+  desc = c('NA', 'NE', 'E', 'SE', 
+           'S', 'SW', 'W', 'NW', 'N')
+)
+
+ggplot() +
+  geom_spatraster(data = dir) +
+  scale_fill_manual(values = rev(rainbow(9))) +
+  labs(title = 'Направление стока', 
+       fill = '')
+```
+]
+
+.pull-right[
+```{r, ref.label='flowdir', echo=F}
+```
+]
+
+---
+
+## Направление и аккумуляция стока
+
+.pull-left[
+```{r flowacc, eval=F}
+ggplot() +
+  geom_spatraster(data = acc / 10^9) +
+  scale_fill_gradient(low = 'white', high = 'black', trans = 'log') +
+  labs(title = 'Аккумуляция стока (площадь)', 
+       fill = expression(Тыс.~км^2))
+```
+]
+
+.pull-right[
+```{r, ref.label='flowacc', echo=F}
+```
+]
+
+---
+
+## Потенциальные водотоки
+
+Выделяются по растрам направления и аккумуляции стока
+```{r}
+setwd('/Users/tsamsonov/GitHub/r-geo-course/data')
+wbt_extract_streams(
+  flow_accum = 'acc.tif',
+  output = 'str.tif',
+  threshold = 1e8 ## 100 кв.км.
+)
+wbt_raster_streams_to_vector(
+  streams = 'str.tif',
+  d8_pntr = 'dir.tif',
+  output = 'streams.shp',
+)
+streams = read_sf('streams.shp') |> 
+  st_set_crs(crs(dem, proj=TRUE))
+```
+
+---
+
+## Потенциальные водотоки
+
+.pull-left[
+```{r streams, eval=F}
+ggplot() +
+  geom_spatraster(data = dem) +
+  geom_sf(data = streams, 
+          color = 'deepskyblue4') +
+  scale_fill_hypso_c() +
+  labs(title = expression(Потенциальные~водотоки~(A~`>`~100~км^2)), 
+       fill = 'Высота, [м]')
+```
+]
+
+.pull-right[
+```{r, ref.label='streams', echo=F}
+```
+]
+
+---
+
+## Водосборные бассейны
+
+Генрируются для указанных точек по растру направлений стока
+```{r}
+setwd('/Users/tsamsonov/GitHub/r-geo-course/data')
+wbt_watershed(
+ d8_pntr = 'dir.tif',
+ pour_pts = 'pour_pts.shp',
+ output = 'wsh.tif'
+)
+wbt_raster_to_vector_polygons(
+ input = 'wsh.tif', 
+ output = 'watersheds.shp'
+)
+
+watersheds = read_sf('watersheds.shp') |> 
+  st_set_crs(crs(dem, proj=TRUE))
+
+pour_pts = read_sf('pour_pts.shp') |> 
+  st_set_crs(crs(dem, proj=TRUE))
+```
+
+---
+
+## Водосборные бассейны
+
+.pull-left[
+```{r watersheds, eval=F}
+ggplot() +
+  geom_spatraster(data = dem) +
+  scale_fill_hypso_c() +
+  labs(title = 'Бассейны', 
+       fill = 'Высота, [м]') +
+  ggnewscale::new_scale_fill() +
+  geom_sf(data = watersheds, 
+          mapping = aes(fill = factor(FID)), 
+          linewidth = 1, color = 'black', 
+          alpha = 0.5, show.legend = FALSE) +
+  geom_sf(data = streams, 
+          color = 'deepskyblue4') +
+  geom_sf(data = pour_pts, size = 2, 
+          fill = 'white', shape = 21,
+          stroke = 1.5)
+```
+]
+
+.pull-right[
+```{r, ref.label='watersheds', echo=F}
+```
+]
+
 
 ---
 

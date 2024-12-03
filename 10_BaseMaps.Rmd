@@ -288,6 +288,100 @@ map + coord_sf(crs = "+proj=moll")
 
 ---
 
+## Проблема 180 меридиана
+
+```{r fig.height=4, out.height='400px'}
+ggplot() +
+  geom_sf(data = lyr110$coast, size = 0.4, color = 'steelblue4') + 
+  coord_sf(crs = "+proj=moll")
+```
+
+---
+
+## Проблема 180 меридиана
+
+```{r}
+for (i in seq_along(lyr110$coast$geometry)) {
+  geom = lyr110$coast$geometry[[i]]
+  for (j in 1:nrow(geom)) {
+    xy = geom[j, ]
+    if (xy[1] < -180 || xy[1] > 180 || xy[2] < -90 || xy[2] > 90) {
+      cat('Incorrect point coordinates: ', paste(xy), '\n')
+    }
+  }
+}
+```
+
+---
+
+## Проблема 180 меридиана
+
+```{r}
+for (i in seq_along(lyr110$coast$geometry)) {
+  geom = lyr110$coast$geometry[[i]]
+  for (j in 1:nrow(geom)) {
+    xy = geom[j, ]
+    if (xy[1] < -180) {
+      lyr110$coast$geometry[[i]][j, 1] = -180
+    }
+    if (xy[1] > 180) {
+      lyr110$coast$geometry[[i]][j, 1] = 180
+    }
+    if (xy[2] < -90) {
+      lyr110$coast$geometry[[i]][j, 1] = -90
+    }
+    if (xy[2] > 90) {
+      lyr110$coast$geometry[[i]][j, 1] = 90
+    }
+      
+  }
+}
+```
+
+---
+
+## Проблема 180 меридиана
+
+```{r fig.height=4, out.height='400px'}
+ggplot() +
+  geom_sf(data = lyr110$coast, size = 0.4, color = 'steelblue4') + 
+  coord_sf(crs = "+proj=moll")
+```
+
+---
+
+## Проблема 180 меридиана
+
+Пересоберем карту с исправленным слоем:
+
+.code-small[
+```{r}
+basemap = list(
+  geom_sf(data = lyr110$countries, color = NA, 
+          mapping = aes(fill = as.factor(mapcolor7)), 
+          show.legend = FALSE),
+  scale_fill_manual(values = brewer.pal(7, 'Set2')),
+  geom_sf(data = lyr110$borders, size = 0.2),
+  geom_sf(data = lyr110$ocean, fill = 'azure', color = NA),
+  geom_sf(data = lyr110$coast, size = 0.4, color = 'steelblue4'),
+  geom_sf(data = lyr110$megacities, shape = 21, 
+          fill = 'white', stroke = 0.75, size = 2)
+)
+map = ggplot() +
+  basemap +
+  geom_label_repel(data = lyr110$megacities, stat = "sf_coordinates",
+                  aes(label = NAME, geometry = geometry), 
+                  size = 3, 
+                  label.size = NA, 
+                  label.padding=.1, 
+                  fill = alpha("white", 0.7), 
+                  family = 'Open Sans', fontface = 'bold') +
+  theme_void()
+```
+]
+
+---
+
 ## Проекции
 
 Проекция __Эккерта III__:

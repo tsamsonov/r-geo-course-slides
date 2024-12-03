@@ -1,0 +1,501 @@
+---
+title: "Тематические карты"
+subtitle: "Визуализация и анализ географических данных на языке R"
+author: "Тимофей Самсонов"
+institute: "МГУ имени Ломоносова, Географический факультет"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: [default, "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+---
+
+```{r setup, echo = FALSE, purl = FALSE, cache = FALSE, include=FALSE}
+library(datasets)
+knitr::knit_hooks$set(crop = knitr::hook_pdfcrop)
+knitr::opts_knit$set(global.par = TRUE)
+knitr::opts_chunk$set(warning=FALSE, collapse=TRUE, message = FALSE, dpi=300, crop = T)
+```
+
+## Пакеты
+
+Для выполнения кода данной лекции вам понадобятся следующие пакеты:
+```{r}
+library(sf)
+library(stars)
+library(tmap)
+library(readxl)
+library(geodata) # загрузка данных
+library(mapview)
+library(classInt)
+library(gapminder)
+library(dplyr)
+library(googlesheets4)
+library(rnaturalearth)
+options(scipen = 999)
+```
+
+---
+
+## Исходные данные
+
+```{r, cache=T}
+ne = '/Volumes/Data/Spatial/Natural Earth/natural_earth_vector.gpkg'
+
+countries = st_read(ne, 'ne_110m_admin_0_countries', quiet = T)
+coast =  st_read(ne, 'ne_110m_coastline', quiet = T)
+ocean = st_read(ne, 'ne_110m_ocean', quiet = T)
+cities = st_read(ne, 'ne_110m_populated_places', quiet = T)
+rivers = st_read(ne, 'ne_110m_rivers_lake_centerlines', quiet = T)
+lakes = st_read(ne, 'ne_110m_lakes', quiet = T)
+# land = st_read(ne, 'ne_110m_land', quiet = T)
+borders = st_read(ne, 'ne_110m_admin_0_boundary_lines_land', quiet = T)
+
+lyr = lst(ocean, coast, countries, 
+          rivers, lakes, cities, borders)
+```
+
+---
+
+## Данные WorldClim
+
+```{r, cache=TRUE, fig.height=20}
+prec = geodata::worldclim_global(var = "prec", res = 10, path = tempdir()) |> 
+  st_as_stars() |>  # преобразуем в stars для удобства работы
+  rename(prec = 1)
+plot(prec) # это 12-канальный растр
+```
+
+---
+
+## Данные WorldClim
+
+Проекция Миллера:
+
+```{r, cache = TRUE}
+precp = prec |> 
+  st_warp(crs = "+proj=mill")
+
+lyrp = lapply(lyr, st_transform, crs = "+proj=mill") # Цилиндрическая проекция Миллера
+```
+
+---
+
+## Данные WorldClim
+
+Визуализируем полученные данные на карте:
+```{r jan, eval = F}
+ramp = colorRampPalette(c("white", "violetred"))
+
+# Визуализируем данные на январь:
+plot(precp[,,,1],
+     main = 'Количество осадков в январе, мм',
+     reset = FALSE) # разрешаем добавлять объекты на карту.
+
+plot(st_geometry(lyrp$ocean), border = 'steelblue', 
+     col = 'lightblue', add = TRUE)
+
+```
+
+---
+
+## Данные WorldClim
+
+Визуализируем полученные данные на карте:
+
+```{r, ref.label='jan', echo=F, out.height='400px'}
+```
+
+---
+
+## Пакет tmap
+
+Пакет __tmap__ предоставляет простой в использовании и достаточно мощный механизм формирования тематических карт. Шаблон построения карты в этом пакете напоминает _ggplot_ и выглядит следующим образом:
+```{r eval=FALSE}
+tm_shape(<DATA>) +
+  tm_<METHOD>(<PARAMETERS>)
+```
+
+где:
+
+- `DATA` - объект пространственного типа (`sf`, `sp`, `stars` или `raster`)
+- `METHOD` - метод визуализации этого объекта (способ изображения)
+- `PARAMETERS` - параметры метода
+
+---
+
+## Полигональные объекты
+
+.left-40[
+```{r pol, eval = F}
+tm_shape(lyrp$countries) +
+   # качественная переменная
+  tm_polygons('ECONOMY') +
+tm_shape(lyrp$ocean)+
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.right-60[
+```{r, ref.label='pol', echo=F}
+```
+]
+
+---
+
+## Количественный фон / картограммы
+
+__Количественный фон__ или __картограммы__ получаются через `tm_polygons()`:
+
+```{r cart, eval = F, cache=TRUE}
+lifexp = WDI::WDI(indicator = 'SP.DYN.LE00.IN')
+gap = read_excel('../r-geo-course/data/gapminder.xlsx', 2)
+lifedf = left_join(gap, 
+                   filter(lifexp, year == 2016), 
+                   by = c('name' = 'country')) |>
+  rename(lifexp = SP.DYN.LE00.IN) |> 
+  mutate(geo = stringr::str_to_upper(geo))
+coun = lyrp$countries |> 
+  left_join(lifedf, by = c('ADM0_A3' = 'geo'))
+
+tm_shape(coun) +
+  tm_polygons('lifexp', col = 'gray20') + # количественная переменная
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue4')
+```
+
+---
+
+## Количественный фон / картограммы
+
+```{r, ref.label='cart', echo=F, out.height='400px'}
+```
+
+---
+
+## Картодиаграммы
+
+Для реализации способа __картодиаграмм__ используется геометрия `tm_bubbles()`. Чтобы оставить отображение границ полигонов, нам необходимо к одной геометрии применить несколько способов изображения:
+
+```{r cardi, eval = F}
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue') +
+tm_shape(lyrp$countries) +
+  tm_fill(fill = 'white') +
+  tm_borders(col = 'grey') +
+  tm_bubbles('GDP_MD', 
+             size.scale = tm_scale_continuous(5),
+             fill = 'red', 
+             fill.alpha = 0.5) # количественная переменная
+```
+
+---
+
+## Картодиаграммы
+
+```{r, ref.label='cardi', echo=F, out.height='400px'}
+```
+
+---
+
+## Значки
+
+Значковый способ реализуется аналогично картодиграммам. Например, крупнейшие города:
+
+```{r pts, eval = F}
+tm_shape(lyrp$countries) +
+  tm_fill(fill = 'white') +
+  tm_borders(col = 'grey') +
+tm_shape(lyrp$ocean) +
+  tm_fill(fill = 'lightblue') +
+  tm_borders(col = 'steelblue') +
+tm_shape(lyrp$cities) +
+  tm_bubbles('POP2015', fill = 'olivedrab', fill.alpha = 0.8)
+```
+
+---
+
+## Значки
+
+```{r, ref.label='pts', echo=F, out.height='400px'}
+```
+
+---
+
+## Надписи
+
+__Надписи__ объектов на карте размещаются с помощью функции `tm_text`. Дополним предыдущую карту названиями городов:
+
+```{r text, eval = F}
+tm_shape(lyrp$countries) +
+  tm_fill(fill = 'white') +
+  tm_borders(col = 'grey') +
+tm_shape(lyrp$ocean) +
+  tm_fill(fill = 'lightblue') +
+  tm_borders(col = 'steelblue') +
+tm_shape(lyrp$cities) +
+  tm_bubbles('POP2015', fill = 'olivedrab', fill.alpha = 0.8) +
+  tm_text('NAME_RU', size = 0.5,
+          options = opt_tm_text(remove.overlap = TRUE,
+                                point.label.gap = 100,
+                                just = c('left', 'bottom')))
+```
+
+
+---
+
+## Надписи
+
+```{r, ref.label='text', echo=F, out.height='400px'}
+```
+
+---
+
+## Растровые данные
+
+При отображении растровых данных используется способ отображения `tm_raster()`.
+
+.pull-left[
+```{r rast, eval = F}
+tm_shape(precp[,,,1]) +
+    tm_raster('prec',
+      col.scale = tm_scale_intervals(
+          breaks = c(10, 50, 100, 
+                   200, 500, 1000),
+          values = ramp(5)
+      ),
+      col.legend = tm_legend(
+        title = "Осадки", reverse = TRUE,
+        position = tm_pos_out("left")
+      )
+    ) +
+tm_shape(lyrp$ocean) +
+  tm_fill(fill = 'lightblue') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.pull-right[
+```{r, ref.label='rast', echo = F, out.height='400px'}
+```
+]
+
+---
+
+## Растровые данные
+
+Также растровые данные можно отображать в категориальном режиме
+
+.pull-left[
+```{r rastcat, eval = F}
+data(land, package = 'tmap')
+
+tm_shape(land) +
+  tm_raster('cover')
+```
+]
+
+.pull-right[
+```{r, ref.label='rastcat', echo = F, out.height='400px'}
+```
+]
+
+
+---
+
+## Цветовые шкалы
+
+.pull-left[
+Удобным инструментом подбора шкалы является функция `palette_explorer()` из пакета __tmaptools__:
+
+```{r, eval=FALSE}
+tmaptools::palette_explorer()
+```
+]
+
+.pull-right[
+```{r, echo = F}
+knitr::include_graphics('../r-geo-course/images/palette_explorer.png')
+```
+]
+
+---
+
+## Цветовые шкалы
+
+.pull-left[
+Категориальная палитра _Dark2_:
+```{r categ, eval=F}
+tm_shape(lyrp$countries) +
+  tm_polygons('ECONOMY', 
+              palette = 'Dark2') + 
+tm_shape(lyrp$ocean)+
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.pull-right[
+```{r, ref.label='categ', echo = F, out.height='400px'}
+```
+]
+
+---
+
+## Цветовые шкалы
+
+.pull-left[
+Последовательная палитра _PuBuGn_:
+```{r seq, eval=F}
+tm_shape(precp[,,,1]) +
+    tm_raster('prec',
+      col.scale = tm_scale_intervals(
+          breaks = c(10, 50, 100, 
+                   200, 500, 1000),
+          values = 'brewer.pu_bu_gn'
+      ),
+      col.legend = tm_legend(
+        title = "Осадки", reverse = TRUE,
+        position = tm_pos_out("left")
+      )) +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'lightblue') +
+  tm_borders(col = 'steelblue')
+```
+]
+
+.pull-right[
+```{r, ref.label='seq', echo = F}
+```
+]
+                  
+---
+
+## Цветовые шкалы
+
+.pull-left[
+Вручную подобранные категориальные цвета:
+```{r mancat, eval=F}
+pal = c("#003200", "#3C9600", "#006E00", 
+        "#556E19", "#00C800", "#8CBE8C",
+		   "#467864", "#B4E664", "#9BC832", 
+		   "#EBFF64", "#F06432", "#9132E6",
+		   "#E664E6", "#9B82E6", "#B4FEF0", 
+		   "#646464", "#C8C8C8", "#FF0000",
+		   "#FFFFFF", "#5ADCDC")
+
+tm_shape(land) +
+  tm_raster('cover', 
+    col.scale = tm_scale_categorical(values = pal)
+  )
+
+```
+]
+
+.pull-right[
+```{r, ref.label='mancat', echo = F}
+```
+]
+
+---
+
+## Классификации
+
+.pull-left[
+С классификациями объектов удобно работать через пакет `classInt`:
+```{r classint, eval=FALSE}
+nclasses = 5
+intervals = classIntervals(
+  countries$POP_EST,
+  n = nclasses, 
+  style = "jenks"
+)
+plot(intervals, 
+     pal = ramp(nclasses), 
+     cex=0.5, 
+     main = "Естественные интервалы")
+```
+]
+
+.pull-right[
+```{r, ref.label='classint', echo=F}
+```
+]
+
+---
+
+## Классификации
+
+Также классификацию можно выполнять непосредственно при визуализации Ряд функций отображения имеют следующие параметры:
+
+- `n` --- количество классов
+- `style` --- метод классификации (так же как и в `classIntervals()`)
+- `breaks` --- значения границ интервалов (необходимы, если `style == fixed`)
+- `interval.closure` --- замыкание интервала (по умолчанию стоит `left`, что означает, что в интервал включается нижняя граница, за исключением последнего интервала, включающего и нижнюю и верхнюю границу) 
+- `midpoint` --- нейтральное значение, которое используется для сопоставления с центральным цветом в расходящихся цветовых палитрах
+
+---
+
+## Компоновки
+
+Пакет tmap позволяет делать достаточно разнообразные настройки компоновки. Большинство из них осуществляется посредством `tm_layout()`:
+
+.pull-left[
+.code-small[
+```{r}
+map = tm_shape(coun, projection = '+proj=moll') +
+  tm_polygons('lifexp', 
+              palette = 'YlGn',
+              n = 4,
+              style = 'jenks',
+              border.col = 'gray20', 
+              title = 'Лет',
+              colorNA = 'lightgray',
+              textNA = 'Нет данных',
+              legend.reverse = TRUE,
+              legend.format = 
+                list(text.separator = '—')) +
+tm_shape(lyrp$ocean) +
+  tm_fill(col = 'azure') +
+  tm_borders(col = 'steelblue4')
+```
+]
+]
+
+.pull-right[
+.code-small[
+```{r mapfin, eval = F}
+map +
+  tm_layout(frame = FALSE,
+          main.title.position = 0.22,
+          legend.outside = TRUE,
+          legend.outside.position = 'right',
+          fontfamily = 'Open Sans',
+          main.title.size = 1.2,
+          main.title = 'Продолжительность жизни',
+          legend.bg.color = 'white',
+          outer.margins = c(0.02, 0.05, 0.02, 0.02),
+          inner.margins = c(0.02, 0.02, 0.07, 0.02)) +
+tm_graticules(x = seq(-150, 150, by = 30),
+        y = seq(-60, 60, by = 30),
+        lwd = 0.2,
+        col = "black")
+```
+]
+]
+
+---
+
+## Компоновки
+
+```{r, echo=F, ref.label='mapfin'}
+```
+
+

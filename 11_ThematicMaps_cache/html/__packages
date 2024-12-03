@@ -11,3 +11,5 @@ gapminder
 dplyr
 googlesheets4
 rnaturalearth
+terra
+geodata

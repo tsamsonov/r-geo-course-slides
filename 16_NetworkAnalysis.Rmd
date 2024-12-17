@@ -319,45 +319,15 @@ ggplot() +
 ```
 ]
 
-
----
-
-## Структурный анализ
-
-```{r}
-lines = roads |> 
-  st_cast('LINESTRING')
-
-twoway = lines |>
-  filter(is.na(ONEWAY) | ONEWAY != 'yes') |>
-  st_reverse() |>
-  bind_rows(lines)
-
-net = twoway |>
-  st_geometry() |>
-  lapply(function(x) round(x, 0)) |>
-  st_sfc(crs = st_crs(roads)) |>
-  as_sfnetwork()
-```
-
----
-
-## Структурный анализ
-
-Результирующий граф
-
-```{r}
-net
-```
-
 ---
 
 ## Структурный анализ
 
 .pull-left[
-Визуализируем
+Готовый граф из пакета __sfnetworks__
 
 ```{r autopl, eval=F}
+net = as_sfnetwork(roxel)
 autoplot(net)
 ```
 ]
@@ -403,7 +373,6 @@ ggplot() +
 .pull-left[
 .code-small[
 ```{r clos, eval = F}
-net = as_sfnetwork(roxel)
 net = net |> 
   activate("nodes") |> 
   mutate(cc = 
@@ -418,7 +387,7 @@ ggplot() +
   scale_fill_viridis_c(option="magma") +
   scale_size(range = c(1.5, 4)) +
   guides(size = guide_legend(reverse=T)) +
-  ggtitle("Центральность по промежуточности")
+  ggtitle("Центральность по близости")
 ```
 ]
 ]
@@ -427,5 +396,67 @@ ggplot() +
 ```{r, echo=FALSE, message=FALSE, warning = FALSE, ref.label='clos'}
 ```
 ]
+
+---
+
+## Структурный анализ
+
+**Центральность по степени** показывает количество ребер, с которыми связана вершина. Локальная характеристика, которая показывает важность вершины в ее собственной окрестности
+
+.pull-left[
+.code-small[
+```{r degree, eval = F}
+net = net |> 
+  activate("nodes") |> 
+  mutate(dc = centrality_degree(mode = 'total'))
+
+ggplot() +
+  geom_sf(data = st_as_sf(net, "edges"), col = "grey50") +
+  geom_sf(data = st_as_sf(net, "nodes"), 
+          aes(fill = dc, size = dc), shape = 21) +
+  scale_fill_viridis_c(option="magma") +
+  scale_size(range = c(1.5, 4)) +
+  guides(size = guide_legend(reverse=T)) +
+  theme_void()
+```
+]
+]
+
+.pull-right[
+```{r, echo=FALSE, message=FALSE, warning = FALSE, ref.label='degree'}
+```
+]
+
+---
+
+## Структурный анализ
+
+**Центральность по влиятельности** показывает сумму степеней вершин, с которыми связана текущая вершина. Позволяет выделить области графа, в которых наблюдается сложная топология сети
+
+.pull-left[
+.code-small[
+```{r infl, eval = F}
+net = net |> 
+  activate("nodes") |> 
+  mutate(ec = centrality_eigen())
+
+ggplot() +
+  geom_sf(data = st_as_sf(net, "edges"), col = "grey50") +
+  geom_sf(data = st_as_sf(net, "nodes"), 
+          aes(fill = ec, size = ec), shape = 21) +
+  scale_fill_viridis_c(option="magma") +
+  scale_size(range = c(1.5, 4)) +
+  guides(size = guide_legend(reverse=T)) +
+  theme_void()
+```
+]
+]
+
+.pull-right[
+```{r, echo=FALSE, message=FALSE, warning = FALSE, ref.label='infl'}
+```
+]
+
+
 
 

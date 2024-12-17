@@ -4,8 +4,8 @@
     <title>Сетевой анализ</title>
     <meta charset="utf-8" />
     <meta name="author" content="Тимофей Самсонов" />
-    <meta name="date" content="2023-12-19" />
-    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2024-12-17" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" type="text/css" />
   </head>
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### МГУ имени Ломоносова, Географический факультет
 ]
 .date[
-### 2023-12-19
+### 2024-12-17
 ]
 
 ---
@@ -38,7 +38,7 @@ class: center, middle, inverse, title-slide
 
 Для выполнения кода данной лекции вам понадобятся следующие пакеты:
 
-```r
+``` r
 library(sf)
 library(tidyverse)
 library(classInt)
@@ -55,7 +55,7 @@ options(scipen = 999)
 ## Исходные данные
 
 
-```r
+``` r
 db = '../r-geo-course/data/moscow.gpkg'
 roads = read_sf(db, "roads") # Дороги
 poi = read_sf(db, "poi") # Точки интереса
@@ -81,7 +81,7 @@ poi_food = poi |&gt;
 .pull-left[
 .code-small[
 
-```r
+``` r
 stations$label = 'M'
 basemap = function(add = FALSE) {
   if (add == FALSE) 
@@ -108,7 +108,7 @@ basemap = function(add = FALSE) {
 ]
 .pull-right[
 
-```r
+``` r
 basemap()
 ```
 
@@ -120,7 +120,7 @@ basemap()
 ## Зоны транспортной доступности
 
 
-```r
+``` r
 WGS84 = st_crs(4326) # Инициализируем WGS84, используемую в OSRM
 
 UTM = st_crs(poi) # Система координат исходных точек
@@ -148,7 +148,7 @@ selected_poi = poi_food[service_area_utm, ]
 
 .pull-left[
 
-```r
+``` r
 basemap()
 mf_base(service_area_utm,
      col = adjustcolor(
@@ -177,7 +177,7 @@ mf_base(psel |&gt; st_geometry(),
 ## Кратчайшие маршруты
 
 
-```r
+``` r
 # Выбираем и проецируем начальную точку
 origin = poi |&gt; filter(NAME == 'Молодая Гвардия')
 origin_wgs = st_transform(origin, WGS84)
@@ -203,7 +203,7 @@ destination$label = 'D'
 .pull-left[
 .code-small[
 
-```r
+``` r
 basemap()
 mf_base(route_utm, lwd = 3,
      col = "orange", add = TRUE)
@@ -231,7 +231,7 @@ mf_label(destination, var = "label",
 **Задача коммивояжера** --- определение оптимального маршрута объезда заданного множества точек
 
 
-```r
+``` r
 sber = poi |&gt;  
   filter(OSM_ID %in% c(2298789061, 1705988219, 
                        1531266598, 916076946, 2043705976)) %&gt;% 
@@ -250,7 +250,7 @@ route = osrmTrip(sber, overview = "full")[[1]]$trip |&gt;
 .pull-left[
 .code-small[
 
-```r
+``` r
 ggplot() + 
   geom_sf(data = roads, 
           color = 'grey', linewidth = 0.25) +
@@ -282,7 +282,7 @@ ggplot() +
 
 .pull-left[
 
-```r
+``` r
 bars = poi_food |&gt; 
  filter(AMENITY %in% c('bar', 'pub')) %&gt;% 
   bind_cols(st_coordinates(x = .)) |&gt; 
@@ -295,12 +295,13 @@ odmatrix = osrmTable(src = bars_wgs,
         osrm.profile	= 'foot')$durations
         # пешеходы
 best = apply(odmatrix, 1, which.min)
+
 ```
 ]
 
 .pull-right[
 
-```r
+``` r
 connects = st_sfc(
   lapply(seq_along(best), \(i) {
     st_linestring(
@@ -321,7 +322,7 @@ connects = st_sfc(
 
 .pull-left[
 
-```r
+``` r
 ggplot() + 
   geom_sf(data = roads, color = 'grey', 
           linewidth = 0.25) +
@@ -342,78 +343,22 @@ ggplot() +
 ![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
 ]
 
-
----
-
-## Структурный анализ
-
-
-```r
-lines = roads |&gt; 
-  st_cast('LINESTRING')
-
-twoway = lines |&gt;
-  filter(is.na(ONEWAY) | ONEWAY != 'yes') |&gt;
-  st_reverse() |&gt;
-  bind_rows(lines)
-
-net = twoway |&gt;
-  st_geometry() |&gt;
-  lapply(function(x) round(x, 0)) |&gt;
-  st_sfc(crs = st_crs(roads)) |&gt;
-  as_sfnetwork()
-```
-
----
-
-## Структурный анализ
-
-Результирующий граф
-
-
-```r
-net
-## # A sfnetwork with 2133 nodes and 2825 edges
-## #
-## # CRS:  WGS 84 / UTM zone 37N 
-## #
-## # A directed multigraph with 223 components with spatially explicit edges
-## #
-## # A tibble: 2,133 × 1
-##                  x
-##        &lt;POINT [m]&gt;
-## 1 (410948 6177750)
-## 2 (410947 6177750)
-## 3 (411054 6177640)
-## 4 (410947 6177557)
-## 5 (410978 6179110)
-## 6 (410947 6179112)
-## # ℹ 2,127 more rows
-## #
-## # A tibble: 2,825 × 3
-##    from    to                                                                  x
-##   &lt;int&gt; &lt;int&gt;                                                   &lt;LINESTRING [m]&gt;
-## 1     1     2                                   (410948 6177750, 410947 6177750)
-## 2     3     4 (411054 6177640, 411046 6177634, 411011 6177606, 410957 6177564, …
-## 3     5     6                   (410978 6179110, 410948 6179112, 410947 6179112)
-## # ℹ 2,822 more rows
-```
-
 ---
 
 ## Структурный анализ
 
 .pull-left[
-Визуализируем
+Готовый граф из пакета __sfnetworks__
 
 
-```r
+``` r
+net = as_sfnetwork(roxel)
 autoplot(net)
 ```
 ]
 
 .pull-right[
-![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
 ]
 
 
@@ -425,7 +370,7 @@ autoplot(net)
 
 .pull-left[
 
-```r
+``` r
 net = net |&gt; 
   activate("edges") |&gt; 
   mutate(weight = edge_length(),
@@ -440,7 +385,7 @@ ggplot() +
 ]
 
 .pull-right[
-![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -452,8 +397,7 @@ ggplot() +
 .pull-left[
 .code-small[
 
-```r
-net = as_sfnetwork(roxel)
+``` r
 net = net |&gt; 
   activate("nodes") |&gt; 
   mutate(cc = 
@@ -468,7 +412,67 @@ ggplot() +
   scale_fill_viridis_c(option="magma") +
   scale_size(range = c(1.5, 4)) +
   guides(size = guide_legend(reverse=T)) +
-  ggtitle("Центральность по промежуточности")
+  ggtitle("Центральность по близости")
+```
+]
+]
+
+.pull-right[
+![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Структурный анализ
+
+**Центральность по степени** показывает количество ребер, с которыми связана вершина. Локальная характеристика, которая показывает важность вершины в ее собственной окрестности
+
+.pull-left[
+.code-small[
+
+``` r
+net = net |&gt; 
+  activate("nodes") |&gt; 
+  mutate(dc = centrality_degree(mode = 'total'))
+
+ggplot() +
+  geom_sf(data = st_as_sf(net, "edges"), col = "grey50") +
+  geom_sf(data = st_as_sf(net, "nodes"), 
+          aes(fill = dc, size = dc), shape = 21) +
+  scale_fill_viridis_c(option="magma") +
+  scale_size(range = c(1.5, 4)) +
+  guides(size = guide_legend(reverse=T)) +
+  theme_void()
+```
+]
+]
+
+.pull-right[
+![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Структурный анализ
+
+**Центральность по влиятельности** показывает сумму степеней вершин, с которыми связана текущая вершина. Позволяет выделить области графа, в которых наблюдается сложная топология сети
+
+.pull-left[
+.code-small[
+
+``` r
+net = net |&gt; 
+  activate("nodes") |&gt; 
+  mutate(ec = centrality_eigen())
+
+ggplot() +
+  geom_sf(data = st_as_sf(net, "edges"), col = "grey50") +
+  geom_sf(data = st_as_sf(net, "nodes"), 
+          aes(fill = ec, size = ec), shape = 21) +
+  scale_fill_viridis_c(option="magma") +
+  scale_size(range = c(1.5, 4)) +
+  guides(size = guide_legend(reverse=T)) +
+  theme_void()
 ```
 ]
 ]
@@ -476,6 +480,8 @@ ggplot() +
 .pull-right[
 ![](16_NetworkAnalysis_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
 ]
+
+
 
 
     </textarea>
